@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="447.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.MyScene">
+    <children>
+        <Button fx:id="btnSay" layoutX="116.0" layoutY="126.0" mnemonicParsing="false" onMouseClicked="#btnSayClick"
+                text="say hello"/>
+        <TextField fx:id="btnTextField" layoutX="116.0" layoutY="194.0"/>
+    </children>
+</AnchorPane>
