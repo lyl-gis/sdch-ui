@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;

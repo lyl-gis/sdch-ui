@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch.ui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class MainPage implements Initializable, Allpages, AllParams {
+public class MainPage implements Initializable, AllPages, AllParams {
 
     @FXML
     private Button choosefile;
@@ -29,7 +29,7 @@ public class MainPage implements Initializable, Allpages, AllParams {
     @FXML
     void choose(ActionEvent event) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        File file = directoryChooser.showDialog(p1.mainstage);
+        File file = directoryChooser.showDialog(AllPages.mainStage);
         String path = file.getPath();//选择的文件夹路径
     }
 
@@ -66,14 +66,14 @@ public class MainPage implements Initializable, Allpages, AllParams {
         MyCategory c3 = new MyCategory(1, 1, "添加");
         MyCategory c4 = new MyCategory(1, 1, "删除");
         MyCategory c5 = new MyCategory(1, 1, "管理");
-        a1.manageCategory.Addcategory(c1);
-        a1.manageCategory.Addcategory(c2);
-        a1.manageCategory.Addcategory(c3);
-        a1.manageCategory.Addcategory(c4);
-        a1.manageCategory.Addcategory(c5);
-        // a1.manageCategory.Allallcategorydescribe(a1.manageCategory.allcategory);
+        AllParams.manageCategory.Addcategory(c1);
+        AllParams.manageCategory.Addcategory(c2);
+        AllParams.manageCategory.Addcategory(c3);
+        AllParams.manageCategory.Addcategory(c4);
+        AllParams.manageCategory.Addcategory(c5);
+        // AllParams.manageCategory.Allallcategorydescribe(AllParams.manageCategory.allcategory);
         cb.setItems(FXCollections.observableArrayList(
-                a1.manageCategory.Allallcategorydescribe(a1.manageCategory.allcategory)));
+                AllParams.manageCategory.Allallcategorydescribe(AllParams.manageCategory.allcategory)));
         Tuceng.setItems(FXCollections.observableArrayList(
                 "图层1", "图层2", "图层3"));
 //        cbsy.setItems(FXCollections.observableArrayList(
@@ -87,11 +87,11 @@ public class MainPage implements Initializable, Allpages, AllParams {
     @FXML
     void datapreview(ActionEvent event) throws IOException {
         //跳转到数据预览页面
-        Parent root = FXMLLoader.load(getClass().getResource("Datapreview.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("DataPreview.fxml"));
         Scene scene = new Scene(root);
-        p1.datapreviewstage.setTitle("数据预览");
-        p1.datapreviewstage.setScene(scene);
-        p1.datapreviewstage.show();
+        AllPages.dataPreviewStage.setTitle("数据预览");
+        AllPages.dataPreviewStage.setScene(scene);
+        AllPages.dataPreviewStage.show();
     }
 
 
@@ -208,31 +208,31 @@ public class MainPage implements Initializable, Allpages, AllParams {
                     if (newVal == "添加") {
                         Parent root = null;
                         try {
-                            root = FXMLLoader.load(getClass().getResource("Managetucengpro.fxml"));
+                            root = FXMLLoader.load(getClass().getResource("CategoryManager.fxml"));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         Scene scene = new Scene(root);
-                        p1.managetucengpro.setTitle("增加分类体系");
-                        p1.managetucengpro.setScene(scene);
-                        p1.managetucengpro.show();
+                        AllPages.categoryMangageStage.setTitle("增加分类体系");
+                        AllPages.categoryMangageStage.setScene(scene);
+                        AllPages.categoryMangageStage.show();
                         System.out.println("1");
-                        //a1.manageCategory.Addcategory(Managetucengpro.MySureAdd());
+                        //AllParams.manageCategory.Addcategory(CategoryManager.MySureAdd());
                         System.out.println("运行到断点");
-//                        a1.mtg.SureAdd();
-//                        a1.mtg.cateid.setText("1");
-//                        a1.mtg.parcateid.setText("2");
-//                        a1.mtg.catedes.setText("3");
-//                        Integer id1=Integer.parseInt(a1.mtg.cateid.getText());
-//                        Integer id2=Integer.parseInt(a1.mtg.parcateid.getText());
-//                        String  des=a1.mtg.catedes.getText();
+//                        AllParams.mtg.SureAdd();
+//                        AllParams.mtg.cateid.setText("1");
+//                        AllParams.mtg.parcateid.setText("2");
+//                        AllParams.mtg.catedes.setText("3");
+//                        Integer id1=Integer.parseInt(AllParams.mtg.cateid.getText());
+//                        Integer id2=Integer.parseInt(AllParams.mtg.parcateid.getText());
+//                        String  des=AllParams.mtg.catedes.getText();
 //                        MyCategory newcate= new MyCategory(id1,id2,des);
 //                        MyCategory newcate= new MyCategory(1,2,"自己的数据");
-//                        a1.manageCategory.Addcategory(newcate);
+//                        AllParams.manageCategory.Addcategory(newcate);
 //                        System.out.println("已添加");
 //                        System.out.println("添加成功");
 //                        cb.setItems(FXCollections.observableArrayList(
-//                                a1.manageCategory.Allallcategorydescribe(a1.manageCategory.allcategory) ));
+//                                AllParams.manageCategory.Allallcategorydescribe(AllParams.manageCategory.allcategory) ));
 //                        System.out.println("3");
                     }
                     if (newVal == "删除") {
@@ -243,11 +243,11 @@ public class MainPage implements Initializable, Allpages, AllParams {
                             e.printStackTrace();
                         }
                         Scene scene = new Scene(root);
-                        p1.managetucengpro.setTitle("删除分类体系");
-                        p1.managetucengpro.setScene(scene);
-                        p1.managetucengpro.show();
+                        AllPages.categoryMangageStage.setTitle("删除分类体系");
+                        AllPages.categoryMangageStage.setScene(scene);
+                        AllPages.categoryMangageStage.show();
                         System.out.println("1");
-                        //a1.manageCategory.Addcategory(Managetucengpro.MySureAdd());
+                        //AllParams.manageCategory.Addcategory(CategoryManager.MySureAdd());
                         System.out.println("运行到断点");
                     }
                     if (newVal == "管理") {
@@ -258,11 +258,11 @@ public class MainPage implements Initializable, Allpages, AllParams {
                             e.printStackTrace();
                         }
                         Scene scene = new Scene(root);
-                        p1.managetucengpro.setTitle("删除分类体系");
-                        p1.managetucengpro.setScene(scene);
-                        p1.managetucengpro.show();
+                        AllPages.categoryMangageStage.setTitle("删除分类体系");
+                        AllPages.categoryMangageStage.setScene(scene);
+                        AllPages.categoryMangageStage.show();
                         System.out.println("1");
-                        //a1.manageCategory.Addcategory(Managetucengpro.MySureAdd());
+                        //AllParams.manageCategory.Addcategory(CategoryManager.MySureAdd());
                         System.out.println("运行到断点");
                     }
                 }

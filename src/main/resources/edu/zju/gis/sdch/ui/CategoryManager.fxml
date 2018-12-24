@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane prefHeight="245.0" prefWidth="325.0" xmlns="http://javafx.com/javafx/8.0.171"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.Managetucengpro">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.CategoryManager">
     <children>
         <Label layoutX="32.0" layoutY="60.0" prefHeight="23.0" prefWidth="96.0" text="输入类别ID"/>
         <TextField fx:id="cateid" layoutX="117.0" layoutY="60.0" prefHeight="23.0" prefWidth="161.0" promptText="类别ID"/>

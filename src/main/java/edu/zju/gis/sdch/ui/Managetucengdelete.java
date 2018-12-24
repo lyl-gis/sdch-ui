@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch.ui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

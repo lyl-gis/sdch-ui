@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch.ui;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;

@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch.ui;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
-public class Managetucengpro implements AllParams {
+public class CategoryManager implements AllParams {
 
     @FXML
     public TextField cateid;
@@ -27,12 +27,12 @@ public class Managetucengpro implements AllParams {
         Integer id2 = Integer.parseInt(parcateid.getText());
         String des = catedes.getText();
         MyCategory newcate = new MyCategory(id1, id2, des);
-        a1.manageCategory.Addcategory(newcate);
+        AllParams.manageCategory.Addcategory(newcate);
         System.out.println("已添加");
         System.out.println("HHHHHHH");
-        a1.mp.cb.setItems(FXCollections.observableArrayList(
-                a1.manageCategory.Allallcategorydescribe(a1.manageCategory.allcategory)));
-        System.out.println(a1.mp.cb.getItems());
+        AllParams.mp.cb.setItems(FXCollections.observableArrayList(
+                AllParams.manageCategory.Allallcategorydescribe(AllParams.manageCategory.allcategory)));
+        System.out.println(AllParams.mp.cb.getItems());
     }
 
     public void SureAdd() {

@@ -1,10 +1,12 @@
 package edu.zju.gis.sdch;
 
 import edu.zju.gis.sdch.config.CommonSetting;
+import edu.zju.gis.sdch.ui.AllPages;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -47,13 +49,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        BorderPane root = FXMLLoader.load(getClass().getResource("scene/MainScene.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("ui/MainPage.fxml"));
         Scene scene = new Scene(root);
-        setMenu(root, primaryStage);
-//        Scene scene = new Scene(root, 300, 275);
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        AllPages.mainStage.setTitle("数据导入");
+        AllPages.mainStage.setScene(scene);
+        AllPages.mainStage.show();
     }
 
     private void setMenu(BorderPane root, Stage primaryStage) {

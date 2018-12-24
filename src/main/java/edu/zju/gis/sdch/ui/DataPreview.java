@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch.ui;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class Datapreview implements Allpages, Initializable {
+public class DataPreview implements AllPages, Initializable {
     @FXML
     private Button Dataimport;
     @FXML
@@ -35,9 +35,9 @@ public class Datapreview implements Allpages, Initializable {
         Parent root = FXMLLoader.load(getClass().getResource("Failedlog.fxml"));
         System.out.println("无法加载fxml文件");
         Scene scene = new Scene(root);
-        p1.failedlogstage.setTitle("入库失败记录");
-        p1.failedlogstage.setScene(scene);
-        p1.failedlogstage.show();
+        AllPages.failedLogStage.setTitle("入库失败记录");
+        AllPages.failedLogStage.setScene(scene);
+        AllPages.failedLogStage.show();
     }
 
     public void initialize(URL location, ResourceBundle resources) {
