@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.MainPage">
+    <children>
+        <Button fx:id="choosefile" layoutX="42.0" layoutY="49.0" mnemonicParsing="false" onAction="#choose"
+                text="选择文件路径"/>
+        <ChoiceBox fx:id="cb" layoutX="225.0" layoutY="49.0" prefHeight="23.0" prefWidth="117.0" value="选择数据类型"/>
+
+        <TableView fx:id="tableview" editable="true" layoutX="42.0" layoutY="95.0" prefHeight="249.0" prefWidth="529.0">
+            <columns>
+                <TableColumn fx:id="onecolumn" prefWidth="75.0" text="fieldname"/>
+                <TableColumn fx:id="twocolumn" prefWidth="75.0" text="fieldtype"/>
+                <TableColumn fx:id="ifanalyzable" prefWidth="75.0" text="analyzable"/>
+                <TableColumn fx:id="boost" prefWidth="75.0" text="boost"/>
+                <TableColumn fx:id="ifused" prefWidth="75.0" text="是否选用"/>
+                <TableColumn fx:id="description" prefWidth="75.0" text="description"/>
+                <TableColumn fx:id="nameother" prefWidth="75.0" text="映射名"/>
+            </columns>
+        </TableView>
+        <Button fx:id="Datapreview" layoutX="383.0" layoutY="357.0" mnemonicParsing="false" onAction="#datapreview"
+                text="数据预览"/>
+        <!--<Label layoutX="430.0" layoutY="53.0" text="索引名称" />-->
+        <!--<TextField layoutX="491.0" layoutY="49.0" prefHeight="23.0" prefWidth="76.0" />-->
+        <RadioButton layoutX="102.0" layoutY="360.0" mnemonicParsing="false" text="是否跳过空间范围为空的纪录"/>
+        <ChoiceBox fx:id="Tuceng" layoutX="454.0" layoutY="49.0" prefHeight="23.0" prefWidth="117.0"/>
+        <Label layoutX="158.0" layoutY="53.0" text="分类体系"/>
+        <Label layoutX="390.0" layoutY="53.0" text="选择图层"/>
+        <!--<ChoiceBox fx:id="cbsy" layoutX="344.0" layoutY="49.0" prefWidth="150.0" />-->
+    </children>
+</AnchorPane>
