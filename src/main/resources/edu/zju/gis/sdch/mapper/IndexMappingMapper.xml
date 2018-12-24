@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.zju.gis.sdch.mapper.IndexMappingMapper">
+    <resultMap id="BaseResultMap" type="edu.zju.gis.sdch.model.IndexMapping">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="INDICE" jdbcType="VARCHAR" property="indice"/>
+        <result column="FIELD_NAME" jdbcType="VARCHAR" property="fieldName"/>
+        <result column="FIELD_TYPE" jdbcType="VARCHAR" property="fieldType"/>
+        <result column="BOOST" jdbcType="FLOAT" property="boost"/>
+        <result column="ANALYZABLE" jdbcType="BIT" property="analyzable"/>
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        ID,
+        INDICE,
+        FIELD_NAME,
+        FIELD_TYPE,
+        BOOST,
+        ANALYZABLE,
+        DESCRIPTION,
+        CREATE_TIME
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_index_mapping
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByIndice" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_index_mapping
+        where INDICE = #{indice,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from tb_index_mapping
+        where ID = #{id,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteByIndice" parameterType="string">
+        delete
+        from tb_index_mapping
+        where INDICE = #{indice,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="edu.zju.gis.sdch.model.IndexMapping">
+        <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+            SELECT uuid() AS ID
+        </selectKey>
+        insert into tb_index_mapping (ID, INDICE, FIELD_NAME,
+        FIELD_TYPE, BOOST, ANALYZABLE,
+        DESCRIPTION, CREATE_TIME)
+        values (#{id,jdbcType=VARCHAR}, #{indice,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR},
+        #{fieldType,jdbcType=VARCHAR}, #{boost,jdbcType=FLOAT}, #{analyzable,jdbcType=BIT},
+        #{description,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="edu.zju.gis.sdch.model.IndexMapping">
+        insert into tb_index_mapping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="indice != null">
+                INDICE,
+            </if>
+            <if test="fieldName != null">
+                FIELD_NAME,
+            </if>
+            <if test="fieldType != null">
+                FIELD_TYPE,
+            </if>
+            <if test="boost != null">
+                BOOST,
+            </if>
+            <if test="analyzable != null">
+                ANALYZABLE,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="indice != null">
+                #{indice,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldName != null">
+                #{fieldName,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldType != null">
+                #{fieldType,jdbcType=VARCHAR},
+            </if>
+            <if test="boost != null">
+                #{boost,jdbcType=FLOAT},
+            </if>
+            <if test="analyzable != null">
+                #{analyzable,jdbcType=BIT},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertByBatch" parameterType="collection">
+        insert into tb_index_mapping (ID, INDICE, FIELD_NAME,
+        FIELD_TYPE, BOOST, ANALYZABLE,
+        DESCRIPTION, CREATE_TIME)
+        values
+        <foreach collection="list" item="item" separator=",">
+            ((select uuid() as id), #{item.indice,jdbcType=VARCHAR}, #{item.fieldName,jdbcType=VARCHAR},
+            #{item.fieldType,jdbcType=VARCHAR}, #{item.boost,jdbcType=FLOAT}, #{item.analyzable,jdbcType=BIT},
+            #{item.description,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="edu.zju.gis.sdch.model.IndexMapping">
+        update tb_index_mapping
+        <set>
+            <if test="indice != null">
+                INDICE = #{indice,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldName != null">
+                FIELD_NAME = #{fieldName,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldType != null">
+                FIELD_TYPE = #{fieldType,jdbcType=VARCHAR},
+            </if>
+            <if test="boost != null">
+                BOOST = #{boost,jdbcType=FLOAT},
+            </if>
+            <if test="analyzable != null">
+                ANALYZABLE = #{analyzable,jdbcType=BIT},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="edu.zju.gis.sdch.model.IndexMapping">
+        update tb_index_mapping
+        set INDICE      = #{indice,jdbcType=VARCHAR},
+            FIELD_NAME  = #{fieldName,jdbcType=VARCHAR},
+            FIELD_TYPE  = #{fieldType,jdbcType=VARCHAR},
+            BOOST       = #{boost,jdbcType=FLOAT},
+            ANALYZABLE  = #{analyzable,jdbcType=BIT},
+            DESCRIPTION = #{description,jdbcType=VARCHAR},
+            CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+</mapper>

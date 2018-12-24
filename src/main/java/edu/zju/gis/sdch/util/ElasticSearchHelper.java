@@ -1,21 +1,17 @@
-package edu.zju.gis.util;
+package edu.zju.gis.sdch.util;
 
-import edu.zju.gis.config.CommonSetting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
@@ -26,6 +22,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -36,7 +33,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -48,24 +44,6 @@ import java.util.concurrent.ExecutionException;
 public final class ElasticSearchHelper implements Closeable {
     private static final Logger log = LogManager.getLogger(ElasticSearchHelper.class);
     private Client client;
-
-    private static class InstanceHolder {
-        static ElasticSearchHelper instance;
-
-        static {
-            CommonSetting setting = CommonSetting.getInstance();
-            try {
-                instance = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
-            } catch (IOException e) {
-                log.error("ElasticSearchHelper初始化失败", e);
-                throw new RuntimeException("ElasticSearchHelper初始化失败", e);
-            }
-        }
-    }
-
-    public static ElasticSearchHelper getInstance() {
-        return InstanceHolder.instance;
-    }
 
     public ElasticSearchHelper(List<String> hosts, int port, String clusterName) throws UnknownHostException {
         Settings settings = Settings.builder()
@@ -97,7 +75,7 @@ public final class ElasticSearchHelper implements Closeable {
         return client.admin().indices().exists(new IndicesExistsRequest(index)).actionGet().isExists();
     }
 
-    public boolean exists(String index, String types) {
+    public boolean exists(String index, String... types) {
         return client.admin().indices().prepareTypesExists(index).setTypes(types).get().isExists();
     }
 
@@ -117,28 +95,33 @@ public final class ElasticSearchHelper implements Closeable {
         return client.admin().indices().create(new CreateIndexRequest(index).settings(settings)).actionGet().isAcknowledged();
     }
 
-    public boolean createIfNotExist(String index, int shards, int replicas, Map<String, String> mappings) throws IOException {
-        if (exists(index))
-            return true;
-        XContentBuilder settings = XContentFactory.jsonBuilder().startObject()
-                .startObject("analysis")
-                .startObject("analyzer")
-                .startObject("ik_max_word").field("tokenizer", "ik_max_word").endObject()
-                .startObject("ik_smart").field("tokenizer", "ik_smart").endObject()
-                .endObject()
-                .endObject()
-                .field("number_of_shards", shards)
-                .field("number_of_replicas", replicas)
-                .endObject();
-        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
-        for (Map.Entry<String, String> mapping : mappings.entrySet()) {
-            request.mapping(mapping.getKey(), mapping.getValue(), XContentType.JSON);
+    public boolean createIfNotExist(String index, int shards, int replicas, String mapping) throws IOException {
+        if (!exists(index)) {
+            XContentBuilder settings = XContentFactory.jsonBuilder().startObject()
+                    .startObject("analysis")
+                    .startObject("analyzer")
+                    .startObject("ik_max_word").field("tokenizer", "ik_max_word").endObject()
+                    .startObject("ik_smart").field("tokenizer", "ik_smart").endObject()
+                    .endObject()
+                    .endObject()
+                    .field("number_of_shards", shards)
+                    .field("number_of_replicas", replicas)
+                    .endObject();
+            CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+            boolean ack = client.admin().indices().create(request).actionGet().isAcknowledged();
+            if (!ack)
+                return false;
         }
-        return client.admin().indices().create(request).actionGet().isAcknowledged();
+        return putMapping(index, "_doc", mapping);
     }
 
-    public AcknowledgedResponse putMapping(String indice, String type, String source) {
-        return client.admin().indices().preparePutMapping(indice).setType(type).setSource(source, XContentType.JSON).get();
+    public boolean putMapping(String indice, String type, String source) {
+        return client.admin().indices().preparePutMapping(indice).setType(type).setSource(source, XContentType.JSON).get().isAcknowledged();
+    }
+
+    public long getDocCount(String indice, String type) {
+        SearchResponse response = client.prepareSearch(indice).setQuery(QueryBuilders.typeQuery(type)).setSize(0).get();
+        return response.getHits().getTotalHits();
     }
 
     public List<String> getAsString(String index, String type, int offset, int size) throws ExecutionException, InterruptedException {
@@ -163,12 +146,12 @@ public final class ElasticSearchHelper implements Closeable {
         return map;
     }
 
-    public IndexResponse publish(String index, String type, String source) {
-        return client.prepareIndex(index, type).setSource(source, XContentType.JSON).get();
+    public boolean publish(String index, String type, String source) {
+        return client.prepareIndex(index, type).setSource(source, XContentType.JSON).get().status() == RestStatus.CREATED;
     }
 
-    public IndexResponse publish(String index, String type, String id, String source) {
-        return client.prepareIndex(index, type, id).setSource(source, XContentType.JSON).get();
+    public boolean publish(String index, String type, String id, String source) {
+        return client.prepareIndex(index, type, id).setSource(source, XContentType.JSON).get().status() == RestStatus.CREATED;
     }
 
     /**
@@ -274,8 +257,8 @@ public final class ElasticSearchHelper implements Closeable {
      * @param id      文档ID
      * @param jsonDoc JSON字符串类型的更新内容（只包含更新部分）
      */
-    public UpdateResponse update(String index, String type, String id, String jsonDoc) {
-        return client.prepareUpdate(index, type, id).setDoc(jsonDoc, XContentType.JSON).get();
+    public boolean update(String index, String type, String id, String jsonDoc) {
+        return client.prepareUpdate(index, type, id).setDoc(jsonDoc, XContentType.JSON).get().getGetResult().isExists();
     }
 
     /**
@@ -344,15 +327,16 @@ public final class ElasticSearchHelper implements Closeable {
         return error;
     }
 
-    public UpdateResponse upsert(String index, String type, String id, Map<String, Object> doc) {
-        return client.prepareUpdate(id, type, id).setUpsert(doc).get();
+    public boolean upsert(String index, String type, String id, Map<String, Object> doc) {
+        return client.prepareUpdate(id, type, id).setUpsert(doc).get().getGetResult().isExists();
     }
 
     public int upsert(String index, String type, Map<String, Map<String, Object>> kvIdDoc) {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         int error = 0;
         for (Map.Entry<String, Map<String, Object>> entry : kvIdDoc.entrySet()) {
-            bulkRequest.add(client.prepareUpdate(index, type, entry.getKey()).setUpsert(entry.getValue()));
+            IndexRequest indexRequest = new IndexRequest(index, type, entry.getKey()).source(entry.getValue());
+            bulkRequest.add(client.prepareUpdate(index, type, entry.getKey()).setDoc(entry.getValue()).setUpsert(indexRequest));
         }
         BulkResponse bulkResponse = bulkRequest.get();
         if (bulkResponse.hasFailures()) {
@@ -379,8 +363,8 @@ public final class ElasticSearchHelper implements Closeable {
     }
 
 
-    public DeleteResponse delete(String index, String type, String id) {
-        return client.prepareDelete(index, type, id).get();
+    public boolean delete(String index, String type, String id) {
+        return client.prepareDelete(index, type, id).get().getResult() == DocWriteResponse.Result.DELETED;
     }
 
     public int delete(String index, String type, List<String> idList) {
@@ -398,81 +382,6 @@ public final class ElasticSearchHelper implements Closeable {
     public String getDetail(String index, String type, String docId) {
         GetResponse getResponse = client.prepareGet(index, type, docId).get();
         return getResponse.getSourceAsString();
-    }
-
-
-    public MappingBuilder mappingBuilder(String index) {
-        return new MappingBuilder(index);
-    }
-
-    public class MappingBuilder {
-        private String index;
-        private Map<String, XContentBuilder> mappings;
-
-        public MappingBuilder(String index) {
-            this.index = index;
-            this.mappings = new HashMap<>();
-        }
-
-        /**
-         * 增加索引类型映射
-         *
-         * @param type           索引类型
-         * @param mappingBuilder 字段映射对象
-         */
-        public MappingBuilder build(String type, XContentBuilder mappingBuilder) {
-            this.mappings.put(type, mappingBuilder);
-            return this;
-        }
-
-        /**
-         * 执行创建索引类型映射，对已存在的映射直接跳过
-         */
-        public boolean mapping() {
-            if (!exists(index))
-                throw new RuntimeException("the index `" + index + "` does not exist.");
-            return mappings.entrySet().stream().map(entry -> {
-                //检查索引类型是否已存在
-                if (!client.admin().indices().prepareTypesExists().setIndices(new String[]{index})
-                        .setTypes(entry.getKey()).execute().actionGet().isExists()) {
-                    PutMappingRequest putMappingRequest = new PutMappingRequest(index).type(entry.getKey()).source(entry.getValue());
-                    return client.admin().indices().putMapping(putMappingRequest).actionGet().isAcknowledged();
-                } else
-                    return true;
-            }).reduce((x, y) -> x && y).orElse(true);
-        }
-
-        public boolean mappingfromString(String type, String mappingJson) {
-            if (!exists(index))
-                throw new RuntimeException("the index `" + index + "` does not exist.");
-            if (!client.admin().indices().prepareTypesExists().setIndices(new String[]{index})
-                    .setTypes(type).execute().actionGet().isExists()) {
-                PutMappingRequest putMappingRequest = new PutMappingRequest(index).type(type).source(mappingJson, XContentType.JSON);
-                return client.admin().indices().putMapping(putMappingRequest).actionGet().isAcknowledged();
-            } else return true;
-        }
-    }
-
-    public static XContentBuilder buildStorage() throws IOException {
-        return XContentFactory.jsonBuilder().startObject()
-                .field("dynamic", "false")
-                .startObject("_all").field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").field("term_vector", "no").field("store", true).endObject()
-                .startObject("properties")
-                .startObject("meta_name").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .startObject("data_owner").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .startObject("director").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .startObject("create_time").field("type", "date").field("store", true).field("format", "yyyy-m-d H:m:s||yyyy/m/d H:m:s").endObject()
-                .startObject("storage_type").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .startObject("storage_location").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .startObject("volume").field("type", "long").field("store", true).field("boost", 1.0).endObject()
-                .startObject("column_num").field("type", "integer").field("store", true).endObject()
-                .startObject("start_time").field("type", "date").field("store", true).field("format", "yyyy-m-d H:m:s||yyyy/m/d H:m:s").endObject()
-                .startObject("end_time").field("type", "date").field("store", true).field("format", "yyyy-m-d H:m:s||yyyy/m/d H:m:s").endObject()
-                .startObject("last_update_time").field("type", "date").field("store", true).field("format", "yyyy-m-d H:m:s||yyyy/m/d H:m:s").endObject()
-                .startObject("secret_level").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .startObject("comment").field("type", "text").field("store", true).field("analyzer", "ik_max_word").field("search_analyzer", "ik_smart").endObject()
-                .endObject()
-                .endObject();
     }
 
     public void close() {

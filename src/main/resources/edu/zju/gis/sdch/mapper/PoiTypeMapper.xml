@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.zju.gis.sdch.mapper.PoiTypeMapper">
+    <resultMap id="BaseResultMap" type="edu.zju.gis.sdch.model.PoiType">
+        <id column="CODE" jdbcType="VARCHAR" property="code"/>
+        <result column="P_CODE" jdbcType="VARCHAR" property="pCode"/>
+        <result column="CODE4" jdbcType="VARCHAR" property="code4"/>
+        <result column="NAME" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        CODE,
+        P_CODE,
+        CODE4,
+        NAME
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_poi_type
+        where CODE = #{code,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from tb_poi_type
+        where CODE = #{code,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="edu.zju.gis.sdch.model.PoiType">
+        insert into tb_poi_type (CODE, P_CODE, CODE4,
+                                 NAME)
+        values (#{code,jdbcType=VARCHAR}, #{pCode,jdbcType=VARCHAR}, #{code4,jdbcType=VARCHAR},
+                #{name,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="edu.zju.gis.sdch.model.PoiType">
+        insert into tb_poi_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null">
+                CODE,
+            </if>
+            <if test="pCode != null">
+                P_CODE,
+            </if>
+            <if test="code4 != null">
+                CODE4,
+            </if>
+            <if test="name != null">
+                NAME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="pCode != null">
+                #{pCode,jdbcType=VARCHAR},
+            </if>
+            <if test="code4 != null">
+                #{code4,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="edu.zju.gis.sdch.model.PoiType">
+        update tb_poi_type
+        <set>
+            <if test="pCode != null">
+                P_CODE = #{pCode,jdbcType=VARCHAR},
+            </if>
+            <if test="code4 != null">
+                CODE4 = #{code4,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                NAME = #{name,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where CODE = #{code,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="edu.zju.gis.sdch.model.PoiType">
+        update tb_poi_type
+        set P_CODE = #{pCode,jdbcType=VARCHAR},
+            CODE4  = #{code4,jdbcType=VARCHAR},
+            NAME   = #{name,jdbcType=VARCHAR}
+        where CODE = #{code,jdbcType=VARCHAR}
+    </update>
+</mapper>

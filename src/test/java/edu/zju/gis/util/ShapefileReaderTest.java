@@ -1,6 +1,7 @@
 package edu.zju.gis.util;
 
-import edu.zju.gis.tool.Importer;
+import edu.zju.gis.sdch.tool.Importer;
+import edu.zju.gis.sdch.util.ShapefileReader;
 import org.gdal.gdal.gdal;
 import org.gdal.ogr.Driver;
 import org.gdal.ogr.Feature;

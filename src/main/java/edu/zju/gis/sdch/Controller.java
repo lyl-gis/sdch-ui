@@ -1,4 +1,4 @@
-package edu.zju.gis;
+package edu.zju.gis.sdch;
 
 public class Controller {
 }

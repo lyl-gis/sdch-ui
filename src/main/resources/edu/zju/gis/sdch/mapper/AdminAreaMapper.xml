@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.zju.gis.sdch.mapper.AdminAreaMapper">
+    <resultMap id="BaseResultMap" type="edu.zju.gis.sdch.model.AdminArea">
+        <id column="CODE" jdbcType="VARCHAR" property="code"/>
+        <result column="P_CODE" jdbcType="VARCHAR" property="pCode"/>
+        <result column="NAME" jdbcType="VARCHAR" property="name"/>
+        <result column="ABBREVIATION" jdbcType="VARCHAR" property="abbreviation"/>
+        <result column="FULL_NAME" jdbcType="VARCHAR" property="fullName"/>
+        <result column="LON" jdbcType="DECIMAL" property="lon"/>
+        <result column="LAT" jdbcType="DECIMAL" property="lat"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="edu.zju.gis.sdch.model.AdminArea">
+        <result column="WKT" jdbcType="LONGVARCHAR" property="wkt"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        CODE,
+        P_CODE,
+        NAME,
+        ABBREVIATION,
+        FULL_NAME,
+        LON,
+        LAT
+    </sql>
+    <sql id="Blob_Column_List">
+        WKT
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from tb_admin_area
+        where CODE = #{code,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from tb_admin_area
+        where CODE = #{code,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="edu.zju.gis.sdch.model.AdminArea">
+        insert into tb_admin_area (CODE, P_CODE, NAME,
+                                   ABBREVIATION, FULL_NAME, LON,
+                                   LAT, WKT)
+        values (#{code,jdbcType=VARCHAR}, #{pCode,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+                #{abbreviation,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, #{lon,jdbcType=DECIMAL},
+                #{lat,jdbcType=DECIMAL}, #{wkt,jdbcType=LONGVARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="edu.zju.gis.sdch.model.AdminArea">
+        insert into tb_admin_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null">
+                CODE,
+            </if>
+            <if test="pCode != null">
+                P_CODE,
+            </if>
+            <if test="name != null">
+                NAME,
+            </if>
+            <if test="abbreviation != null">
+                ABBREVIATION,
+            </if>
+            <if test="fullName != null">
+                FULL_NAME,
+            </if>
+            <if test="lon != null">
+                LON,
+            </if>
+            <if test="lat != null">
+                LAT,
+            </if>
+            <if test="wkt != null">
+                WKT,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="pCode != null">
+                #{pCode,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="abbreviation != null">
+                #{abbreviation,jdbcType=VARCHAR},
+            </if>
+            <if test="fullName != null">
+                #{fullName,jdbcType=VARCHAR},
+            </if>
+            <if test="lon != null">
+                #{lon,jdbcType=DECIMAL},
+            </if>
+            <if test="lat != null">
+                #{lat,jdbcType=DECIMAL},
+            </if>
+            <if test="wkt != null">
+                #{wkt,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="edu.zju.gis.sdch.model.AdminArea">
+        update tb_admin_area
+        <set>
+            <if test="pCode != null">
+                P_CODE = #{pCode,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                NAME = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="abbreviation != null">
+                ABBREVIATION = #{abbreviation,jdbcType=VARCHAR},
+            </if>
+            <if test="fullName != null">
+                FULL_NAME = #{fullName,jdbcType=VARCHAR},
+            </if>
+            <if test="lon != null">
+                LON = #{lon,jdbcType=DECIMAL},
+            </if>
+            <if test="lat != null">
+                LAT = #{lat,jdbcType=DECIMAL},
+            </if>
+            <if test="wkt != null">
+                WKT = #{wkt,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where CODE = #{code,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="edu.zju.gis.sdch.model.AdminArea">
+        update tb_admin_area
+        set P_CODE       = #{pCode,jdbcType=VARCHAR},
+            NAME         = #{name,jdbcType=VARCHAR},
+            ABBREVIATION = #{abbreviation,jdbcType=VARCHAR},
+            FULL_NAME    = #{fullName,jdbcType=VARCHAR},
+            LON          = #{lon,jdbcType=DECIMAL},
+            LAT          = #{lat,jdbcType=DECIMAL},
+            WKT          = #{wkt,jdbcType=LONGVARCHAR}
+        where CODE = #{code,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="edu.zju.gis.sdch.model.AdminArea">
+        update tb_admin_area
+        set P_CODE       = #{pCode,jdbcType=VARCHAR},
+            NAME         = #{name,jdbcType=VARCHAR},
+            ABBREVIATION = #{abbreviation,jdbcType=VARCHAR},
+            FULL_NAME    = #{fullName,jdbcType=VARCHAR},
+            LON          = #{lon,jdbcType=DECIMAL},
+            LAT          = #{lat,jdbcType=DECIMAL}
+        where CODE = #{code,jdbcType=VARCHAR}
+    </update>
+</mapper>

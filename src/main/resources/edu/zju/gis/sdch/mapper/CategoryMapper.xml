@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.zju.gis.sdch.mapper.CategoryMapper">
+    <resultMap id="BaseResultMap" type="edu.zju.gis.sdch.model.Category">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="P_ID" jdbcType="VARCHAR" property="pId"/>
+        <result column="FUNC" jdbcType="VARCHAR" property="func"/>
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        ID,
+        P_ID,
+        FUNC,
+        DESCRIPTION
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_category
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from tb_category
+        where ID = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="edu.zju.gis.sdch.model.Category">
+        insert into tb_category (ID, P_ID, FUNC,
+                                 DESCRIPTION)
+        values (#{id,jdbcType=VARCHAR}, #{pId,jdbcType=VARCHAR}, #{func,jdbcType=VARCHAR},
+                #{description,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="edu.zju.gis.sdch.model.Category">
+        insert into tb_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="pId != null">
+                P_ID,
+            </if>
+            <if test="func != null">
+                FUNC,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="pId != null">
+                #{pId,jdbcType=VARCHAR},
+            </if>
+            <if test="func != null">
+                #{func,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="edu.zju.gis.sdch.model.Category">
+        update tb_category
+        <set>
+            <if test="pId != null">
+                P_ID = #{pId,jdbcType=VARCHAR},
+            </if>
+            <if test="func != null">
+                FUNC = #{func,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="edu.zju.gis.sdch.model.Category">
+        update tb_category
+        set P_ID        = #{pId,jdbcType=VARCHAR},
+            FUNC        = #{func,jdbcType=VARCHAR},
+            DESCRIPTION = #{description,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+</mapper>
