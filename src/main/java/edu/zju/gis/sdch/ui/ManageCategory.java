@@ -1,7 +1,6 @@
 package edu.zju.gis.sdch.ui;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class ManageCategory {
 
@@ -17,8 +16,8 @@ public class ManageCategory {
         allcategory.remove(mc);
     }
 
-    public Collection<String> Allallcategorydescribe(ArrayList<MyCategory> allcategory) {
-        Collection<String> allallcategorydescribe = new ArrayList<String>();
+    public ArrayList<String> Allallcategorydescribe(ArrayList<MyCategory> allcategory) {
+        ArrayList<String> allallcategorydescribe = new ArrayList<String>();
         for (int i = 0; i < allcategory.size(); i++) {
             ((ArrayList<String>) allallcategorydescribe).add(allcategory.get(i).GetCategorydescribtion());
         }

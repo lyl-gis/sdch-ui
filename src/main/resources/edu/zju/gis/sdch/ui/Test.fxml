@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.Test">
+    <children>
+        <TableView fx:id="TestTableview" editable="true" layoutX="76.0" layoutY="41.0" prefHeight="254.0"
+                   prefWidth="286.0">
+            <columns>
+                <TableColumn fx:id="filedName" prefWidth="75.0" text="字段名"/>
+                <TableColumn fx:id="filedType" prefWidth="75.0" text="字段类型"/>
+                <TableColumn fx:id="ifAnalyzable" prefWidth="75.0" text="是否模糊匹配"/>
+                <TableColumn fx:id="boost" prefWidth="75.0" text="权重"/>
+                <TableColumn fx:id="ifUsed" prefWidth="75.0" text="是否选用"/>
+                <TableColumn fx:id="description" prefWidth="75.0" text="描述"/>
+                <TableColumn fx:id="nameOther" prefWidth="75.0" text="映射名"/>
+            </columns>
+        </TableView>
+    </children>
+</AnchorPane>

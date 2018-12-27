@@ -5,29 +5,31 @@
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.MainPage">
     <children>
-        <Button fx:id="choosefile" layoutX="42.0" layoutY="49.0" mnemonicParsing="false" onAction="#choose"
+        <Button fx:id="btnChooseFile" layoutX="42.0" layoutY="49.0" mnemonicParsing="false" onAction="#choose"
                 text="选择文件路径"/>
-        <ChoiceBox fx:id="cb" layoutX="225.0" layoutY="49.0" prefHeight="23.0" prefWidth="117.0" value="选择数据类型"/>
+        <ChoiceBox fx:id="cbCategory" layoutX="225.0" layoutY="49.0" prefHeight="23.0" prefWidth="117.0"
+                   value="选择数据类型"/>
 
-        <TableView fx:id="tableview" editable="true" layoutX="42.0" layoutY="95.0" prefHeight="249.0" prefWidth="529.0">
+        <TableView fx:id="tableView" editable="true" layoutX="42.0" layoutY="95.0" prefHeight="249.0" prefWidth="529.0">
             <columns>
-                <TableColumn fx:id="onecolumn" prefWidth="75.0" text="fieldname"/>
-                <TableColumn fx:id="twocolumn" prefWidth="75.0" text="fieldtype"/>
-                <TableColumn fx:id="ifanalyzable" prefWidth="75.0" text="analyzable"/>
-                <TableColumn fx:id="boost" prefWidth="75.0" text="boost"/>
-                <TableColumn fx:id="ifused" prefWidth="75.0" text="是否选用"/>
-                <TableColumn fx:id="description" prefWidth="75.0" text="description"/>
-                <TableColumn fx:id="nameother" prefWidth="75.0" text="映射名"/>
+                <TableColumn fx:id="tcFieldName" prefWidth="75.0" text="字段名"/>
+                <TableColumn fx:id="tcTargetName" prefWidth="75.0" text="映射名"/>
+                <TableColumn fx:id="tcFieldType" prefWidth="75.0" text="字段类型"/>
+                <TableColumn fx:id="tcUsed" prefWidth="75.0" text="是否选用"/>
+                <TableColumn fx:id="tcAnalyzable" prefWidth="75.0" text="是否模糊匹配"/>
+                <TableColumn fx:id="tcBoost" prefWidth="75.0" text="权重"/>
+                <TableColumn fx:id="tcDescription" prefWidth="75.0" text="描述"/>
             </columns>
         </TableView>
-        <Button fx:id="Datapreview" layoutX="383.0" layoutY="357.0" mnemonicParsing="false" onAction="#datapreview"
-                text="数据预览"/>
+        <Button fx:id="btnPreview" layoutX="491.0" layoutY="357.0" mnemonicParsing="false" text="数据预览"/>
         <!--<Label layoutX="430.0" layoutY="53.0" text="索引名称" />-->
         <!--<TextField layoutX="491.0" layoutY="49.0" prefHeight="23.0" prefWidth="76.0" />-->
-        <RadioButton layoutX="102.0" layoutY="360.0" mnemonicParsing="false" text="是否跳过空间范围为空的纪录"/>
-        <ChoiceBox fx:id="Tuceng" layoutX="454.0" layoutY="49.0" prefHeight="23.0" prefWidth="117.0"/>
+        <RadioButton fx:id="rbSkipEmpty" layoutX="284.0" layoutY="361.0" mnemonicParsing="false" text="是否跳过空间范围为空的纪录"/>
+        <ChoiceBox fx:id="cbxLayers" layoutX="454.0" layoutY="49.0" prefHeight="23.0" prefWidth="117.0"/>
         <Label layoutX="158.0" layoutY="53.0" text="分类体系"/>
         <Label layoutX="390.0" layoutY="53.0" text="选择图层"/>
-        <!--<ChoiceBox fx:id="cbsy" layoutX="344.0" layoutY="49.0" prefWidth="150.0" />-->
+        <Label layoutX="42.0" layoutY="362.0" text="选择唯一标识字段"/>
+        <ChoiceBox fx:id="cbUuidField" layoutX="148.0" layoutY="358.0" prefHeight="23.0" prefWidth="117.0"
+                   value="选择唯一标识字段"/>
     </children>
 </AnchorPane>

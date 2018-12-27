@@ -145,6 +145,9 @@ public class Importer {
         if (sr.IsProjected() == 1)
             transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
         Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, 1000, fields, uuidField, skipEmptyGeom, transformation);
+//      //自己加了一行代码
+//       DataPreview.myrecords=records;
+//        //得到预览的前1000条数据在records中
         Set<String> destKeys = fieldMapping.keySet();
         long error = 0;
         long count = 0;

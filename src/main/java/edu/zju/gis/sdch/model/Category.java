@@ -12,4 +12,15 @@ public class Category {
     private String pId;
     private String func;
     private String description;
+
+    //wmx加了一个构造函数
+    public Category(String id, String pId, String func, String description) {
+        id = id;
+        pId = pId;
+        func = func;
+        description = description;
+    }
+
+    public Category() {
+    }
 }

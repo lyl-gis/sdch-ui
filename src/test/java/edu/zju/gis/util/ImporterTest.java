@@ -2,6 +2,7 @@ package edu.zju.gis.util;
 
 import edu.zju.gis.sdch.config.CommonSetting;
 import edu.zju.gis.sdch.tool.Importer;
+import edu.zju.gis.sdch.ui.AllParams;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.FGDBReader;
 import edu.zju.gis.sdch.util.GdalHelper;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public class ImporterTest {
+public class ImporterTest implements AllParams {
     private CommonSetting setting;
     private FGDBReader reader;
     private ElasticSearchHelper helper;
@@ -24,7 +25,7 @@ public class ImporterTest {
     @Before
     public void setup() throws IOException {
         ogr.RegisterAll();
-        String gdb = "F:\\Project\\山东国土测绘院\\data.gdb";
+        String gdb = "F:\\山东项目\\data.gdb";
         InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
         // 创建会话工厂，传入mybatis的配置文件信息
         Properties props = new Properties();
@@ -39,6 +40,7 @@ public class ImporterTest {
         setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
         helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
         reader = new FGDBReader(gdb);
+
     }
 
     @Test
@@ -62,7 +64,8 @@ public class ImporterTest {
         fieldMapping.put("ENTIID6", "lsid");
         Map<String, Float> analyzable = new HashMap<>();
         analyzable.put("name", 4.0f);
-        Importer importer = new Importer(helper, setting, "sdmap", "xzm", layer, fields, uuidField, fieldMapping
+
+        Importer importer = new Importer(helper, setting, "mysdmap", "xzm", layer, fields, uuidField, fieldMapping
                 , analyzable, true);
         importer.exec();
     }
