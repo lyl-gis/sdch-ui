@@ -1,8 +1,12 @@
 package edu.zju.gis.sdch.service;
 
 import edu.zju.gis.sdch.model.Category;
+import edu.zju.gis.sdch.model.Index;
+import edu.zju.gis.sdch.model.IndexMapping;
+import edu.zju.gis.sdch.model.IndexType;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,11 +14,21 @@ import java.util.Map;
  * @version 1.0 2018/12/21
  */
 public interface IndexService {
-    boolean createCatetory(Category category);
+    boolean createCategory(Category category);
 
-    boolean createIndex(String indice, String dtype, String geomType, String description, int shards, int replicas, String mappingSource) throws IOException;
+    boolean createIndex(Index index) throws IOException;
+
+    void upsertIndexType(IndexType indexType);
+
+    List<IndexType> getIndexType(String indice);
+
+    void addMapping(List<IndexMapping> mappings);
 
     boolean deleteIndex(String indice);
+
+    Index getByIndice(String indice);
+
+    List<IndexMapping> getMappingByIndice(String indice);
 
     /**
      * 构建索引（如果某索引存在，则执行更新）

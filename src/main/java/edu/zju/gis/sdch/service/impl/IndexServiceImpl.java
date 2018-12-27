@@ -3,17 +3,21 @@ package edu.zju.gis.sdch.service.impl;
 import edu.zju.gis.sdch.mapper.CategoryMapper;
 import edu.zju.gis.sdch.mapper.IndexMapper;
 import edu.zju.gis.sdch.mapper.IndexMappingMapper;
+import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.model.Category;
 import edu.zju.gis.sdch.model.Index;
+import edu.zju.gis.sdch.model.IndexMapping;
+import edu.zju.gis.sdch.model.IndexType;
 import edu.zju.gis.sdch.service.IndexService;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import lombok.AllArgsConstructor;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.DeleteByQueryAction;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,32 +29,73 @@ public class IndexServiceImpl implements IndexService {
     private ElasticSearchHelper helper;
     private CategoryMapper categoryMapper;
     private IndexMapper indexMapper;
+    private IndexTypeMapper indexTypeMapper;
     private IndexMappingMapper indexMappingMapper;
 
     @Override
-    public boolean createCatetory(Category category) {
+    public boolean createCategory(Category category) {
         return categoryMapper.insert(category) == 1;
     }
 
     @Override
-    public boolean createIndex(String indice, String dtype, String geomType, String description, int shards
-            , int replicas, String mappingSource) throws IOException {
-        if (helper.createIfNotExist(indice, shards, replicas, mappingSource)) {
-            if (indexMapper.selectByPrimaryKey(indice) == null) {
-                Index index = new Index();
-                index.setIndice(indice);
-                index.setDtype(dtype);
-                index.setShards(shards);
-                index.setReplicas(replicas);
-                index.setGeoType(geomType);
-                index.setDescription(description);
-                index.setCreateTime(new Date());
-                int flag = indexMapper.insert(index);//更新索引创建信息到数据库
-                return flag == 1;
+    public boolean createIndex(Index index) throws IOException {
+        if (helper.createIfNotExist(index.getIndice(), index.getShards(), index.getReplicas())) {
+            if (indexMapper.selectByPrimaryKey(index.getIndice()) == null) {
+                return indexMapper.insert(index) == 1;
             }
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void upsertIndexType(IndexType indexType) {
+        if (indexTypeMapper.selectByType(indexType.getIndice(), indexType.getDtype()) == null)
+            indexTypeMapper.insertSelective(indexType);
+        else
+            indexTypeMapper.updateByPrimaryKeySelective(indexType);
+    }
+
+    @Override
+    public List<IndexType> getIndexType(String indice) {
+        return indexTypeMapper.selectByIndice(indice);
+    }
+
+    @Override
+    public void addMapping(List<IndexMapping> mappings) {
+        if (mappings.isEmpty())
+            return;
+        JSONObject source = new JSONObject();
+        JSONObject properties = new JSONObject();
+        source.put("properties", properties);
+        for (IndexMapping mapping : mappings) {
+            switch (mapping.getFieldType()) {
+                case "integer":
+                    properties.put(mapping.getFieldName(), new JSONObject().put("type", "integer").put("store", true));
+                    break;
+                case "long":
+                    properties.put(mapping.getFieldName(), new JSONObject().put("type", "long").put("store", true));
+                    break;
+                case "float":
+                    properties.put(mapping.getFieldName(), new JSONObject().put("type", "float").put("store", true));
+                    break;
+                case "string":
+                    if (mapping.getAnalyzable())
+                        properties.put(mapping.getFieldName(), new JSONObject().put("type", "text").put("store", true)
+                                .put("analyzer", "ik_max_word").put("search_analyzer", "ik_smart")
+                                .put("boost", mapping.getBoost()));
+                    else
+                        properties.put(mapping.getFieldName(), new JSONObject().put("type", "text").put("store", true));
+                    break;
+            }
+        }
+        properties.put("dtype", new JSONObject().put("type", "keyword").put("store", true));
+        properties.put("the_shape", new JSONObject().put("type", "geo_shape"));
+        properties.put("the_point", new JSONObject().put("type", "geo_point"));
+        helper.putMapping(mappings.get(0).getIndice(), "_doc", source.toString());
+        for (IndexMapping mapping : mappings)
+            if (indexMappingMapper.selectByField(mapping.getIndice(), mapping.getFieldName()) == null)
+                indexMappingMapper.insert(mapping);
     }
 
     @Override
@@ -60,6 +105,16 @@ public class IndexServiceImpl implements IndexService {
             indexMapper.deleteByPrimaryKey(indice);
         }
         return true;
+    }
+
+    @Override
+    public Index getByIndice(String indice) {
+        return indexMapper.selectByPrimaryKey(indice);
+    }
+
+    @Override
+    public List<IndexMapping> getMappingByIndice(String indice) {
+        return indexMappingMapper.selectByIndice(indice);
     }
 
     @Override
@@ -83,4 +138,5 @@ public class IndexServiceImpl implements IndexService {
     public boolean deleteDoc(String index, String docId) {
         return helper.delete(index, "_doc", docId);
     }
+
 }

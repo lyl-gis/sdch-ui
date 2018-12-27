@@ -33,6 +33,12 @@
         from tb_index_mapping
         where INDICE = #{indice,jdbcType=VARCHAR}
     </select>
+    <select id="selectByField" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_index_mapping
+        where INDICE = #{indice,jdbcType=VARCHAR} and FIELD_NAME=#{field,jdbcType=VARCHAR}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
         delete
         from tb_index_mapping

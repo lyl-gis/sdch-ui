@@ -2,7 +2,7 @@ package edu.zju.gis.util;
 
 import edu.zju.gis.sdch.config.CommonSetting;
 import edu.zju.gis.sdch.tool.Importer;
-import edu.zju.gis.sdch.ui.AllParams;
+import edu.zju.gis.sdch.util.Contants;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.FGDBReader;
 import edu.zju.gis.sdch.util.GdalHelper;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public class ImporterTest implements AllParams {
+public class ImporterTest {
     private CommonSetting setting;
     private FGDBReader reader;
     private ElasticSearchHelper helper;
@@ -25,7 +25,7 @@ public class ImporterTest implements AllParams {
     @Before
     public void setup() throws IOException {
         ogr.RegisterAll();
-        String gdb = "F:\\山东项目\\data.gdb";
+        String gdb = "F:\\Project\\山东国土测绘院\\data.gdb";
         InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
         // 创建会话工厂，传入mybatis的配置文件信息
         Properties props = new Properties();
@@ -40,7 +40,6 @@ public class ImporterTest implements AllParams {
         setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
         helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
         reader = new FGDBReader(gdb);
-
     }
 
     @Test
@@ -64,9 +63,8 @@ public class ImporterTest implements AllParams {
         fieldMapping.put("ENTIID6", "lsid");
         Map<String, Float> analyzable = new HashMap<>();
         analyzable.put("name", 4.0f);
-
-        Importer importer = new Importer(helper, setting, "mysdmap", "xzm", layer, fields, uuidField, fieldMapping
-                , analyzable, true);
+        Importer importer = new Importer(helper, setting, "sdmap", "fe_xzm", layer, fields, uuidField, fieldMapping
+                , analyzable, true, Contants.IndexType.FRAMEWORK, "xzm");
         importer.exec();
     }
 
@@ -111,8 +109,8 @@ public class ImporterTest implements AllParams {
         analyzable.put("name5", 4.0f);
         analyzable.put("name6", 4.0f);
         analyzable.put("name7", 4.0f);
-        Importer importer = new Importer(helper, setting, "fe_road", "road", layer, fields, uuidField, fieldMapping
-                , analyzable, true);
+        Importer importer = new Importer(helper, setting, "sdmap", "fe_road", layer, fields, uuidField, fieldMapping
+                , analyzable, true, Contants.IndexType.FRAMEWORK, "road");
         importer.exec();
     }
 
@@ -152,100 +150,101 @@ public class ImporterTest implements AllParams {
         fieldMapping.put("ADDCODE", "addcode");
         Map<String, Float> analyzable = new HashMap<>();
         analyzable.put("name", 4.0f);
-        Importer importer = new Importer(helper, setting, "f_poi", "poi", layer, fields, uuidField, fieldMapping
-                , analyzable, true);
+        analyzable.put("address", 2.0f);
+        Importer importer = new Importer(helper, setting, "sdmap", "f_poi", layer, fields, uuidField, fieldMapping
+                , analyzable, true, Contants.IndexType.FRAMEWORK, "poi");
         importer.exec();
     }
 
-    @Test
-    public void testInsertShuixi() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\shuixi.properties", "E:\\data\\shiti\\shuixi.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertZhengqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\zq.properties", "E:\\data\\shiti\\zhengqu.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertBaoshuiqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\bsq.properties", "E:\\data\\实体查询\\保税区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertDizhigongyuan() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\dzgy.properties", "E:\\data\\实体查询\\地质公园.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertFengjingmingshengqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\fjmsq.properties", "E:\\data\\shiti\\风景名胜区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertGuojiajigaoxinqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjjgxq.properties", "E:\\data\\实体查询\\国家级高新区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertGuojiajikaifaqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjjkfq.properties", "E:\\data\\实体查询\\国家级开发区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertGuojiasenlingongyuan() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjjslgy.properties", "E:\\data\\shiti\\国家级森林公园.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertGuojialvyoudujiaqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjlydjq.properties", "E:\\data\\实体查询\\国家旅游度假区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertShengjigaoxinqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjgxq.properties", "E:\\data\\实体查询\\省级高新区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertShengjikaifaqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjkfq.properties", "E:\\data\\shiti\\省级开发区.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertShengjisenlingongyuan() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjslgy.properties", "E:\\data\\实体查询\\省级森林公园.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertShijieziranwenhuayichan() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjzrwhyc.properties", "E:\\data\\实体查询\\世界自然文化遗产.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertWenhuayichan() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\whyc.properties", "E:\\data\\实体查询\\文化遗产.shp"
-                , "GBK", ""});
-    }
-
-    @Test
-    public void testInsertZiranbaohuqu() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\zrbhq.properties", "E:\\data\\实体查询\\自然保护区.shp"
-                , "GBK", ""});
-    }
+//    @Test
+//    public void testInsertShuixi() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\shuixi.properties", "E:\\data\\shiti\\shuixi.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertZhengqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\zq.properties", "E:\\data\\shiti\\zhengqu.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertBaoshuiqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\bsq.properties", "E:\\data\\实体查询\\保税区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertDizhigongyuan() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\dzgy.properties", "E:\\data\\实体查询\\地质公园.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertFengjingmingshengqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\fjmsq.properties", "E:\\data\\shiti\\风景名胜区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertGuojiajigaoxinqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjjgxq.properties", "E:\\data\\实体查询\\国家级高新区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertGuojiajikaifaqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjjkfq.properties", "E:\\data\\实体查询\\国家级开发区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertGuojiasenlingongyuan() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjjslgy.properties", "E:\\data\\shiti\\国家级森林公园.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertGuojialvyoudujiaqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\gjlydjq.properties", "E:\\data\\实体查询\\国家旅游度假区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertShengjigaoxinqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjgxq.properties", "E:\\data\\实体查询\\省级高新区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertShengjikaifaqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjkfq.properties", "E:\\data\\shiti\\省级开发区.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertShengjisenlingongyuan() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjslgy.properties", "E:\\data\\实体查询\\省级森林公园.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertShijieziranwenhuayichan() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\sjzrwhyc.properties", "E:\\data\\实体查询\\世界自然文化遗产.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertWenhuayichan() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\whyc.properties", "E:\\data\\实体查询\\文化遗产.shp"
+//                , "GBK", ""});
+//    }
+//
+//    @Test
+//    public void testInsertZiranbaohuqu() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\SDGT\\Desktop\\sdch-ui\\src\\main\\resources\\conf\\zrbhq.properties", "E:\\data\\实体查询\\自然保护区.shp"
+//                , "GBK", ""});
+//    }
 
     @Test
     public void testIn() {

@@ -5,23 +5,17 @@
         <id column="INDICE" jdbcType="VARCHAR" property="indice"/>
         <result column="SHARDS" jdbcType="INTEGER" property="shards"/>
         <result column="REPLICAS" jdbcType="INTEGER" property="replicas"/>
-        <result column="DTYPE" jdbcType="VARCHAR" property="dtype"/>
-        <result column="GEO_TYPE" jdbcType="VARCHAR" property="geoType"/>
         <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
         <result column="CATEGORY" jdbcType="VARCHAR" property="category"/>
         <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="SIZE" jdbcType="BIGINT" property="size"/>
     </resultMap>
     <sql id="Base_Column_List">
         INDICE,
         SHARDS,
         REPLICAS,
-        DTYPE,
-        GEO_TYPE,
         DESCRIPTION,
         CATEGORY,
-        CREATE_TIME,
-        SIZE
+        CREATE_TIME
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
@@ -35,12 +29,9 @@
         where INDICE = #{indice,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="edu.zju.gis.sdch.model.Index">
-        insert into tb_index (INDICE, SHARDS, REPLICAS,
-                              DTYPE, GEO_TYPE, DESCRIPTION,
-                              CATEGORY, CREATE_TIME, SIZE)
+        insert into tb_index (INDICE, SHARDS, REPLICAS, DESCRIPTION, CATEGORY, CREATE_TIME)
         values (#{indice,jdbcType=VARCHAR}, #{shards,jdbcType=INTEGER}, #{replicas,jdbcType=INTEGER},
-                #{dtype,jdbcType=VARCHAR}, #{geoType,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
-                #{category,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{size,jdbcType=BIGINT})
+                #{description,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="edu.zju.gis.sdch.model.Index">
         insert into tb_index
@@ -112,12 +103,6 @@
             <if test="replicas != null">
                 REPLICAS = #{replicas,jdbcType=INTEGER},
             </if>
-            <if test="dtype != null">
-                DTYPE = #{dtype,jdbcType=VARCHAR},
-            </if>
-            <if test="geoType != null">
-                GEO_TYPE = #{geoType,jdbcType=VARCHAR},
-            </if>
             <if test="description != null">
                 DESCRIPTION = #{description,jdbcType=VARCHAR},
             </if>
@@ -127,9 +112,6 @@
             <if test="createTime != null">
                 CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="size != null">
-                SIZE = #{size,jdbcType=BIGINT},
-            </if>
         </set>
         where INDICE = #{indice,jdbcType=VARCHAR}
     </update>
@@ -137,12 +119,9 @@
         update tb_index
         set SHARDS      = #{shards,jdbcType=INTEGER},
             REPLICAS    = #{replicas,jdbcType=INTEGER},
-            DTYPE       = #{dtype,jdbcType=VARCHAR},
-            GEO_TYPE    = #{geoType,jdbcType=VARCHAR},
             DESCRIPTION = #{description,jdbcType=VARCHAR},
             CATEGORY    = #{category,jdbcType=VARCHAR},
-            CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
-            SIZE        = #{size,jdbcType=BIGINT}
+            CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
         where INDICE = #{indice,jdbcType=VARCHAR}
     </update>
 </mapper>

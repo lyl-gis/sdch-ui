@@ -2,6 +2,7 @@ package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.Main;
 import edu.zju.gis.sdch.tool.Importer;
+import edu.zju.gis.sdch.util.Contants;
 import edu.zju.gis.sdch.util.GdalHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -81,7 +82,7 @@ public class DataPreview implements Initializable {
         Boolean ccSkipemptygeom = MPindex.rbSkipEmpty.isSelected();//检查单选框是否被选中
 //        System.out.println("最后检查一次");
         Importer importer = new Importer(Main.getHelper(), Main.getSetting(), ccIndex, ccDtype, AllParams.mp.reader.getLayer(ccLayer), ccFields, ccUuidfield,
-                ccFieldMapping, ccAnalyzable, ccSkipemptygeom);
+                ccFieldMapping, ccAnalyzable, ccSkipemptygeom, Contants.IndexType.FRAMEWORK, "");
         importer.exec();
 
 

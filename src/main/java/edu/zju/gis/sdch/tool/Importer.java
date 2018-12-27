@@ -1,10 +1,15 @@
 package edu.zju.gis.sdch.tool;
 
 import edu.zju.gis.sdch.config.CommonSetting;
+import edu.zju.gis.sdch.mapper.CategoryMapper;
 import edu.zju.gis.sdch.mapper.IndexMapper;
 import edu.zju.gis.sdch.mapper.IndexMappingMapper;
+import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.model.Index;
 import edu.zju.gis.sdch.model.IndexMapping;
+import edu.zju.gis.sdch.model.IndexType;
+import edu.zju.gis.sdch.service.IndexService;
+import edu.zju.gis.sdch.service.impl.IndexServiceImpl;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.GdalHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
@@ -13,11 +18,9 @@ import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gdal.ogr.Layer;
-import org.gdal.ogr.ogr;
 import org.gdal.osr.CoordinateTransformation;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -29,7 +32,6 @@ import java.util.stream.Collectors;
  */
 public class Importer {
     private static final Logger log = LogManager.getLogger(Importer.class);
-    private ElasticSearchHelper helper;
     /**
      * 索引名
      */
@@ -59,6 +61,8 @@ public class Importer {
      * 是否跳过空间范围为空的记录
      */
     private boolean skipEmptyGeom;
+    private String categoryType;
+    private String dataType;
     private CommonSetting setting;
     @Getter
     @Setter
@@ -69,12 +73,15 @@ public class Importer {
     @Getter
     @Setter
     private String description;
-    private IndexMapper indexMapper;
-    private IndexMappingMapper indexMappingMapper;
+    private IndexService indexService;
 
-    public Importer(ElasticSearchHelper helper, CommonSetting setting, String indice, String dtype, Layer layer, Map<String, Integer> fields
-            , String uuidField, Map<String, String> fieldMapping, Map<String, Float> analyzable, boolean skipEmptyGeom) {
-        this.helper = helper;
+    /**
+     * @param categoryType see {@link edu.zju.gis.sdch.util.Contants}
+     * @param dataType     see {@link edu.zju.gis.sdch.util.Contants}
+     */
+    public Importer(ElasticSearchHelper helper, CommonSetting setting, String indice, String dtype, Layer layer
+            , Map<String, Integer> fields, String uuidField, Map<String, String> fieldMapping, Map<String, Float> analyzable
+            , boolean skipEmptyGeom, String categoryType, String dataType) {
         this.indice = indice;
         this.dtype = dtype;
         this.layer = layer;
@@ -83,61 +90,60 @@ public class Importer {
         this.fieldMapping = fieldMapping;
         this.analyzable = analyzable;
         this.skipEmptyGeom = skipEmptyGeom;
+        this.categoryType = categoryType;
+        this.dataType = dataType;
         this.setting = setting;
-        indexMapper = MyBatisUtil.getMapper(IndexMapper.class);
-        indexMappingMapper = MyBatisUtil.getMapper(IndexMappingMapper.class);
+        this.indexService = new IndexServiceImpl(helper
+                , MyBatisUtil.getMapper(CategoryMapper.class)
+                , MyBatisUtil.getMapper(IndexMapper.class)
+                , MyBatisUtil.getMapper(IndexTypeMapper.class)
+                , MyBatisUtil.getMapper(IndexMappingMapper.class));
     }
 
     public void exec() throws IOException {
-        Index index = indexMapper.selectByPrimaryKey(indice);
+        exec(new Observable());
+    }
+
+    public void exec(Observable observable) throws IOException {//todo 类别字段确定一下：poi->kind, entity->clasid
+        Index index = indexService.getByIndice(indice);
         if (index == null) {
             if (shards == null)
                 shards = setting.getEsShards();
             if (replicas == null)
                 replicas = setting.getEsReplicas();
             //创建索引
-            if (helper.createIfNotExist(indice, shards, replicas)) {
-                index = new Index();
-                index.setIndice(indice);
-                index.setDtype(dtype);
-                index.setShards(shards);
-                index.setReplicas(replicas);
-                index.setGeoType(GdalHelper.getGeoTypeName(layer.GetGeomType()));
-                index.setDescription(description == null ? "" : description);
-                index.setCreateTime(new Date());
-                index.setSize(0L);
-                indexMapper.insert(index);//更新索引创建信息到数据库
-            } else {
-                throw new IOException("索引`" + indice + "`创建失败");
-            }
+            index = new Index();
+            index.setIndice(indice);
+            index.setShards(shards);
+            index.setReplicas(replicas);
+            index.setDescription(description == null ? "" : description);
+            index.setCategory(categoryType);
+            index.setCreateTime(new Date());
+            indexService.createIndex(index);//更新索引创建信息到数据库
         }
-        List<IndexMapping> mappings = indexMappingMapper.selectByIndice(indice);//获取索引字段信息
+        IndexType indexType = new IndexType();
+        indexType.setIndice(indice);
+        indexType.setDtype(dtype);
+        indexType.setDescription(description);
+        indexType.setCategory(dataType);
+        indexType.setGeoType(GdalHelper.getGeoTypeName(layer.GetGeomType()));
+        indexService.upsertIndexType(indexType);
+        List<IndexMapping> mappings = indexService.getMappingByIndice(indice);//获取索引字段信息
         List<String> mappingFields = mappings.stream().map(IndexMapping::getFieldName).collect(Collectors.toList());
-        Map<String, Integer> maps = new HashMap<>();
         List<IndexMapping> newMappings = new ArrayList<>();
-        Date now = new Date();
         for (String field : fields.keySet()) {
             String destName = fieldMapping.getOrDefault(field, field);
             if (!mappingFields.contains(destName)) {//当有新增字段时，同步更新到数据库
-                maps.put(destName, fields.get(field));
                 IndexMapping mapping = new IndexMapping();
                 mapping.setIndice(indice);
                 mapping.setFieldName(destName);
                 mapping.setFieldType(GdalHelper.getTypeName(fields.get(field)));
                 mapping.setBoost(analyzable.getOrDefault(destName, 1.0f));
                 mapping.setAnalyzable(analyzable.containsKey(destName));
-                mapping.setCreateTime(now);
                 newMappings.add(mapping);
             }
         }
-        if (!maps.isEmpty()) {
-            JSONObject mappingSource = addMappingFields(maps, analyzable, setting);
-            if (!helper.exists(indice, "_doc"))
-                mappingSource.put("dynamic", false).put("_all", new JSONObject().put("enabled", false));
-            if (helper.putMapping(indice, "_doc", mappingSource.toString())) {
-                indexMappingMapper.insertByBatch(newMappings);//更新mapping到数据库
-            }
-        }
+        indexService.addMapping(newMappings);
         layer.ResetReading();//重置图层要素读取的游标位置
 
         SpatialReference sr = layer.GetSpatialRef();
@@ -159,48 +165,12 @@ public class Importer {
                     if (destKeys.contains(key))
                         m.put(fieldMapping.get(key), m.remove(key));
             });
-            error += helper.upsert(indice, "_doc", records);
+            error += indexService.upsert(indice, "_doc", records);
             count += records.size();
+            observable.notifyObservers(count * 1.0 / layer.GetFeatureCount());
             log.info("当前已入库失败{}条记录", error);
             records = GdalHelper.getNextNFeatures(layer, 1000, fields, uuidField, skipEmptyGeom, transformation);
         }
-        Long size = helper.getDocCount(indice, "_doc");
-        index.setSize(size);
-        indexMapper.updateByPrimaryKeySelective(index);
-    }
-
-    public static void main(String[] args) throws IOException {
-
-    }
-
-    private static JSONObject addMappingFields(Map<String, Integer> fields, Map<String, Float> analyzable, CommonSetting setting) {
-        JSONObject source = new JSONObject();
-        JSONObject properties = new JSONObject();
-        source.put("properties", properties);
-        for (String field : fields.keySet()) {
-            switch (fields.get(field)) {
-                case ogr.OFTInteger:
-                    properties.put(field, new JSONObject().put("type", "integer").put("store", true));
-                    break;
-                case ogr.OFTInteger64:
-                    properties.put(field, new JSONObject().put("type", "long").put("store", true));
-                    break;
-                case ogr.OFTReal:
-                    properties.put(field, new JSONObject().put("type", "float").put("store", true));
-                    break;
-                case ogr.OFTString:
-                    if (analyzable.containsKey(field))
-                        properties.put(field, new JSONObject().put("type", "text").put("store", true)
-                                .put("analyzer", "ik_max_word").put("search_analyzer", "ik_smart")
-                                .put("boost", analyzable.getOrDefault(field, setting.getEsFieldBoostDefault())));
-                    else
-                        properties.put(field, new JSONObject().put("type", "text").put("store", true));
-                    break;
-            }
-        }
-        properties.put("dtype", new JSONObject().put("type", "keyword").put("store", true));
-        properties.put("the_shape", new JSONObject().put("type", "geo_shape"));
-        properties.put("the_point", new JSONObject().put("type", "geo_point"));
-        return source;
+        observable.notifyObservers(1);
     }
 }

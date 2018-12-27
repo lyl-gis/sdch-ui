@@ -25,6 +25,9 @@
         where ID = #{id,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="edu.zju.gis.sdch.model.Category">
+        <selectKey keyProperty="id" order="BEFORE" resultType="string">
+            SELECT uuid() AS ID
+        </selectKey>
         insert into tb_category (ID, P_ID, FUNC,
                                  DESCRIPTION)
         values (#{id,jdbcType=VARCHAR}, #{pId,jdbcType=VARCHAR}, #{func,jdbcType=VARCHAR},
