@@ -16,5 +16,5 @@ public interface IndexTypeMapper {
 
     List<IndexType> selectByIndice(String indice);
 
-    List<IndexType> selectByType(@Param("indice") String indice, @Param("dtype") String dtype);
+    IndexType selectByType(@Param("indice") String indice, @Param("dtype") String dtype);
 }
