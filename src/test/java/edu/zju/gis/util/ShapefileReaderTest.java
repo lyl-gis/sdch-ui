@@ -1,6 +1,5 @@
 package edu.zju.gis.util;
 
-import edu.zju.gis.sdch.tool.Importer;
 import edu.zju.gis.sdch.util.ShapefileReader;
 import org.gdal.gdal.gdal;
 import org.gdal.ogr.Driver;
@@ -39,49 +38,49 @@ public class ShapefileReaderTest {
         System.out.println(driver.getName());
     }
 
-    @Test
-    public void testGdalImport() throws IOException {
-        Importer.main(new String[]{"C:\\Users\\yanlo\\Desktop\\shuixi.properties", "F:\\Project\\山东国土测绘院\\实体查询\\shuixi.shp"
-                , "UTF-8", ""});
-    }
+//    @Test
+//    public void testGdalImport() throws IOException {
+//        Importer.main(new String[]{"C:\\Users\\yanlo\\Desktop\\shuixi.properties", "F:\\Project\\山东国土测绘院\\实体查询\\shuixi.shp"
+//                , "UTF-8", ""});
+//    }
+//
+//    @Test
+//    public void testImportXzm() throws IOException {
+//        String path = "F:\\Project\\山东国土测绘院\\实体查询\\BOUA6乡镇面.shp";
+//        String configFile = "C:\\Users\\yanlo\\Desktop\\xzfwm.properties";
+//        Importer.main(new String[]{configFile, path, "CP936", ""});
+//    }
 
-    @Test
-    public void testImportXzm() throws IOException {
-        String path = "F:\\Project\\山东国土测绘院\\实体查询\\BOUA6乡镇面.shp";
-        String configFile = "C:\\Users\\yanlo\\Desktop\\xzfwm.properties";
-        Importer.main(new String[]{configFile, path, "CP936", ""});
-    }
-
-    @Test
-    public void testImportDaolu() throws IOException {
-        String path = "F:\\Project\\山东国土测绘院\\实体查询\\daolu.shp";
-        String configFile = "C:\\Users\\yanlo\\Desktop\\daolu.properties";
-        Importer.main(new String[]{configFile, path, "CP936", ""});
-    }
-
-    @Test
-    public void testImportPOI() throws IOException {
-        String path = "F:\\Project\\山东国土测绘院\\实体查询\\poi.shp";
-        String configFile = "C:\\Users\\yanlo\\Desktop\\poi.properties";
-        Importer.main(new String[]{configFile, path, "", ""});
-    }
-
-    @Test
-    public void testImportShuixi() throws IOException {
-        String path = "F:\\Project\\山东国土测绘院\\实体查询\\shuixi.shp";
-        String configFile = "C:\\Users\\yanlo\\Desktop\\shuixi.properties";
-        Importer.main(new String[]{configFile, path, "CP936", ""});
-    }
-
-    @Test
-    public void testReadXzm() throws IOException {
-        String path = "F:\\Project\\山东国土测绘院\\实体查询\\BOUA6乡镇面.shp";
-        String configFile = "C:\\Users\\yanlo\\Desktop\\xzfwm.properties";
-        List<Map<String, Object>> records = getRecords(path, configFile, "CP936");
-        Files.write(Paths.get("C:\\Users\\yanlo\\Desktop\\xiangzhenmian.txt"), records.stream().map(Object::toString).collect(Collectors.toList()));
-//        System.out.println(records);
-        Importer.main(new String[]{configFile, path, "CP936", ""});
-    }
+//    @Test
+//    public void testImportDaolu() throws IOException {
+//        String path = "F:\\Project\\山东国土测绘院\\实体查询\\daolu.shp";
+//        String configFile = "C:\\Users\\yanlo\\Desktop\\daolu.properties";
+//        Importer.main(new String[]{configFile, path, "CP936", ""});
+//    }
+//
+//    @Test
+//    public void testImportPOI() throws IOException {
+//        String path = "F:\\Project\\山东国土测绘院\\实体查询\\poi.shp";
+//        String configFile = "C:\\Users\\yanlo\\Desktop\\poi.properties";
+//        Importer.main(new String[]{configFile, path, "", ""});
+//    }
+//
+//    @Test
+//    public void testImportShuixi() throws IOException {
+//        String path = "F:\\Project\\山东国土测绘院\\实体查询\\shuixi.shp";
+//        String configFile = "C:\\Users\\yanlo\\Desktop\\shuixi.properties";
+//        Importer.main(new String[]{configFile, path, "CP936", ""});
+//    }
+//
+//    @Test
+//    public void testReadXzm() throws IOException {
+//        String path = "F:\\Project\\山东国土测绘院\\实体查询\\BOUA6乡镇面.shp";
+//        String configFile = "C:\\Users\\yanlo\\Desktop\\xzfwm.properties";
+//        List<Map<String, Object>> records = getRecords(path, configFile, "CP936");
+//        Files.write(Paths.get("C:\\Users\\yanlo\\Desktop\\xiangzhenmian.txt"), records.stream().map(Object::toString).collect(Collectors.toList()));
+////        System.out.println(records);
+//        Importer.main(new String[]{configFile, path, "CP936", ""});
+//    }
 
     @Test
     public void testReadDaolu() throws IOException {

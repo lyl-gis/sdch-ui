@@ -4,16 +4,18 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
 @ToString
-public class Index {
+public class IndexType implements Serializable {
+    private String id;
     private String indice;
-    private Integer shards;
-    private Integer replicas;
+    private String dtype;
+    private String geoType;
     private String description;
     private String category;
-    private Date createTime;
+    private Date updateTime;
 }

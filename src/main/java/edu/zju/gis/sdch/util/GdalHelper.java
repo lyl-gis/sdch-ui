@@ -79,6 +79,11 @@ public class GdalHelper {
         return layer.GetLayerDefn().GetGeomType();
     }
 
+    public static Map<String, Map<String, Object>> getNextNFeatures(Layer layer, long size, Map<String, Integer> fields
+            , String uuidField, boolean skipEmptyGeom, CoordinateTransformation transformation) {
+        return getNextNFeatures(layer, size, fields, uuidField, skipEmptyGeom, transformation, true);
+    }
+
     /**
      * 读取当前游标开始的{@code size}条记录，不包含跳过的空记录
      *
@@ -90,7 +95,7 @@ public class GdalHelper {
      * @return
      */
     public static Map<String, Map<String, Object>> getNextNFeatures(Layer layer, long size, Map<String, Integer> fields
-            , String uuidField, boolean skipEmptyGeom, CoordinateTransformation transformation) {
+            , String uuidField, boolean skipEmptyGeom, CoordinateTransformation transformation, boolean trim) {
         Map<String, Map<String, Object>> records = new HashMap<>();
         Feature feature;
         Set<String> fieldNames = fields.keySet();
@@ -133,7 +138,10 @@ public class GdalHelper {
                         value = feature.GetFieldAsDouble(name);
                         break;
                     case ogr.OFTString:
-                        value = feature.GetFieldAsString(name);
+                        if (trim)
+                            value = feature.GetFieldAsString(name).trim();
+                        else
+                            value = feature.GetFieldAsString(name);
                         break;
                     default:
                         value = null;
