@@ -50,4 +50,9 @@ public class EntityTypeMapperTest {
         }
         entityTypeList.forEach(m -> mapper.insert(m));
     }
+
+    @Test
+    public void testRead() {
+        System.out.println(mapper.selectByPrimaryKey("3701"));
+    }
 }

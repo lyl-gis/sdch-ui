@@ -65,7 +65,7 @@ public class ImporterTest {
         analyzable.put("name", 4.0f);
         Importer importer = new Importer(helper, setting, "sdmap", "fe_xzm", layer, fields, uuidField, fieldMapping
                 , analyzable, true, Contants.IndexType.FRAMEWORK, "xzm");
-        importer.exec();
+        importer.call();
     }
 
     @Test
@@ -111,7 +111,7 @@ public class ImporterTest {
         analyzable.put("name7", 4.0f);
         Importer importer = new Importer(helper, setting, "sdmap12", "fe_road", layer, fields, uuidField, fieldMapping
                 , analyzable, true, Contants.IndexType.FRAMEWORK, "road");
-        importer.exec();
+        importer.call();
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ImporterTest {
         analyzable.put("address", 2.0f);
         Importer importer = new Importer(helper, setting, "sdmap", "f_poi", layer, fields, uuidField, fieldMapping
                 , analyzable, true, Contants.IndexType.FRAMEWORK, "poi");
-        importer.exec();
+        importer.call();
     }
 
 //    @Test

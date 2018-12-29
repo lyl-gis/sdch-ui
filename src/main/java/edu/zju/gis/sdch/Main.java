@@ -2,6 +2,7 @@ package edu.zju.gis.sdch;
 
 import edu.zju.gis.sdch.config.CommonSetting;
 import edu.zju.gis.sdch.ui.AllPages;
+import edu.zju.gis.sdch.ui.StageManager;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.gdal.ogr.ogr;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +25,7 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
+        ogr.RegisterAll();
         Properties props = new Properties();
         try (InputStream is = ClassLoader.getSystemResourceAsStream("config.properties")) {
             props.load(is);
@@ -54,6 +57,9 @@ public class Main extends Application {
         AllPages.mainStage.setTitle("数据导入");
         AllPages.mainStage.setScene(scene);
         AllPages.mainStage.show();
+        StageManager.STAGE.put("mainStage", AllPages.mainStage);
+        StageManager.CONTROLLER.put("mainPage", this);
+
     }
 
     private void setMenu(BorderPane root, Stage primaryStage) {
@@ -96,7 +102,6 @@ public class Main extends Application {
                 new CheckMenuItem("Swing"));
 
         sqlMenu.getItems().add(tutorialManeu);
-
         menuBar.getMenus().addAll(fileMenu, webMenu, sqlMenu);
     }
 }

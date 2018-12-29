@@ -13,6 +13,7 @@ import edu.zju.gis.sdch.service.impl.IndexServiceImpl;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.GdalHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
+import javafx.concurrent.Task;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  * @author yanlong_lee@qq.com
  * @version 1.0 2018/11/15
  */
-public class Importer {
+public class Importer extends Task<Double> {
     private static final Logger log = LogManager.getLogger(Importer.class);
     /**
      * 索引名
@@ -100,11 +101,8 @@ public class Importer {
                 , MyBatisUtil.getMapper(IndexMappingMapper.class));
     }
 
-    public void exec() throws IOException {
-        exec(new Observable());
-    }
-
-    public void exec(Observable observable) throws IOException {//todo 类别字段确定一下：poi->kind, entity->clasid
+    @Override
+    public Double call() throws IOException {
         Index index = indexService.getByIndice(indice);
         if (index == null) {
             if (shards == null)
@@ -164,10 +162,11 @@ public class Importer {
             });
             error += indexService.upsert(indice, "_doc", records);
             count += records.size();
-            observable.notifyObservers(count * 1.0 / layer.GetFeatureCount());
+            updateProgress(count * 1.0 / layer.GetFeatureCount(), 1);
             log.info("当前已入库失败{}条记录", error);
             records = GdalHelper.getNextNFeatures(layer, 1000, fields, uuidField, skipEmptyGeom, transformation);
         }
-        observable.notifyObservers(1);
+        updateProgress(1, 1);
+        return (double) error;
     }
 }

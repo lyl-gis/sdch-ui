@@ -43,6 +43,10 @@ public class GdalHelper {
         geomTypes.put(ogr.wkbGeometryCollection, "GEOMETRYCOLLECTION");
     }
 
+    public static Map<Integer, String> getFieldTypes() {
+        return fieldTypes;
+    }
+
     public static String getTypeName(int ogrFieldType) {
         return fieldTypes.get(ogrFieldType);
     }
@@ -150,8 +154,12 @@ public class GdalHelper {
                     record.put(name, value);
             }
             if (!record.isEmpty()) {
-                records.put(uuidField == null || uuidField.isEmpty() ? UUID.randomUUID().toString()
-                        : record.get(uuidField).toString(), record);
+                String uuid;
+                if (uuidField != null && !uuidField.isEmpty() && record.containsKey(uuidField))
+                    uuid = record.get(uuidField).toString();
+                else
+                    uuid = UUID.randomUUID().toString();
+                records.put(uuid, record);
             }
         }
         if (records.size() < 500)
