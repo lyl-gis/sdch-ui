@@ -222,7 +222,7 @@ public final class ElasticSearchHelper implements Closeable {
         for (JSONObject entity : jsons) {
             String docId = entity.get("doc_id").toString();
             entity.remove("doc_id");
-            bulkRequest.add(client.prepareIndex(index, type, docId).setSource(entity));
+            bulkRequest.add(client.prepareIndex(index, type, docId).setSource(entity.toString(), XContentType.JSON));
             if (bulkRequest.numberOfActions() >= 1000) {
                 BulkResponse bulkResponse = bulkRequest.get();
                 if (bulkResponse.hasFailures()) {

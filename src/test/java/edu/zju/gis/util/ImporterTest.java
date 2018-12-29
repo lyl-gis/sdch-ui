@@ -69,7 +69,7 @@ public class ImporterTest {
     }
 
     @Test
-    public void testInsertDaolu() throws IOException {
+    public void testInsertDaolu() throws IOException, InterruptedException {
         Layer layer = reader.getLayer("daolu");
         Map<String, Integer> fields = GdalHelper.getFieldTypes(layer);
         fields.remove("ELEMID");
@@ -109,7 +109,7 @@ public class ImporterTest {
         analyzable.put("name5", 4.0f);
         analyzable.put("name6", 4.0f);
         analyzable.put("name7", 4.0f);
-        Importer importer = new Importer(helper, setting, "sdmap", "fe_road", layer, fields, uuidField, fieldMapping
+        Importer importer = new Importer(helper, setting, "sdmap12", "fe_road", layer, fields, uuidField, fieldMapping
                 , analyzable, true, Contants.IndexType.FRAMEWORK, "road");
         importer.exec();
     }

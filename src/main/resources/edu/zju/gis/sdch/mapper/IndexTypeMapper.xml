@@ -17,9 +17,12 @@
         GEO_TYPE,
         DESCRIPTION,
         CATEGORY,
-        UPDATE_TIME,
+        UPDATE_TIME
     </sql>
     <insert id="insert" parameterType="edu.zju.gis.sdch.model.IndexType">
+        <selectKey keyProperty="id" order="BEFORE" resultType="string">
+            select uuid() as ID
+        </selectKey>
         insert into tb_index_type (ID, INDICE, DTYPE,
                                    GEO_TYPE, DESCRIPTION, CATEGORY,
                                    UPDATE_TIME)
@@ -28,6 +31,9 @@
                 #{updateTime,jdbcType=TIMESTAMP})
     </insert>
     <insert id="insertSelective" parameterType="edu.zju.gis.sdch.model.IndexType">
+        <selectKey keyProperty="id" order="BEFORE" resultType="string">
+            select uuid() as ID
+        </selectKey>
         insert into tb_index_type
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -111,10 +117,10 @@
         from tb_index_type
         where INDICE = #{indice,jdbcType=VARCHAR}
     </select>
-    <select id="selectByType">
+    <select id="selectByType" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_index_type
-        where INDICE = #{indice,jdbcType=VARCHAR} and DTYPE=#{dtype,jdbcType=VARCHAR}
+        where INDICE = #{indice,jdbcType=VARCHAR} and DTYPE = #{dtype,jdbcType=VARCHAR}
     </select>
 </mapper>
