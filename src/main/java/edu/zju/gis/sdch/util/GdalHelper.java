@@ -43,6 +43,10 @@ public class GdalHelper {
         geomTypes.put(ogr.wkbGeometryCollection, "GEOMETRYCOLLECTION");
     }
 
+    public static Map<Integer, String> getFieldTypes() {
+        return fieldTypes;
+    }
+
     public static String getTypeName(int ogrFieldType) {
         return fieldTypes.get(ogrFieldType);
     }

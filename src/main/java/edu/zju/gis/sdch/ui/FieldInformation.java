@@ -24,9 +24,9 @@ public class FieldInformation {
     public FieldInformation() {
         name = new SimpleStringProperty();
         type = new SimpleIntegerProperty();
-        analyzable = new SimpleBooleanProperty();
-        used = new SimpleBooleanProperty();
-        boost = new SimpleFloatProperty();
+        analyzable = new SimpleBooleanProperty(false);
+        used = new SimpleBooleanProperty(true);
+        boost = new SimpleFloatProperty(1);
         desc = new SimpleStringProperty();
         targetName = new SimpleStringProperty();
     }

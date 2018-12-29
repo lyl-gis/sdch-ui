@@ -53,7 +53,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("ui/MainPage.fxml"));
-//       Parent root = FXMLLoader.load(getClass().getResource("ui/Test.fxml"));
         Scene scene = new Scene(root);
         AllPages.mainStage.setTitle("数据导入");
         AllPages.mainStage.setScene(scene);
