@@ -2,7 +2,6 @@ package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.util.FGDBReader;
 import edu.zju.gis.sdch.util.GdalHelper;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -24,43 +24,46 @@ import org.gdal.ogr.Layer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MainPage implements Initializable {
     private static final Logger log = LogManager.getLogger(MainPage.class);
+    public static final String TITLE = "数据入库";
     public static MainPage instance = null;
+    @FXML
+    private BorderPane rootLayout;
     @FXML
     private Button btnPreview;
     @FXML
     private TextField tfChooseFile;
     @FXML
-    public ComboBox<String> cbCategory;
+    private ComboBox<String> cbCategory;
     @FXML
-    public TableView<FieldInformation> tableView;
+    private TableView<FieldInformation> tableView;
     @FXML
-    public TableColumn<FieldInformation, String> tcFieldName;
+    private TableColumn<FieldInformation, String> tcFieldName;
     @FXML
-    public TableColumn<FieldInformation, String> tcTargetName;
+    private TableColumn<FieldInformation, String> tcTargetName;
     @FXML
-    public TableColumn<FieldInformation, Number> tcFieldType;//写成Number,入库时强制转换成Integer
+    private TableColumn<FieldInformation, Number> tcFieldType;//写成Number,入库时强制转换成Integer
     @FXML
-    public TableColumn<FieldInformation, Boolean> tcUsed;
+    private TableColumn<FieldInformation, Boolean> tcUsed;
     @FXML
-    public TableColumn<FieldInformation, Boolean> tcAnalyzable;
+    private TableColumn<FieldInformation, Boolean> tcAnalyzable;
     @FXML
-    public TableColumn<FieldInformation, Number> tcBoost;
+    private TableColumn<FieldInformation, Number> tcBoost;
     @FXML
-    public TableColumn<FieldInformation, String> tcDescription;
+    private TableColumn<FieldInformation, String> tcDescription;
     @FXML
-    public ComboBox<String> cbxLayers;
+    private ComboBox<String> cbxLayers;
     @FXML
-    public ComboBox<String> cbUuidField;
+    private ComboBox<String> cbUuidField;
     @FXML
-    public RadioButton rbSkipEmpty;
+    private RadioButton rbSkipEmpty;
 
-    public static FGDBReader reader;
-
+    private FGDBReader reader;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -85,9 +88,10 @@ public class MainPage implements Initializable {
                 fields.forEach((key, value) -> {
                     FieldInformation fieldRow = new FieldInformation();
                     fieldRow.getName().set(key);
-                    fieldRow.getTargetName().set(key);
+                    String targetName = key.toLowerCase();
+                    fieldRow.getTargetName().set(targetName);
                     fieldRow.getType().set(value);
-                    fieldRow.getUsed().set(true);
+                    fieldRow.getUsed().set(FieldInformation.fixedFields.contains(targetName));
                     fieldRow.getAnalyzable().set(false);
                     fieldRow.getBoost().set(1f);
                     fieldRow.getDesc().set("");
@@ -100,7 +104,7 @@ public class MainPage implements Initializable {
                 btnPreview.setDisable(false);
             });
         });
-        cbCategory.setItems(FXCollections.observableArrayList("专题数据", "框架数据"));
+        cbCategory.getItems().addAll("框架数据", "专题数据");
         tcFieldName.setCellValueFactory(cellData -> cellData.getValue().getName());
         tcFieldType.setCellValueFactory(cellData -> cellData.getValue().getType());
         tcFieldType.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
@@ -148,11 +152,14 @@ public class MainPage implements Initializable {
                     if ("".equals(cbCategory.getValue())) {
                         new Alert(Alert.AlertType.CONFIRMATION, "请选择分类体系", ButtonType.OK)
                                 .showAndWait();
+                        return;
                     }
                     Parent root = FXMLLoader.load(getClass().getResource("DataPreview.fxml"));
                     Scene scene = new Scene(root);
+                    Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
                     Stage stage = new Stage();
-                    stage.setTitle("数据预览");
+                    stage.initOwner(primaryStage);
+                    stage.setTitle(DataPreview.TITLE);
                     stage.setScene(scene);
                     stage.show();
                 } catch (IOException e) {
@@ -163,8 +170,29 @@ public class MainPage implements Initializable {
 
             }
         });
-
     }
 
+    public FGDBReader getReader() {
+        return reader;
+    }
 
+    public String getCategory() {
+        return cbCategory.getValue().trim();
+    }
+
+    public String getSelectedLayer() {
+        return cbxLayers.getValue().trim();
+    }
+
+    public String getUuidField() {
+        return cbUuidField.getValue().trim();
+    }
+
+    public boolean skipEmpty() {
+        return rbSkipEmpty.isSelected();
+    }
+
+    public List<FieldInformation> getFieldInfos() {
+        return tableView.getItems();
+    }
 }
