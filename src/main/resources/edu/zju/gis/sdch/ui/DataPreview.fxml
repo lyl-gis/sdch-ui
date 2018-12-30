@@ -3,43 +3,41 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane prefHeight="370.0" prefWidth="667.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane prefHeight="370.0" prefWidth="667.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DataPreview">
     <top>
         <HBox prefHeight="35.0" prefWidth="613.0" spacing="10.0" BorderPane.alignment="CENTER">
-            <children>
-                <Label prefHeight="25.0" prefWidth="76.0" text="预览前">
-                    <padding>
-                        <Insets left="25.0" top="5.0"/>
-                    </padding>
-                </Label>
-                <ChoiceBox fx:id="cbPreviewSize" prefHeight="13.0" prefWidth="36.0"/>
-                <Label prefHeight="25.0" prefWidth="57.0" text="数据">
-                    <padding>
-                        <Insets top="5.0"/>
-                    </padding>
-                </Label>
-                <Label prefHeight="25.0" prefWidth="67.0" text="索引名称">
-                    <padding>
-                        <Insets top="5.0"/>
-                    </padding>
-                </Label>
-                <TextField fx:id="tfIndex" prefHeight="30.0" prefWidth="72.0"/>
-                <Label prefHeight="25.0" prefWidth="67.0" text="数据类型">
-                    <padding>
-                        <Insets top="5.0"/>
-                    </padding>
-                </Label>
-                <ComboBox fx:id="coDataType" prefHeight="30.0" prefWidth="108.0"/>
-                <Button fx:id="btnImport" mnemonicParsing="false" prefHeight="30.0" prefWidth="83.0" text="数据入库"/>
-                <!--<ComboBox fx:id="coDataType" prefWidth="150.0" />-->
-            </children>
             <opaqueInsets>
                 <Insets/>
             </opaqueInsets>
             <padding>
                 <Insets bottom="10.0" top="10.0"/>
             </padding>
+            <Label prefHeight="25.0" prefWidth="76.0" text="预览前">
+                <padding>
+                    <Insets left="25.0" top="5.0"/>
+                </padding>
+            </Label>
+            <ChoiceBox fx:id="cbPreviewSize" prefHeight="30.0" prefWidth="53.0"/>
+            <Label prefHeight="25.0" prefWidth="44.0" text="数据">
+                <padding>
+                    <Insets top="5.0"/>
+                </padding>
+            </Label>
+            <Label prefHeight="25.0" prefWidth="67.0" text="索引名称">
+                <padding>
+                    <Insets top="5.0"/>
+                </padding>
+            </Label>
+            <TextField fx:id="tfIndex" prefHeight="30.0" prefWidth="72.0"/>
+            <Label prefHeight="25.0" prefWidth="67.0" text="数据类型">
+                <padding>
+                    <Insets top="5.0"/>
+                </padding>
+            </Label>
+            <ComboBox fx:id="coDataType" prefHeight="30.0" prefWidth="108.0"/>
+            <Button fx:id="btnImport" mnemonicParsing="false" prefHeight="30.0" prefWidth="83.0" text="数据入库"/>
+            <!--<ComboBox fx:id="coDataType" prefWidth="150.0" />-->
         </HBox>
     </top>
     <bottom>

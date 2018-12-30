@@ -162,8 +162,6 @@ public class GdalHelper {
                 records.put(uuid, record);
             }
         }
-        if (records.size() < 500)
-            System.out.println(records.size());
         return records;
     }
 }

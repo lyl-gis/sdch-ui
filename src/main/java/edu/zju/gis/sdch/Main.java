@@ -1,8 +1,6 @@
 package edu.zju.gis.sdch;
 
 import edu.zju.gis.sdch.config.CommonSetting;
-import edu.zju.gis.sdch.ui.AllPages;
-import edu.zju.gis.sdch.ui.StageManager;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -54,12 +52,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("ui/MainPage.fxml"));
         Scene scene = new Scene(root);
-        AllPages.mainStage.setTitle("数据导入");
-        AllPages.mainStage.setScene(scene);
-        AllPages.mainStage.show();
-        StageManager.STAGE.put("mainStage", AllPages.mainStage);
-        StageManager.CONTROLLER.put("mainPage", this);
-
+        primaryStage.setTitle("数据导入");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     private void setMenu(BorderPane root, Stage primaryStage) {

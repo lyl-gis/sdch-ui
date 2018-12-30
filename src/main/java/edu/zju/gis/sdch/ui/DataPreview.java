@@ -5,9 +5,7 @@ import edu.zju.gis.sdch.tool.Importer;
 import edu.zju.gis.sdch.util.GdalHelper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -35,32 +33,19 @@ public class DataPreview implements Initializable {
     @FXML
     private ChoiceBox<Integer> cbPreviewSize;
 
-    //    private HistoryField<String> historyField;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //  this.coDataType=new HistoryField<>();
-        ArrayList<String> datatpye = new ArrayList<>();
-        datatpye.add("poi");
-        datatpye.add("entity");
-        coDataType.setItems(FXCollections.observableArrayList("poi", "entity"));
+        coDataType.getItems().add("poi");
+        coDataType.getItems().add("entity");
         coDataType.setEditable(true);
-        coDataType.valueProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                int number = 0;//如果列表中已经有这个值，则不加到列表中
-                for (int i = 0; i < datatpye.size(); i++) {
-                    if (newValue == datatpye.get(i))
-                        number++;
-                }
-                if (number == 0) {
-                    datatpye.add(newValue);
-                    coDataType.setItems(FXCollections.observableArrayList(datatpye));
-                }
-            }
+        coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<String> dataTypes = coDataType.getItems();
+            if (!dataTypes.contains(newValue))
+                dataTypes.add(newValue);
         });
-        cbPreviewSize.setItems(FXCollections.observableArrayList(10, 25, 50, 100));
+        cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            MainPage mainPage = (MainPage) StageManager.CONTROLLER.get("dataPreviewController");
+            MainPage mainPage = MainPage.instance;
             Layer layer = MainPage.reader.getLayer(mainPage.cbxLayers.getValue());
             //1. 读取字段配置
             Map<String, Integer> fields = new HashMap<>();
@@ -78,10 +63,13 @@ public class DataPreview implements Initializable {
                 tableColumns.add(column);
                 column.setCellValueFactory(param -> {
                     String value = "";
-                    String colName = column.getText();
                     for (String srcName : fieldMapping.keySet())
-                        if (colName.equals(fieldMapping.get(srcName)))
-                            value = param.getValue().get(srcName).toString();
+                        try {
+                            if (targetName.equals(fieldMapping.get(srcName)))
+                                value = param.getValue().get(srcName).toString();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     return new SimpleStringProperty(value);
                 });
             });
@@ -102,17 +90,14 @@ public class DataPreview implements Initializable {
                 @Override
                 protected Task<Double> createTask() {
                     String index = tfIndex.getText();
-                    MainPage mainPage = (MainPage) StageManager.CONTROLLER.get("dataPreviewController");
-                    String dtype = mainPage.cbCategory.getValue();
+                    MainPage mainPage = MainPage.instance;
+                    String category = mainPage.cbCategory.getValue().trim();
                     String layerName = mainPage.cbxLayers.getValue();
-                    String uuidField = mainPage.cbUuidField.getValue();
-                    String indexType = mainPage.cbCategory.getValue();
-
-                    if (indexType == "框架数据")
-                        indexType = "framework";
+                    String dtype = coDataType.getValue().trim();
+                    if ("框架数据".equals(category))
+                        category = "framework";
                     else
-                        indexType = "topic";
-
+                        category = "topic";
                     Map<String, String> fieldMapping = new HashMap<>();//选取字段名与别名的映射
                     Map<String, Integer> fields = new HashMap<>();//选取字段名与类型的映射
                     Map<String, Float> analyzable = new HashMap<>();
@@ -125,12 +110,11 @@ public class DataPreview implements Initializable {
                             }
                         }
                     });
+                    String uuidField = mainPage.cbUuidField.getValue();
                     boolean skipEmptyGeom = mainPage.rbSkipEmpty.isSelected();//检查单选框是否被选中
                     Layer layer = MainPage.reader.getLayer(layerName);
-//                    return new Importer(Main.getHelper(), Main.getSetting(), index, dtype, layer, fields, uuidField,
-//                            fieldMapping, analyzable, skipEmptyGeom, Contants.IndexType.FRAMEWORK, "");
                     return new Importer(Main.getHelper(), Main.getSetting(), index, dtype, layer, fields, uuidField,
-                            fieldMapping, analyzable, skipEmptyGeom, indexType, coDataType.getValue());
+                            fieldMapping, analyzable, skipEmptyGeom, category, dtype);
                 }
             };
             progressBar.progressProperty().bind(service.progressProperty());
@@ -145,7 +129,8 @@ public class DataPreview implements Initializable {
                             new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
                                     .showAndWait();
                         else {
-                            AllPages.dataPreviewStage.close();
+
+                            DataPreview.this.btnImport.getScene().getWindow().hide();
                             new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
                                     .showAndWait();
                         }
