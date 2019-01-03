@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="263.0" prefWidth="413.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.IndexManage">
+    <children>
+
+        <TableView fx:id="tvIndex" editable="true" layoutX="15.0" layoutY="96.0" prefHeight="143.0" prefWidth="359.0">
+            <columns>
+                <TableColumn fx:id="tcIndice" prefWidth="77.0" text="索引名称" />
+                <TableColumn fx:id="tcShards" prefWidth="67.0" text="分片数" />
+                <TableColumn fx:id="tcReplicas" prefWidth="72.0" text="备份数" />
+                <TableColumn fx:id="tcDescription" prefWidth="69.0" text="描述" />
+                <TableColumn fx:id="tcCategory" prefWidth="76.0" text="类别" />
+            </columns>
+        </TableView>
+        <Button fx:id="btnAdd" layoutX="31.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="增加" />
+        <Button fx:id="btnDelete" layoutX="126.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="删除" />
+        <Button fx:id="btnModified" layoutX="219.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="修改" />
+        <Button fx:id="btnSelect" layoutX="315.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="查找" />
+    </children>
+</AnchorPane>
