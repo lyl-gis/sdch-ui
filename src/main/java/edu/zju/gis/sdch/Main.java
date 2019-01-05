@@ -21,8 +21,6 @@ import java.util.Properties;
 public class Main extends Application {
     private static CommonSetting setting = new CommonSetting();
     private static ElasticSearchHelper helper;
-
-
     public static void main(String[] args) {
         ogr.RegisterAll();
         Properties props = new Properties();
