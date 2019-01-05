@@ -24,6 +24,7 @@ import org.gdal.ogr.Layer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -97,6 +98,7 @@ public class MainPage implements Initializable {
                     fieldRow.getDesc().set("");
                     informations.add(fieldRow);
                 });
+                informations.sort(Comparator.comparing(fieldInformation -> fieldInformation.getName().get()));
                 cbUuidField.getItems().clear();
                 cbUuidField.getItems().addAll(fields.keySet().stream().sorted().toArray(String[]::new));
                 cbUuidField.getItems().add(0, "--自动生成--");
