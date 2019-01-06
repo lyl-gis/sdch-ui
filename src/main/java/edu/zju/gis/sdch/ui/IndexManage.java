@@ -1,7 +1,9 @@
 package edu.zju.gis.sdch.ui;
 
+import edu.zju.gis.sdch.config.CommonSetting;
 import edu.zju.gis.sdch.mapper.IndexMapper;
 import edu.zju.gis.sdch.model.Index;
+import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,9 +18,10 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.net.UnknownHostException;
+import java.util.*;
 
 
 public class IndexManage implements Initializable {
@@ -46,14 +49,50 @@ public class IndexManage implements Initializable {
     private Button btnConfirmDelete;
     @FXML
     private Button btnSaveModified;
+
+    //    @FXML
+//    private TextField tfSelectedIndex;
+    @FXML
+    private Button btnToDocManage;
+
+//    @FXML
+//    private TableView<Map<String, Object>> tvDocs;
+
     public static final String TITLE = "索引管理";
     public static IndexManage instance = null;
     public IndexMapper mapper;
+    public ElasticSearchHelper helper;
+    public CommonSetting setting;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
+        InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
+        // 创建会话工厂，传入mybatis的配置文件信息
+        Properties props = new Properties();
+        try {
+            props.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setting = new CommonSetting();
+        setting.setEsName(props.getProperty("es.name", "elasticsearch"));
+        setting.setEsHosts(Arrays.asList(props.getProperty("es.hosts").split(",")));
+        setting.setEsPort(Integer.parseInt(props.getProperty("es.port", "9300")));
+        setting.setEsShards(Integer.parseInt(props.getProperty("es.number_of_shards", "4")));
+        setting.setEsReplicas(Integer.parseInt(props.getProperty("es.number_of_replicas", "0")));
+        setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
+        try {
+            helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         btnConfirmDelete.setVisible(false);
         btnSaveModified.setVisible(false);
         tcIndice.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -95,8 +134,8 @@ public class IndexManage implements Initializable {
         ObservableList<MyIndex> indices = tvIndex.getItems();//必须放在列与数据绑定之后
         btnSelect.setOnMouseClicked(event -> {
             indices.clear();
-            List<Index> indexList=mapper.selectAll();
-            for(int i=0;i<indexList.size();i++){
+            List<Index> indexList = mapper.selectAll();
+            for (int i = 0; i < indexList.size(); i++) {
                 MyIndex index = new MyIndex();
                 index.getDescription().set(indexList.get(i).getDescription());
                 index.getCategory().set(indexList.get(i).getCategory());
@@ -115,7 +154,7 @@ public class IndexManage implements Initializable {
             }
             Scene scene = new Scene(root);
             Stage stage = new Stage();
-            stage.setTitle(DataPreview.TITLE);
+            stage.setTitle(IndexAdd.TITLE);
             stage.setScene(scene);
             stage.show();
 
@@ -132,9 +171,10 @@ public class IndexManage implements Initializable {
 
         btnConfirmDelete.setOnMouseClicked(event -> {
 
-            for (int i = 0; i <tvIndex.getItems().size(); i++) {
-                if (tvIndex.getItems().get(i).getDeleted().getValue() == true) {
-                   mapper.deleteByPrimaryKey(tvIndex.getItems().get(i).getIndice().getValue());
+            for (int i = 0; i < tvIndex.getItems().size(); i++) {
+                if (tvIndex.getItems().get(i).getDeleted().getValue()) {
+                    helper.delete(tvIndex.getItems().get(i).getIndice().getValue());//在ES中删除
+                    mapper.deleteByPrimaryKey(tvIndex.getItems().get(i).getIndice().getValue());
                     tvIndex.getItems().remove(i);//在表中删除打钩的那一行
                     i--;
                 }
@@ -157,7 +197,7 @@ public class IndexManage implements Initializable {
             tvIndex.getColumns().add(tcModified);//在表中增加一列
 
         });
-        btnSaveModified.setOnMouseClicked(event->{
+        btnSaveModified.setOnMouseClicked(event -> {
             for (int i = 0; i < tvIndex.getItems().size(); i++) {
                 if (tvIndex.getItems().get(i).getModified().getValue() == true) {
                     Index index = new Index();
@@ -171,6 +211,52 @@ public class IndexManage implements Initializable {
             }
             tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
             btnSaveModified.setVisible(false);
+        });
+
+//        btnDocManage.setOnMouseClicked(event -> {
+//            String selectedindex = tfSelectedIndex.getText();
+//
+//            try {
+//                List<Map<String, Object>> result = helper.getAsMap(selectedindex, "_doc", 0, 5);
+//                System.out.println("gfsg");
+//                //将查到的数据显示在表格中
+//                List<TableColumn<Map<String, Object>, String>> tableColumns = new ArrayList<>();
+//                result.get(0).values().forEach(targetName -> {
+//                    TableColumn<Map<String, Object>, String> column = new TableColumn<>("新一列");
+//                    tableColumns.add(column);
+//                    column.setCellFactory(TextFieldTableCell.forTableColumn());
+//                    column.setEditable(true);
+//                    column.setCellValueFactory(param -> {
+//                        String value = "";
+//                        for (String srcName : result.get(0).keySet())
+//                            if (targetName.equals(result.get(0).get(srcName)))
+//                                value = param.getValue().get(srcName).toString();
+//                        return new SimpleStringProperty(value);
+//                    });
+//                });
+//
+//                tvDocs.getColumns().clear();
+//                tvDocs.getColumns().addAll(tableColumns);
+//                for (int i = 0; i < result.size(); i++)
+//                    tvDocs.getItems().add(result.get(i));
+//            } catch (ExecutionException e) {
+//                e.printStackTrace();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        });
+        btnToDocManage.setOnMouseClicked(event -> {
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("DocManage.fxml"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setTitle(DocManage.TITLE);
+            stage.setScene(scene);
+            stage.show();
         });
     }
 }

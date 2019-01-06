@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 public class IndexAdd implements Initializable {
@@ -34,7 +35,7 @@ public class IndexAdd implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         IndexManage indexManage = IndexManage.instance;
         cbShards.getItems().addAll(1,2,3,4,5,6,7,8);
-        cbReplicas.getItems().addAll(1,2,3,4,5,6,7,8);
+        cbReplicas.getItems().addAll(0, 1, 2, 3, 4, 5, 6, 7, 8);
         cbCategory.getItems().addAll("xzm","poi","road");
         btnConfirm.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -55,6 +56,12 @@ public class IndexAdd implements Initializable {
                 indexadd.setCategory(indexnew.getCategory().getValue());
                 indexadd.setDescription(indexnew.getDescription().getValue());
                 indexManage.mapper.insert(indexadd);
+                try {
+                    indexManage.helper.createIfNotExist(indexadd.getIndice(), indexadd.getShards(), indexadd.getReplicas());//在ES中添加
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 Stage stage = (Stage) btnCancel.getScene().getWindow();
                 stage.close();
             }

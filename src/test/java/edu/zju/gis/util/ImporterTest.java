@@ -14,7 +14,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class ImporterTest {
     private CommonSetting setting;
@@ -25,7 +27,7 @@ public class ImporterTest {
     @Before
     public void setup() throws IOException {
         ogr.RegisterAll();
-        String gdb = "F:\\Project\\山东国土测绘院\\data.gdb";
+        String gdb = "F:\\sdch_data.gdb";
         InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
         // 创建会话工厂，传入mybatis的配置文件信息
         Properties props = new Properties();
@@ -268,5 +270,12 @@ public class ImporterTest {
     @Test
     public void testCount() {
         System.out.println(helper.getDocCount("f_poi", "_doc"));
+    }
+
+    @Test
+    public void testReadEs() throws ExecutionException, InterruptedException, UnknownHostException {
+        helper = new ElasticSearchHelper(Arrays.asList("192.168.137.81"), 9300, "elasticsearch");
+        Object res = helper.getAsMap("sdmap", "_doc", 0, 10);
+        System.out.println(res);
     }
 }
