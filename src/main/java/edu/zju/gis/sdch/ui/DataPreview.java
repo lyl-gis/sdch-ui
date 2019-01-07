@@ -71,6 +71,7 @@ public class DataPreview implements Initializable {
             tableColumns.add(column);
             column.setCellValueFactory(param -> {
                 String value = "";
+
                 for (String srcName : fieldMapping.keySet())
                     if (targetName.equals(fieldMapping.get(srcName)))
                         value = param.getValue().get(srcName).toString();

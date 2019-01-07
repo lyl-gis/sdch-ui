@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="354.0" prefWidth="284.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DocAdd">
+    <children>
+        <TableView fx:id="tvDocsAdd" editable="true" layoutX="26.0" layoutY="18.0" prefHeight="268.0" prefWidth="225.0">
+            <columns>
+                <TableColumn fx:id="tcDocKeys" prefWidth="75.0" text="key"/>
+                <TableColumn fx:id="tcDocValues" prefWidth="149.0" text="value"/>
+            </columns>
+        </TableView>
+        <Button fx:id="btnCancelAddDoc" layoutX="175.0" layoutY="306.0" mnemonicParsing="false" text="取消"/>
+        <Button fx:id="btnConfirmAddDoc" layoutX="26.0" layoutY="306.0" mnemonicParsing="false" text="确认添加"/>
+    </children>
+</AnchorPane>

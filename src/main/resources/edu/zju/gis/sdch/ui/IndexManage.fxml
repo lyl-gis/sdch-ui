@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="263.0" prefWidth="413.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.IndexManage">
-    <children>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="373.0" prefWidth="628.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.IndexManage">
+   <top>
+      <HBox prefHeight="57.0" prefWidth="502.0" spacing="60.0" BorderPane.alignment="CENTER">
+         <children>
+              <Button fx:id="btnSelect" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="查找" />
+              <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="增加" />
+              <Button fx:id="btnDelete" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="删除" />
+              <Button fx:id="btnModified" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="修改" />
+         </children>
+         <opaqueInsets>
+            <Insets top="50.0" />
+         </opaqueInsets>
+         <padding>
+            <Insets left="30.0" top="15.0" />
+         </padding>
+         <BorderPane.margin>
+            <Insets left="50.0" />
+         </BorderPane.margin>
+      </HBox>
+   </top>
+   <center>
 
-        <TableView fx:id="tvIndex" editable="true" layoutX="15.0" layoutY="96.0" prefHeight="143.0" prefWidth="359.0">
+       <TableView fx:id="tvIndex" editable="true" prefHeight="126.0" prefWidth="494.0" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="tcIndice" prefWidth="77.0" text="索引名称" />
                 <TableColumn fx:id="tcShards" prefWidth="67.0" text="分片数" />
@@ -13,10 +34,29 @@
                 <TableColumn fx:id="tcDescription" prefWidth="69.0" text="描述" />
                 <TableColumn fx:id="tcCategory" prefWidth="76.0" text="类别" />
             </columns>
+         <opaqueInsets>
+            <Insets left="50.0" />
+         </opaqueInsets>
         </TableView>
-        <Button fx:id="btnAdd" layoutX="31.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="增加" />
-        <Button fx:id="btnDelete" layoutX="126.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="删除" />
-        <Button fx:id="btnModified" layoutX="219.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="修改" />
-        <Button fx:id="btnSelect" layoutX="315.0" layoutY="49.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="查找" />
-    </children>
-</AnchorPane>
+   </center>
+   <left>
+       <VBox prefHeight="126.0" prefWidth="79.0" BorderPane.alignment="CENTER"/>
+   </left>
+   <right>
+       <VBox prefHeight="126.0" prefWidth="83.0" BorderPane.alignment="CENTER"/>
+   </right>
+    <bottom>
+        <HBox prefHeight="61.0" prefWidth="628.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnSaveModified" mnemonicParsing="false" prefHeight="15.0" prefWidth="138.0"
+                        text="保存索引编辑"/>
+                <Button fx:id="btnConfirmDelete" mnemonicParsing="false" prefHeight="23.0" prefWidth="94.0"
+                        text="确认删除索引"/>
+                <Button fx:id="btnToDocManage" mnemonicParsing="false" prefHeight="23.0" prefWidth="151.0" text="编辑文档"/>
+            </children>
+            <BorderPane.margin>
+                <Insets left="200.0"/>
+            </BorderPane.margin>
+        </HBox>
+    </bottom>
+</BorderPane>
