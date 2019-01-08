@@ -2,10 +2,7 @@ package edu.zju.gis.util;
 
 import edu.zju.gis.sdch.util.ShapefileReader;
 import org.gdal.gdal.gdal;
-import org.gdal.ogr.Driver;
-import org.gdal.ogr.Feature;
-import org.gdal.ogr.Geometry;
-import org.gdal.ogr.ogr;
+import org.gdal.ogr.*;
 import org.gdal.osr.CoordinateTransformation;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
@@ -156,5 +153,14 @@ public class ShapefileReaderTest {
             e.printStackTrace();
         }
         return records;
+    }
+
+    @Test
+    public void importMysql() {
+        Driver d = ogr.GetDriverByName("MySQL");
+        DataSource ds = d.CreateDataSource("MySQL:sdmap,user=root,password=root,host=localhost,port=3306", new Vector());
+        DataSource srcDs = ogr.Open("F:\\Project\\山东国土测绘院\\data.gdb");
+        Layer layer = srcDs.GetLayer("zhengqu");
+        ds.CopyLayer(layer, "zq");
     }
 }
