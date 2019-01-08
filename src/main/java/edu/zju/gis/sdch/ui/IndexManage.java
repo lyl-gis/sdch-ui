@@ -36,7 +36,7 @@ public class IndexManage implements Initializable {
     @FXML
     public TableView<MyIndex> tvIndex;
     @FXML
-    private TableColumn<MyIndex, String> tcIndice;
+    public TableColumn<MyIndex, String> tcIndice;
     @FXML
     private TableColumn<MyIndex, Number> tcShards;
     @FXML
@@ -50,13 +50,8 @@ public class IndexManage implements Initializable {
     @FXML
     private Button btnSaveModified;
 
-    //    @FXML
-//    private TextField tfSelectedIndex;
     @FXML
     private Button btnToDocManage;
-
-//    @FXML
-//    private TableView<Map<String, Object>> tvDocs;
 
     public static final String TITLE = "索引管理";
     public static IndexManage instance = null;
@@ -93,8 +88,8 @@ public class IndexManage implements Initializable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        btnConfirmDelete.setVisible(false);
-        btnSaveModified.setVisible(false);
+        btnConfirmDelete.setDisable(true);
+        btnSaveModified.setDisable(true);
         tcIndice.setCellFactory(TextFieldTableCell.forTableColumn());
         tcIndice.setCellValueFactory(cellData -> cellData.getValue().getIndice());
         tcShards.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
@@ -166,7 +161,7 @@ public class IndexManage implements Initializable {
             tvIndex.getColumns().add(tcDeleted);//在表中增加一列
             new Alert(Alert.AlertType.INFORMATION, "在要删除的内容后打钩", ButtonType.OK)
                     .showAndWait();
-            btnConfirmDelete.setVisible(true);
+            btnConfirmDelete.setDisable(false);
         });
 
         btnConfirmDelete.setOnMouseClicked(event -> {
@@ -180,7 +175,7 @@ public class IndexManage implements Initializable {
                 }
             }
             tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
-            btnConfirmDelete.setVisible(false);
+            btnConfirmDelete.setDisable(true);
         });
         btnModified.setOnMouseClicked(event -> {
             new Alert(Alert.AlertType.INFORMATION, "进入可编辑状态,在要编辑的内容后面打钩", ButtonType.OK)
@@ -195,7 +190,7 @@ public class IndexManage implements Initializable {
             tcModified.setCellFactory(CheckBoxTableCell.forTableColumn(tcModified));
             tcModified.setCellValueFactory(o -> o.getValue().getModified());
             tvIndex.getColumns().add(tcModified);//在表中增加一列
-
+            btnSaveModified.setDisable(false);
         });
         btnSaveModified.setOnMouseClicked(event -> {
             for (int i = 0; i < tvIndex.getItems().size(); i++) {
@@ -210,7 +205,7 @@ public class IndexManage implements Initializable {
                 }
             }
             tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
-            btnSaveModified.setVisible(false);
+            btnSaveModified.setDisable(true);
         });
 
 //        btnDocManage.setOnMouseClicked(event -> {
@@ -257,6 +252,8 @@ public class IndexManage implements Initializable {
             stage.setTitle(DocManage.TITLE);
             stage.setScene(scene);
             stage.show();
+            new Alert(Alert.AlertType.INFORMATION, "请在查询之后再进行其他操作", ButtonType.OK)
+                    .showAndWait();
         });
     }
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="464.0" prefWidth="322.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DocModify">
+    <bottom>
+        <HBox prefHeight="31.0" prefWidth="322.0" spacing="40.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnSaveModify" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="保存编辑">
+                    <HBox.margin>
+                        <Insets left="60.0"/>
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="btnCancelModify" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="取消">
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets top="10.0"/>
+            </BorderPane.margin>
+        </HBox>
+    </bottom>
+    <center>
+        <TableView fx:id="tvDocModify" editable="true" prefHeight="183.0" prefWidth="385.0"
+                   BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="tcKeys" prefWidth="125.0" text="keys"/>
+                <TableColumn fx:id="tcValues" prefWidth="122.0" text="values"/>
+            </columns>
+        </TableView>
+    </center>
+    <top>
+        <HBox prefHeight="25.0" prefWidth="549.0" style="-fx-background-color: lightblue;"
+              BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="5.0"/>
+            </BorderPane.margin>
+        </HBox>
+    </top>
+    <left>
+        <HBox prefHeight="200.0" prefWidth="30.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <right>
+        <HBox prefHeight="192.0" prefWidth="29.0" BorderPane.alignment="CENTER"/>
+    </right>
+</BorderPane>

@@ -1,7 +1,9 @@
 package edu.zju.gis.sdch.ui;
 
+import edu.zju.gis.sdch.model.Index;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,35 +25,47 @@ public class DocManage implements Initializable {
     private Button btnSelectDoc;
 
     @FXML
-    private TextField tfSelectedIndex;
-
+    private ChoiceBox<String> cbSelectedIndex;
     @FXML
     private Button btnAddDoc;
 
     @FXML
     private Button btnDeleteDoc;
-
     @FXML
     private Button btnModifyDoc;
-
     @FXML
-    private Button btnConfirmDeletedocs;
-
+    private Button btnConfirmDeleteDocs;
     @FXML
-    private Button btnSaveModifieddocs;
+    private Button btnStartModifiedDocs;
     @FXML
-    private TableView<Map<String, Object>> tvDocs;
+    public TableView<Map<String, Object>> tvDocs;
     public static final String TITLE = "文档编辑";
     static public List<Map<String, Object>> result;
     public static DocManage instance = null;
+    public static int modifyNumber;//记录有多少个要修改的文档
+    public static ArrayList<Integer> modifyItems;//记录要修改在表格中是第几行
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
         IndexManage indexManage = IndexManage.instance;
+        btnStartModifiedDocs.setDisable(true);
+        btnConfirmDeleteDocs.setDisable(true);
+        //用查到的索引名称初始下拉框中的值，初始化成功的条件是上个窗口中查找索引
+        List<Index> indexList = indexManage.mapper.selectAll();
+        ObservableList<String> allIndex = cbSelectedIndex.getItems();
+        for (int i = 0; i < indexList.size(); i++) {
+            allIndex.add(indexList.get(i).getIndice());
+        }
+        cbSelectedIndex.setValue(" ");
         btnSelectDoc.setOnMouseClicked(event -> {
+            System.out.println(cbSelectedIndex.getValue());
+            if (cbSelectedIndex.getValue().equals(" ")) {
+                new Alert(Alert.AlertType.INFORMATION, "请先选择索引名称", ButtonType.OK)
+                        .showAndWait();
+            }
             try {
-                result = indexManage.helper.getAsMap("sdmap", "_doc", 0, 5);
+                result = indexManage.helper.getAsMap(cbSelectedIndex.getValue(), "_doc", 0, 20);
             } catch (ExecutionException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -81,6 +95,8 @@ public class DocManage implements Initializable {
                 tvDocs.getItems().add(result.get(i));
         });
         btnAddDoc.setOnMouseClicked(event -> {
+            new Alert(Alert.AlertType.INFORMATION, "请务必填写the_shape的值", ButtonType.OK)
+                    .showAndWait();
             Parent root = null;
             try {
                 root = FXMLLoader.load(getClass().getResource("DocAdd.fxml"));
@@ -102,32 +118,29 @@ public class DocManage implements Initializable {
             tcDeletedDoc.setCellFactory(CheckBoxTableCell.forTableColumn(tcDeletedDoc));
             tcDeletedDoc.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Map<String, Object>, Boolean>, ObservableValue<Boolean>>() {
                 Docs deleteddocs = new Docs();
-
                 @Override
                 public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Map<String, Object>, Boolean> param) {
-                    for (String string : param.getValue().keySet()) {
-                        if (string.equals("是否删除"))
-                            deleteddocs = (Docs) param.getValue().get(string);
-                    }
+                    deleteddocs = (Docs) param.getValue().get("是否删除");
                     return deleteddocs.getIfDeleted();
                 }
             });
             tvDocs.getColumns().add(tcDeletedDoc);//在表中增加一列
             new Alert(Alert.AlertType.INFORMATION, "在要删除的内容后打钩", ButtonType.OK)
                     .showAndWait();
-
+            btnConfirmDeleteDocs.setDisable(false);
         });
-        btnConfirmDeletedocs.setOnMouseClicked(event -> {
+        btnConfirmDeleteDocs.setOnMouseClicked(event -> {
             for (int i = 0; i < tvDocs.getItems().size(); i++) {
                 if (((Docs) tvDocs.getItems().get(i).get("是否删除")).getIfDeleted().getValue()) {
                     //在ES中删除
                     Boolean bool = indexManage.helper.delete("sdmap", "_doc", tvDocs.getItems().get(i).get("lsid").toString());
-                    System.out.println(bool);
+                    System.out.println("是否删除" + bool);
                     tvDocs.getItems().remove(i);//在表中删除打钩的那一行
                     i--;
                 }
             }
             tvDocs.getColumns().remove(tvDocs.getColumns().size() - 1);//删去新增的一列
+            btnConfirmDeleteDocs.setDisable(true);
         });
         btnModifyDoc.setOnMouseClicked(event -> {
             TableColumn<Map<String, Object>, Boolean> tcModifiedDoc = new TableColumn<>("是否修改");
@@ -141,28 +154,37 @@ public class DocManage implements Initializable {
 
                 @Override
                 public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Map<String, Object>, Boolean> param) {
-                    for (String string : param.getValue().keySet()) {
-                        if (string.equals("是否修改"))
-                            modifidDocs = (Docs) param.getValue().get(string);
-                    }
+                    modifidDocs = (Docs) param.getValue().get("是否修改");
                     return modifidDocs.ifModified;
                 }
             });
             tvDocs.getColumns().add(tcModifiedDoc);//在表中增加一列
             new Alert(Alert.AlertType.INFORMATION, "在要编辑的内容后打钩", ButtonType.OK)
                     .showAndWait();
+            btnStartModifiedDocs.setDisable(false);
         });
-        //修改docs的部分还有问题，无法得到修改后的值
-        btnSaveModifieddocs.setOnMouseClicked(event -> {
+        btnStartModifiedDocs.setOnMouseClicked(event -> {
+            modifyNumber = 0;
+            modifyItems = new ArrayList<>();
             Map<String, Map<String, Object>> kvIdDoc = new HashMap<>();
             for (int i = 0; i < tvDocs.getItems().size(); i++) {
                 if (((Docs) tvDocs.getItems().get(i).get("是否修改")).getIfModified().getValue()) {
-                    kvIdDoc.put(" ", tvDocs.getItems().get(i));
+                    modifyNumber++;
+                    modifyItems.add(i);
                 }
             }
-            int number = indexManage.helper.updateFromMap("sdmap", "_doc", kvIdDoc);
-            System.out.println(number);
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("DocModify.fxml"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
             tvDocs.getColumns().remove(tvDocs.getColumns().size() - 1);//删去新增的一列
+            btnStartModifiedDocs.setDisable(true);
         });
     }
 }
