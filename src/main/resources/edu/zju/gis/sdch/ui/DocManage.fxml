@@ -1,21 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171"
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane prefHeight="418.0" prefWidth="584.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DocManage">
-    <children>
-        <TableView fx:id="tvDocs" editable="true" layoutX="13.0" layoutY="112.0" prefHeight="200.0" prefWidth="560.0">
+    <right>
+        <VBox prefHeight="339.0" prefWidth="116.0" spacing="15.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="查询">
+                    <VBox.margin>
+                        <Insets left="5.0" top="30.0"/>
+                    </VBox.margin>
+                </Button>
+                <Button fx:id="btnAddDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="增加">
+                    <VBox.margin>
+                        <Insets left="5.0"/>
+                    </VBox.margin>
+                </Button>
+                <Button fx:id="btnDeleteDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="删除">
+                    <VBox.margin>
+                        <Insets left="5.0"/>
+                    </VBox.margin>
+                </Button>
+                <Button fx:id="btnConfirmDeleteDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0"
+                        text="确认删除">
+                    <VBox.margin>
+                        <Insets left="5.0"/>
+                    </VBox.margin>
+                </Button>
+                <Button fx:id="btnModifyDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="编辑">
+                    <VBox.margin>
+                        <Insets left="5.0"/>
+                    </VBox.margin>
+                </Button>
+                <Button fx:id="btnStartModifiedDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0"
+                        text="开始编辑">
+                    <VBox.margin>
+                        <Insets left="5.0"/>
+                    </VBox.margin>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets left="10.0"/>
+            </BorderPane.margin>
+        </VBox>
+    </right>
+    <center>
+        <TableView fx:id="tvDocs" editable="true" prefHeight="339.0" prefWidth="411.0" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn prefWidth="75.0" text="C1"/>
                 <TableColumn prefWidth="75.0" text="C2"/>
             </columns>
         </TableView>
-        <Button fx:id="btnSelectDoc" layoutX="83.0" layoutY="51.0" mnemonicParsing="false" text="查询"/>
-        <Button fx:id="btnAddDoc" layoutX="162.0" layoutY="51.0" mnemonicParsing="false" text="增加"/>
-        <Button fx:id="btnDeleteDoc" layoutX="227.0" layoutY="51.0" mnemonicParsing="false" text="删除"/>
-        <Button fx:id="btnModifyDoc" layoutX="300.0" layoutY="51.0" mnemonicParsing="false" text="编辑"/>
-        <Button fx:id="btnConfirmDeletedocs" layoutX="83.0" layoutY="338.0" mnemonicParsing="false" text="确认删除"/>
-        <Button fx:id="btnSaveModifieddocs" layoutX="235.0" layoutY="338.0" mnemonicParsing="false" text="保存编辑"/>
-    </children>
-</AnchorPane>
+    </center>
+    <left>
+        <VBox prefHeight="362.0" prefWidth="41.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <top>
+        <HBox prefHeight="43.0" prefWidth="584.0" spacing="20.0" style="-fx-background-color: lightblue;"
+              BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="5.0"/>
+            </BorderPane.margin>
+            <children>
+                <Label style="-fx-border-width: 2; -fx-border-color: gray;" text="选择索引名称">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                    <HBox.margin>
+                        <Insets left="50.0" top="10.0"/>
+                    </HBox.margin>
+                </Label>
+                <ChoiceBox fx:id="cbSelectedIndex" prefWidth="150.0">
+                    <HBox.margin>
+                        <Insets top="10.0"/>
+                    </HBox.margin>
+                </ChoiceBox>
+            </children>
+        </HBox>
+    </top>
+    <bottom>
+        <HBox prefHeight="26.0" prefWidth="584.0" BorderPane.alignment="CENTER"/>
+    </bottom>
+</BorderPane>

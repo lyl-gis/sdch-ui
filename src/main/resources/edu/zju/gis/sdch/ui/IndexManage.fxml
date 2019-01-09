@@ -3,30 +3,25 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane prefHeight="373.0" prefWidth="628.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane prefHeight="438.0" prefWidth="641.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.IndexManage">
    <top>
-      <HBox prefHeight="57.0" prefWidth="502.0" spacing="60.0" BorderPane.alignment="CENTER">
-         <children>
-              <Button fx:id="btnSelect" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="查找" />
-              <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="增加" />
-              <Button fx:id="btnDelete" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="删除" />
-              <Button fx:id="btnModified" mnemonicParsing="false" prefHeight="30.0" prefWidth="45.0" text="修改" />
-         </children>
+       <HBox prefHeight="25.0" prefWidth="641.0" spacing="30.0" style="-fx-background-color: lightblue;"
+             BorderPane.alignment="CENTER">
          <opaqueInsets>
             <Insets top="50.0" />
          </opaqueInsets>
          <padding>
-            <Insets left="30.0" top="15.0" />
+             <Insets top="20.0"/>
          </padding>
          <BorderPane.margin>
-            <Insets left="50.0" />
+             <Insets/>
          </BorderPane.margin>
       </HBox>
    </top>
    <center>
 
-       <TableView fx:id="tvIndex" editable="true" prefHeight="126.0" prefWidth="494.0" BorderPane.alignment="CENTER">
+       <TableView fx:id="tvIndex" editable="true" prefHeight="351.0" prefWidth="523.0" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="tcIndice" prefWidth="77.0" text="索引名称" />
                 <TableColumn fx:id="tcShards" prefWidth="67.0" text="分片数" />
@@ -40,23 +35,44 @@
         </TableView>
    </center>
    <left>
-       <VBox prefHeight="126.0" prefWidth="79.0" BorderPane.alignment="CENTER"/>
+       <VBox prefHeight="310.0" prefWidth="18.0" BorderPane.alignment="CENTER"/>
    </left>
    <right>
-       <VBox prefHeight="126.0" prefWidth="83.0" BorderPane.alignment="CENTER"/>
+       <VBox prefHeight="370.0" prefWidth="120.0" spacing="5.0" style="-fx-border-width: 2; -fx-border-color: gray;"
+             BorderPane.alignment="CENTER">
+           <children>
+               <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="100.0"
+                      style="-fx-border-width: 2; -fx-background-color: lightblue;" text="索引管理">
+                   <VBox.margin>
+                       <Insets top="20.0"/>
+                   </VBox.margin>
+               </Label>
+               <Button fx:id="btnSelect" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="查找索引"/>
+               <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="增加索引"/>
+               <Button fx:id="btnDelete" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="删除索引"/>
+               <Button fx:id="btnConfirmDelete" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0"
+                       text="确认删除索引"/>
+               <Button fx:id="btnModified" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="修改索引"/>
+               <Button fx:id="btnSaveModified" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0"
+                       text="保存索引编辑"/>
+               <Label alignment="CENTER" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: lightblue;"
+                      text="文档管理">
+                   <VBox.margin>
+                       <Insets top="30.0"/>
+                   </VBox.margin>
+               </Label>
+               <Button fx:id="btnToDocManage" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="编辑文档"/>
+           </children>
+       </VBox>
    </right>
     <bottom>
-        <HBox prefHeight="61.0" prefWidth="628.0" BorderPane.alignment="CENTER">
-            <children>
-                <Button fx:id="btnSaveModified" mnemonicParsing="false" prefHeight="15.0" prefWidth="138.0"
-                        text="保存索引编辑"/>
-                <Button fx:id="btnConfirmDelete" mnemonicParsing="false" prefHeight="23.0" prefWidth="94.0"
-                        text="确认删除索引"/>
-                <Button fx:id="btnToDocManage" mnemonicParsing="false" prefHeight="23.0" prefWidth="151.0" text="编辑文档"/>
-            </children>
+        <HBox prefHeight="25.0" prefWidth="641.0" BorderPane.alignment="TOP_RIGHT">
             <BorderPane.margin>
-                <Insets left="200.0"/>
+                <Insets/>
             </BorderPane.margin>
+            <padding>
+                <Insets top="15.0"/>
+            </padding>
         </HBox>
     </bottom>
 </BorderPane>
