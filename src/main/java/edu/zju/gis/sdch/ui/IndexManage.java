@@ -1,8 +1,13 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.config.CommonSetting;
+import edu.zju.gis.sdch.mapper.CategoryMapper;
 import edu.zju.gis.sdch.mapper.IndexMapper;
+import edu.zju.gis.sdch.mapper.IndexMappingMapper;
+import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.model.Index;
+import edu.zju.gis.sdch.service.IndexService;
+import edu.zju.gis.sdch.service.impl.IndexServiceImpl;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.collections.ObservableList;
@@ -58,7 +63,7 @@ public class IndexManage implements Initializable {
     public IndexMapper mapper;
     public ElasticSearchHelper helper;
     public CommonSetting setting;
-
+    public IndexService indexService;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
@@ -85,6 +90,11 @@ public class IndexManage implements Initializable {
         setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
         try {
             helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
+            indexService = new IndexServiceImpl(helper
+                    , MyBatisUtil.getMapper(CategoryMapper.class)
+                    , MyBatisUtil.getMapper(IndexMapper.class)
+                    , MyBatisUtil.getMapper(IndexTypeMapper.class)
+                    , MyBatisUtil.getMapper(IndexMappingMapper.class));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

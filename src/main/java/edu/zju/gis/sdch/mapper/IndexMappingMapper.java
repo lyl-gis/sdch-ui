@@ -25,4 +25,6 @@ public interface IndexMappingMapper {
     void insertByBatch(List<IndexMapping> mappings);
 
     int deleteByIndice(String indice);
+
+    List<IndexMapping> selectByIndices(List<String> indices);
 }

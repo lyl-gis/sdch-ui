@@ -46,4 +46,11 @@ public interface IndexService {
 
     boolean deleteDoc(String index, String docId);
 
+    String[] getAnalyzable(String... indexNames);
+
+    String[] getIndexNames();
+
+    List<Index> getIndices();
+
+    Index getIndexByName(String indice);
 }

@@ -33,6 +33,13 @@
         from tb_index_mapping
         where INDICE = #{indice,jdbcType=VARCHAR}
     </select>
+    <select id="selectByIndices" parameterType="collection" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_index_mapping
+        where INDICE in
+        <foreach collection="list" item="item" open="(" separator="," close=")">#{item,jdbcType=VARCHAR}</foreach>
+    </select>
     <select id="selectByField" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
