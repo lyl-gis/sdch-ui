@@ -19,11 +19,11 @@ public class MyIndex {
     private SimpleBooleanProperty deleted;
     private SimpleBooleanProperty   modified;
     MyIndex(){
-        indice=new SimpleStringProperty();
-        shards=new SimpleIntegerProperty();
-        replicas=new SimpleIntegerProperty();
-        description=new SimpleStringProperty();
-        category=new SimpleStringProperty();
+        indice = new SimpleStringProperty("");
+        shards = new SimpleIntegerProperty(1);
+        replicas = new SimpleIntegerProperty(1);
+        description = new SimpleStringProperty("");
+        category = new SimpleStringProperty("");
         deleted=new SimpleBooleanProperty(false);
         modified=new SimpleBooleanProperty(false);
     }

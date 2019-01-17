@@ -57,8 +57,6 @@ public class IndexManage implements Initializable {
 
     @FXML
     private Button btnToDocManage;
-
-    public static final String TITLE = "索引管理";
     public static IndexManage instance = null;
     public IndexMapper mapper;
     public ElasticSearchHelper helper;
@@ -130,11 +128,8 @@ public class IndexManage implements Initializable {
         tcCategory.setCellValueFactory(cellData -> cellData.getValue().getCategory());
         tcDescription.setCellFactory(TextFieldTableCell.forTableColumn());
         tcDescription.setCellValueFactory(cellData -> cellData.getValue().getDescription());
-        tcIndice.setEditable(false);
-        tcShards.setEditable(false);
-        tcCategory.setEditable(false);
-        tcCategory.setEditable(false);
-        tcDescription.setEditable(false);
+        tvIndex.setEditable(false);
+
         //将数据库中的索引信息呈现在表格中
         ObservableList<MyIndex> indices = tvIndex.getItems();//必须放在列与数据绑定之后
         btnSelect.setOnMouseClicked(event -> {
@@ -165,44 +160,56 @@ public class IndexManage implements Initializable {
 
         });
         btnDelete.setOnMouseClicked(event -> {
-            TableColumn<MyIndex, Boolean> tcDeleted = new TableColumn<>("是否删除");
-            tcDeleted.setCellFactory(CheckBoxTableCell.forTableColumn(tcDeleted));
-            tcDeleted.setCellValueFactory(o -> o.getValue().getDeleted());
-            tvIndex.getColumns().add(tcDeleted);//在表中增加一列
-            new Alert(Alert.AlertType.INFORMATION, "在要删除的内容后打钩", ButtonType.OK)
-                    .showAndWait();
-            btnConfirmDelete.setDisable(false);
+            if (tvIndex.getColumns().size() < 6) {//不重复添加列
+                TableColumn<MyIndex, Boolean> tcDeleted = new TableColumn<>("是否删除");
+                tcDeleted.setCellFactory(CheckBoxTableCell.forTableColumn(tcDeleted));
+                tcDeleted.setCellValueFactory(o -> o.getValue().getDeleted());
+                tvIndex.getColumns().add(tcDeleted);//在表中增加一列
+                new Alert(Alert.AlertType.INFORMATION, "在要删除的内容后打钩", ButtonType.OK)
+                        .showAndWait();
+                btnConfirmDelete.setDisable(false);
+                tvIndex.setEditable(true);
+            }
         });
 
         btnConfirmDelete.setOnMouseClicked(event -> {
-
+            int deleteNumber = 0;
             for (int i = 0; i < tvIndex.getItems().size(); i++) {
                 if (tvIndex.getItems().get(i).getDeleted().getValue()) {
                     helper.delete(tvIndex.getItems().get(i).getIndice().getValue());//在ES中删除
-                    mapper.deleteByPrimaryKey(tvIndex.getItems().get(i).getIndice().getValue());
+                    int result = mapper.deleteByPrimaryKey(tvIndex.getItems().get(i).getIndice().getValue());
                     tvIndex.getItems().remove(i);//在表中删除打钩的那一行
-                    i--;
+                    i--;//删除之后表中少一行，所以要
+                    deleteNumber = result + deleteNumber;
                 }
             }
             tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
             btnConfirmDelete.setDisable(true);
+            tvIndex.setEditable(false);
+            new Alert(Alert.AlertType.INFORMATION, "成功删除" + deleteNumber + "条数据", ButtonType.OK)
+                    .showAndWait();
         });
         btnModified.setOnMouseClicked(event -> {
-            new Alert(Alert.AlertType.INFORMATION, "进入可编辑状态,在要编辑的内容后面打钩", ButtonType.OK)
-                    .showAndWait();
-            tcIndice.setEditable(true);
-            tcShards.setEditable(true);
-            tcCategory.setEditable(true);
-            tcCategory.setEditable(true);
-            tcDescription.setEditable(true);
-            btnSaveModified.setVisible(true);
-            TableColumn<MyIndex, Boolean> tcModified = new TableColumn<>("是否修改");
-            tcModified.setCellFactory(CheckBoxTableCell.forTableColumn(tcModified));
-            tcModified.setCellValueFactory(o -> o.getValue().getModified());
-            tvIndex.getColumns().add(tcModified);//在表中增加一列
-            btnSaveModified.setDisable(false);
+            if (tvIndex.getColumns().size() < 6) {
+                new Alert(Alert.AlertType.INFORMATION, "进入可编辑状态,在要编辑的内容后面打钩", ButtonType.OK)
+                        .showAndWait();
+                tcIndice.setEditable(true);
+                tcShards.setEditable(true);
+                tcCategory.setEditable(true);
+                tcCategory.setEditable(true);
+                tcDescription.setEditable(true);
+                btnSaveModified.setVisible(true);
+                TableColumn<MyIndex, Boolean> tcModified = new TableColumn<>("是否修改");
+                tcModified.setCellFactory(CheckBoxTableCell.forTableColumn(tcModified));
+                tcModified.setCellValueFactory(o -> o.getValue().getModified());
+                tvIndex.getColumns().add(tcModified);//在表中增加一列
+                btnSaveModified.setDisable(false);
+                tvIndex.setEditable(true);
+            }
         });
         btnSaveModified.setOnMouseClicked(event -> {
+
+            int modifyNumber = 0;
             for (int i = 0; i < tvIndex.getItems().size(); i++) {
                 if (tvIndex.getItems().get(i).getModified().getValue() == true) {
                     Index index = new Index();
@@ -211,45 +218,17 @@ public class IndexManage implements Initializable {
                     index.setReplicas(tvIndex.getItems().get(i).getReplicas().getValue());
                     index.setShards(tvIndex.getItems().get(i).getShards().getValue());
                     index.setIndice(tvIndex.getItems().get(i).getIndice().getValue());
-                    mapper.updateByPrimaryKey(index);
+                    int result = mapper.updateByPrimaryKey(index);
+                    modifyNumber = result + modifyNumber;
                 }
             }
             tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
             btnSaveModified.setDisable(true);
+            tvIndex.setEditable(false);
+            new Alert(Alert.AlertType.INFORMATION, "成功编辑" + modifyNumber + "条数据", ButtonType.OK)
+                    .showAndWait();
         });
 
-//        btnDocManage.setOnMouseClicked(event -> {
-//            String selectedindex = tfSelectedIndex.getText();
-//
-//            try {
-//                List<Map<String, Object>> result = helper.getAsMap(selectedindex, "_doc", 0, 5);
-//                System.out.println("gfsg");
-//                //将查到的数据显示在表格中
-//                List<TableColumn<Map<String, Object>, String>> tableColumns = new ArrayList<>();
-//                result.get(0).values().forEach(targetName -> {
-//                    TableColumn<Map<String, Object>, String> column = new TableColumn<>("新一列");
-//                    tableColumns.add(column);
-//                    column.setCellFactory(TextFieldTableCell.forTableColumn());
-//                    column.setEditable(true);
-//                    column.setCellValueFactory(param -> {
-//                        String value = "";
-//                        for (String srcName : result.get(0).keySet())
-//                            if (targetName.equals(result.get(0).get(srcName)))
-//                                value = param.getValue().get(srcName).toString();
-//                        return new SimpleStringProperty(value);
-//                    });
-//                });
-//
-//                tvDocs.getColumns().clear();
-//                tvDocs.getColumns().addAll(tableColumns);
-//                for (int i = 0; i < result.size(); i++)
-//                    tvDocs.getItems().add(result.get(i));
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        });
         btnToDocManage.setOnMouseClicked(event -> {
             Parent root = null;
             try {
