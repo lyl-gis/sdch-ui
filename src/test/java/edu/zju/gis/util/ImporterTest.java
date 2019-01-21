@@ -6,6 +6,8 @@ import edu.zju.gis.sdch.util.Contants;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.FGDBReader;
 import edu.zju.gis.sdch.util.GdalHelper;
+import org.gdal.ogr.Feature;
+import org.gdal.ogr.Geometry;
 import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
 import org.json.JSONObject;
@@ -17,6 +19,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class ImporterTest {
     private CommonSetting setting;
@@ -277,5 +280,91 @@ public class ImporterTest {
         helper = new ElasticSearchHelper(Arrays.asList("192.168.137.81"), 9300, "elasticsearch");
         Object res = helper.getAsMap("sdmap", "_doc", 0, 10);
         System.out.println(res);
+    }
+
+
+    @Test
+    public void testImportRoad() throws IOException {
+        helper.createIfNotExist("roadtest", 1, 1);
+        JSONObject source = new JSONObject();
+        JSONObject properties = new JSONObject();
+        source.put("properties", properties);
+        properties.put("dtype", new JSONObject().put("type", "keyword").put("store", true))
+                .put("the_shape", new JSONObject().put("type", "geo_shape"));
+        helper.putMapping("roadtest", "_doc", source.toString());
+        Layer layer = reader.getLayer("daolu");
+        Map<String, Integer> fieldTypes = GdalHelper.getFieldTypes(layer);
+        class Holder {
+            String lsid;
+            String name;
+            String clasid;
+            String district;
+            Geometry geometry;
+        }
+        Map<String, List<Holder>> entityId2Entity = new HashMap<>();
+        String[] entityFields = fieldTypes.keySet().stream().filter(s -> s.startsWith("ENTIID")).toArray(String[]::new);
+        Feature feature;
+        while ((feature = layer.GetNextFeature()) != null) {
+            String clasid = feature.GetFieldAsString("CLASID").trim();
+            String district = feature.GetFieldAsString("AdCode").trim();//todo to be modified
+            Geometry geometry = feature.GetGeometryRef();
+            for (String entityField : entityFields) {
+                String entiid = feature.GetFieldAsString(entityField);
+                if (entiid == null)
+                    continue;
+                entiid = entiid.trim();
+                if (!entiid.isEmpty()) {
+                    if (!entityId2Entity.containsKey(entiid))
+                        entityId2Entity.put(entiid, new ArrayList<>());
+                    String name = feature.GetFieldAsString(entityField.replace("ENTIID", "NAME"));
+                    Holder holder = new Holder();
+                    holder.lsid = entiid;
+                    holder.name = name.trim();
+                    holder.clasid = clasid;
+                    holder.district = district;
+                    holder.geometry = geometry;
+                    entityId2Entity.get(entiid).add(holder);
+                }
+            }
+        }
+        List<Map<String, Object>> maps = entityId2Entity.values().parallelStream().map(segments -> {
+            Holder first = segments.get(0);
+            String lsid = first.lsid;
+            String name = first.name;
+            String clasid = first.clasid;
+            String district = first.district;
+            Geometry geometry = first.geometry;
+            for (int i = 1; i < segments.size(); i++) {
+                Holder segment = segments.get(i);
+                int k;
+                for (k = 0; k < clasid.length(); k++) {
+                    if (k > segment.clasid.length())
+                        break;
+                    else {
+                        if (clasid.charAt(k) != segment.clasid.charAt(k))
+                            break;
+                    }
+                }
+                clasid = clasid.substring(0, k);//取clasid公共部分
+                if (district.length() == 6 && !district.equalsIgnoreCase(segment.district)) {
+                    district = district.substring(0, 4);
+                    if (!segment.district.startsWith(district))
+                        district = "370000";
+                    else
+                        district += "00";
+                }
+                geometry = geometry.Union(segment.geometry);
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("lsid", lsid);
+            map.put("name", name);
+            map.put("clasid", clasid);
+            map.put("district", district);
+            JSONObject json = new JSONObject(geometry.ExportToJson());
+            map.put("the_shape", json.toMap());
+            map.put("doc_id", lsid);
+            return map;
+        }).collect(Collectors.toList());
+        helper.publish("roadtest", "_doc", maps);
     }
 }
