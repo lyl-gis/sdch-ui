@@ -32,7 +32,6 @@ public class IndexServiceImpl implements IndexService {
     private IndexMapper indexMapper;
     private IndexTypeMapper indexTypeMapper;
     private IndexMappingMapper indexMappingMapper;
-
     @Override
     public boolean createCategory(Category category) {
         return categoryMapper.insert(category) == 1;
