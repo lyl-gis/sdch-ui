@@ -1,20 +1,29 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.config.CommonSetting;
+import edu.zju.gis.sdch.mapper.CategoryMapper;
 import edu.zju.gis.sdch.mapper.IndexMapper;
+import edu.zju.gis.sdch.mapper.IndexMappingMapper;
+import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.model.Index;
+import edu.zju.gis.sdch.service.IndexService;
+import edu.zju.gis.sdch.service.impl.IndexServiceImpl;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -26,13 +35,9 @@ import java.util.*;
 
 public class IndexManage implements Initializable {
     @FXML
-    private Button btnSelect;
+    private Button btnRefresh;
     @FXML
     private Button btnAdd;
-    @FXML
-    private Button btnModified;
-    @FXML
-    private Button btnDelete;
     @FXML
     public TableView<MyIndex> tvIndex;
     @FXML
@@ -46,18 +51,12 @@ public class IndexManage implements Initializable {
     @FXML
     private TableColumn<MyIndex, String> tcCategory;
     @FXML
-    private Button btnConfirmDelete;
-    @FXML
     private Button btnSaveModified;
-
-    @FXML
-    private Button btnToDocManage;
-
-    public static final String TITLE = "索引管理";
     public static IndexManage instance = null;
     public IndexMapper mapper;
     public ElasticSearchHelper helper;
     public CommonSetting setting;
+    public IndexService indexService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -85,11 +84,15 @@ public class IndexManage implements Initializable {
         setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
         try {
             helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
+            indexService = new IndexServiceImpl(helper
+                    , MyBatisUtil.getMapper(CategoryMapper.class)
+                    , MyBatisUtil.getMapper(IndexMapper.class)
+                    , MyBatisUtil.getMapper(IndexTypeMapper.class)
+                    , MyBatisUtil.getMapper(IndexMappingMapper.class));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        btnConfirmDelete.setDisable(true);
-        btnSaveModified.setDisable(true);
+        tvIndex.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);//设置表格中数据可以多选
         tcIndice.setCellFactory(TextFieldTableCell.forTableColumn());
         tcIndice.setCellValueFactory(cellData -> cellData.getValue().getIndice());
         tcShards.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
@@ -120,25 +123,40 @@ public class IndexManage implements Initializable {
         tcCategory.setCellValueFactory(cellData -> cellData.getValue().getCategory());
         tcDescription.setCellFactory(TextFieldTableCell.forTableColumn());
         tcDescription.setCellValueFactory(cellData -> cellData.getValue().getDescription());
-        tcIndice.setEditable(false);
-        tcShards.setEditable(false);
-        tcCategory.setEditable(false);
-        tcCategory.setEditable(false);
-        tcDescription.setEditable(false);
+        tvIndex.setEditable(true);
         //将数据库中的索引信息呈现在表格中
         ObservableList<MyIndex> indices = tvIndex.getItems();//必须放在列与数据绑定之后
-        btnSelect.setOnMouseClicked(event -> {
+        //修改为一进入页面便有数据在表格中
+        List<Index> indexList = mapper.selectAll();
+        for (int i = 0; i < indexList.size(); i++) {
+            MyIndex index = new MyIndex();
+            index.getDescription().set(indexList.get(i).getDescription());
+            index.getCategory().set(indexList.get(i).getCategory());
+            index.getReplicas().set(indexList.get(i).getReplicas());
+            index.getShards().set(indexList.get(i).getShards());
+            index.getIndice().set(indexList.get(i).getIndice());
+            indices.add(index);
+        }
+        tvIndex.setRowFactory(new Callback<TableView<MyIndex>, TableRow<MyIndex>>() {
+            @Override
+            public TableRow<MyIndex> call(TableView<MyIndex> param) {
+                return new TableRowControl();
+            }
+        });
+
+        btnRefresh.setOnMouseClicked(event -> {
             indices.clear();
-            List<Index> indexList = mapper.selectAll();
-            for (int i = 0; i < indexList.size(); i++) {
+            List<Index> indexListt = mapper.selectAll();
+            for (int i = 0; i < indexListt.size(); i++) {
                 MyIndex index = new MyIndex();
-                index.getDescription().set(indexList.get(i).getDescription());
-                index.getCategory().set(indexList.get(i).getCategory());
-                index.getReplicas().set(indexList.get(i).getReplicas());
-                index.getShards().set(indexList.get(i).getShards());
-                index.getIndice().set(indexList.get(i).getIndice());
+                index.getDescription().set(indexListt.get(i).getDescription());
+                index.getCategory().set(indexListt.get(i).getCategory());
+                index.getReplicas().set(indexListt.get(i).getReplicas());
+                index.getShards().set(indexListt.get(i).getShards());
+                index.getIndice().set(indexListt.get(i).getIndice());
                 indices.add(index);
             }
+
         });
         btnAdd.setOnMouseClicked(event -> {
             Parent root = null;
@@ -154,107 +172,101 @@ public class IndexManage implements Initializable {
             stage.show();
 
         });
-        btnDelete.setOnMouseClicked(event -> {
-            TableColumn<MyIndex, Boolean> tcDeleted = new TableColumn<>("是否删除");
-            tcDeleted.setCellFactory(CheckBoxTableCell.forTableColumn(tcDeleted));
-            tcDeleted.setCellValueFactory(o -> o.getValue().getDeleted());
-            tvIndex.getColumns().add(tcDeleted);//在表中增加一列
-            new Alert(Alert.AlertType.INFORMATION, "在要删除的内容后打钩", ButtonType.OK)
-                    .showAndWait();
-            btnConfirmDelete.setDisable(false);
-        });
-
-        btnConfirmDelete.setOnMouseClicked(event -> {
-
-            for (int i = 0; i < tvIndex.getItems().size(); i++) {
-                if (tvIndex.getItems().get(i).getDeleted().getValue()) {
-                    helper.delete(tvIndex.getItems().get(i).getIndice().getValue());//在ES中删除
-                    mapper.deleteByPrimaryKey(tvIndex.getItems().get(i).getIndice().getValue());
-                    tvIndex.getItems().remove(i);//在表中删除打钩的那一行
-                    i--;
-                }
-            }
-            tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
-            btnConfirmDelete.setDisable(true);
-        });
-        btnModified.setOnMouseClicked(event -> {
-            new Alert(Alert.AlertType.INFORMATION, "进入可编辑状态,在要编辑的内容后面打钩", ButtonType.OK)
-                    .showAndWait();
-            tcIndice.setEditable(true);
-            tcShards.setEditable(true);
-            tcCategory.setEditable(true);
-            tcCategory.setEditable(true);
-            tcDescription.setEditable(true);
-            btnSaveModified.setVisible(true);
-            TableColumn<MyIndex, Boolean> tcModified = new TableColumn<>("是否修改");
-            tcModified.setCellFactory(CheckBoxTableCell.forTableColumn(tcModified));
-            tcModified.setCellValueFactory(o -> o.getValue().getModified());
-            tvIndex.getColumns().add(tcModified);//在表中增加一列
-            btnSaveModified.setDisable(false);
-        });
         btnSaveModified.setOnMouseClicked(event -> {
+            //将表格中的所有数据保存一次
+            List<Integer> modifyResult = new ArrayList<>();
             for (int i = 0; i < tvIndex.getItems().size(); i++) {
-                if (tvIndex.getItems().get(i).getModified().getValue() == true) {
-                    Index index = new Index();
-                    index.setDescription(tvIndex.getItems().get(i).getDescription().getValue());
-                    index.setCategory(tvIndex.getItems().get(i).getCategory().getValue());
-                    index.setReplicas(tvIndex.getItems().get(i).getReplicas().getValue());
-                    index.setShards(tvIndex.getItems().get(i).getShards().getValue());
-                    index.setIndice(tvIndex.getItems().get(i).getIndice().getValue());
-                    mapper.updateByPrimaryKey(index);
-                }
+                Index index = new Index();
+                index.setDescription(tvIndex.getItems().get(i).getDescription().getValue());
+                index.setCategory(tvIndex.getItems().get(i).getCategory().getValue());
+                index.setReplicas(tvIndex.getItems().get(i).getReplicas().getValue());
+                index.setShards(tvIndex.getItems().get(i).getShards().getValue());
+                index.setIndice(tvIndex.getItems().get(i).getIndice().getValue());
+                int result = mapper.updateByPrimaryKey(index);
+                modifyResult.add(result);
             }
-            tvIndex.getColumns().remove(tvIndex.getColumns().size() - 1);//删去新增的一列
-            btnSaveModified.setDisable(true);
-        });
-
-//        btnDocManage.setOnMouseClicked(event -> {
-//            String selectedindex = tfSelectedIndex.getText();
-//
-//            try {
-//                List<Map<String, Object>> result = helper.getAsMap(selectedindex, "_doc", 0, 5);
-//                System.out.println("gfsg");
-//                //将查到的数据显示在表格中
-//                List<TableColumn<Map<String, Object>, String>> tableColumns = new ArrayList<>();
-//                result.get(0).values().forEach(targetName -> {
-//                    TableColumn<Map<String, Object>, String> column = new TableColumn<>("新一列");
-//                    tableColumns.add(column);
-//                    column.setCellFactory(TextFieldTableCell.forTableColumn());
-//                    column.setEditable(true);
-//                    column.setCellValueFactory(param -> {
-//                        String value = "";
-//                        for (String srcName : result.get(0).keySet())
-//                            if (targetName.equals(result.get(0).get(srcName)))
-//                                value = param.getValue().get(srcName).toString();
-//                        return new SimpleStringProperty(value);
-//                    });
-//                });
-//
-//                tvDocs.getColumns().clear();
-//                tvDocs.getColumns().addAll(tableColumns);
-//                for (int i = 0; i < result.size(); i++)
-//                    tvDocs.getItems().add(result.get(i));
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        });
-        btnToDocManage.setOnMouseClicked(event -> {
-            Parent root = null;
-            try {
-                root = FXMLLoader.load(getClass().getResource("DocManage.fxml"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setTitle(DocManage.TITLE);
-            stage.setScene(scene);
-            stage.show();
-            new Alert(Alert.AlertType.INFORMATION, "请在查询之后再进行其他操作", ButtonType.OK)
-                    .showAndWait();
+            if (!modifyResult.contains(0))
+                new Alert(Alert.AlertType.
+                        INFORMATION, "成功保存编辑", ButtonType.OK).showAndWait();
+            else
+                new Alert(Alert.AlertType.
+                        INFORMATION, "未能成功保存编辑", ButtonType.OK).showAndWait();
         });
     }
+
+    class TableRowControl extends TableRow<MyIndex> {
+        public TableRowControl() {
+            this.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    //右键下拉选项删除选中行
+                    if (event.getButton().equals(MouseButton.SECONDARY)
+                            && event.getClickCount() == 1
+                            && TableRowControl.this.getIndex() < tvIndex.getItems().size()) {
+                        final ContextMenu contextMenu = new ContextMenu();
+                        MenuItem deleteItem = new MenuItem("删除");
+                        MenuItem manageDocsItem = new MenuItem("编辑文档");
+                        contextMenu.getItems().addAll(deleteItem, manageDocsItem);
+                        deleteItem.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                List<Integer> newDeleteItems = new ArrayList<>();
+                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedIndices().size(); i++) {
+                                    //因为tvDocs.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
+                                    newDeleteItems.add(tvIndex.getSelectionModel().getSelectedIndices().get(i));
+                                }
+                                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "确认删除?");
+                                Optional<ButtonType> result = confirmation.showAndWait();
+                                if (result.isPresent() && result.get() == ButtonType.OK) {
+                                    if (newDeleteItems.size() == 0) {
+                                        new Alert(Alert.AlertType.INFORMATION, "没有要删除的内容", ButtonType.OK)
+                                                .showAndWait();
+                                    } else {
+                                        int deleted = 0;
+                                        List<Integer> deleteResult = new ArrayList<>();
+                                        for (int i = 0; i < newDeleteItems.size(); i++) {
+                                            helper.delete(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在ES中删除
+                                            int deleteresult = mapper.deleteByPrimaryKey(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在数据库中删除
+                                            deleteResult.add(deleteresult);
+                                            tvIndex.getItems().remove(newDeleteItems.get(i).intValue() - deleted);   //在表中删除打钩的那一行
+                                            deleted++;
+                                        }
+                                        int succedDelete = 0;
+                                        int failedDelete = 0;
+                                        for (int i = 0; i < deleteResult.size(); i++) {
+                                            if (deleteResult.get(i) == 1)
+                                                succedDelete++;
+                                            else
+                                                failedDelete++;
+                                        }
+                                        new Alert(Alert.AlertType.INFORMATION, "成功删除" + succedDelete + "条数据," + failedDelete + "条数据删除失败", ButtonType.OK)
+                                                .showAndWait();
+                                    }
+                                }
+                            }
+                        });
+                        manageDocsItem.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                Parent root = null;
+                                try {
+                                    root = FXMLLoader.load(getClass().getResource("DocManage.fxml"));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                Scene scene = new Scene(root);
+                                Stage stage = new Stage();
+                                stage.setTitle(DocManage.TITLE);
+                                stage.setScene(scene);
+                                stage.show();
+                            }
+                        });
+                        tvIndex.setContextMenu(contextMenu);
+                    }
+                }
+            });
+        }
+    }
+
 }
 

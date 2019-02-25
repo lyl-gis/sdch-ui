@@ -3,12 +3,12 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane fx:id="rootLayout" prefHeight="568.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DataPreview">
     <top>
-        <HBox prefHeight="35.0" prefWidth="613.0" spacing="10.0" BorderPane.alignment="CENTER">
+        <HBox prefHeight="0.0" prefWidth="778.0" spacing="10.0" BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="10.0" top="10.0"/>
+                <Insets bottom="10.0" top="15.0"/>
             </padding>
             <Label prefHeight="25.0" prefWidth="76.0" text="预览前">
                 <padding>
@@ -41,17 +41,6 @@
             <!--<ComboBox fx:id="coDataType" prefWidth="150.0" />-->
         </HBox>
     </top>
-    <bottom>
-        <ProgressBar fx:id="progressBar" prefHeight="43.0" prefWidth="539.0" progress="0.0"
-                     BorderPane.alignment="CENTER">
-            <opaqueInsets>
-                <Insets left="40.0"/>
-            </opaqueInsets>
-            <padding>
-                <Insets bottom="15.0" left="20.0" right="20.0" top="10.0"/>
-            </padding>
-        </ProgressBar>
-    </bottom>
     <center>
         <TableView fx:id="tvPreview" editable="true" prefHeight="284.0" prefWidth="586.0" BorderPane.alignment="CENTER">
             <opaqueInsets>
@@ -65,4 +54,50 @@
     <right>
         <AnchorPane prefHeight="284.0" prefWidth="25.0" BorderPane.alignment="CENTER"/>
     </right>
+    <bottom>
+        <HBox fx:id="hbox" prefHeight="61.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox prefHeight="73.0" prefWidth="774.0">
+                    <children>
+                        <ProgressBar fx:id="progressBar" prefHeight="58.0" prefWidth="771.0" progress="0.0">
+                            <opaqueInsets>
+                                <Insets left="40.0"/>
+                            </opaqueInsets>
+                            <padding>
+                                <Insets bottom="15.0" left="25.0" right="20.0" top="15.0"/>
+                            </padding>
+                        </ProgressBar>
+                        <HBox prefHeight="15.0" prefWidth="718.0" spacing="10.0">
+                            <children>
+                                <Label prefHeight="15.0" prefWidth="37.0" text="共有">
+                                    <HBox.margin>
+                                        <Insets left="5.0"/>
+                                    </HBox.margin>
+                                </Label>
+                                <Label fx:id="lableAllNumber" prefHeight="15.0" prefWidth="116.0" text="条数据"/>
+                                <Label prefHeight="15.0" prefWidth="55.0" text="已入库">
+                                    <HBox.margin>
+                                        <Insets left="100.0"/>
+                                    </HBox.margin>
+                                </Label>
+                                <Label fx:id="labelNumber" prefHeight="15.0" prefWidth="113.0" text="条数据"/>
+                                <Label prefHeight="15.0" prefWidth="82.0" text="当前已用时间">
+                                    <HBox.margin>
+                                        <Insets left="100.0"/>
+                                    </HBox.margin>
+                                </Label>
+                                <Label fx:id="labelTime" prefHeight="15.0" prefWidth="106.0" text="s"/>
+                            </children>
+                            <VBox.margin>
+                                <Insets left="30.0"/>
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0"/>
+                    </padding>
+                </VBox>
+            </children>
+        </HBox>
+    </bottom>
 </BorderPane>

@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gdal.ogr.Layer;
@@ -38,9 +39,19 @@ public class DataPreview implements Initializable {
     private TableView<Map<String, Object>> tvPreview;
     @FXML
     private ChoiceBox<Integer> cbPreviewSize;
+    @FXML
+    private Label labelTime;
+    @FXML
+    private Label labelNumber;
+
+    @FXML
+    private Label lableAllNumber;
+    @FXML
+    private HBox hbox;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         coDataType.getItems().add("poi");
         coDataType.getItems().add("entity");
         coDataType.setEditable(true);
@@ -107,6 +118,8 @@ public class DataPreview implements Initializable {
         cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.setValue(10);
         btnImport.setOnMouseClicked(event -> {
+            hbox.setVisible(true);
+            Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
             Service<Double> service = new Service<Double>() {
                 @Override
                 protected Task<Double> createTask() {
@@ -126,8 +139,16 @@ public class DataPreview implements Initializable {
                             fieldMapping, analyzable, skipEmptyGeom, category, dtype);
                 }
             };
+            lableAllNumber.setText(allNumber.toString() + "条数据");
             progressBar.progressProperty().bind(service.progressProperty());
             service.start();
+            long startTime = System.currentTimeMillis();    //获取开始时间
+            service.progressProperty().addListener((observable, oldValue, newValue) -> {
+                long endTime = System.currentTimeMillis();    //获取结束时间
+
+                labelTime.setText((endTime - startTime) / 1000.0 + "s");
+                labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
+            });
             service.stateProperty().addListener((observable, oldValue, newValue) -> {
                 switch (newValue) {
                     case READY:
@@ -138,10 +159,9 @@ public class DataPreview implements Initializable {
                             new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
                                     .showAndWait();
                         else {
-
-                            DataPreview.this.btnImport.getScene().getWindow().hide();
                             new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
                                     .showAndWait();
+                            DataPreview.this.btnImport.getScene().getWindow().hide();
                         }
                         break;
                     case FAILED:

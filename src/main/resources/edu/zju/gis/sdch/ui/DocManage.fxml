@@ -3,85 +3,70 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<BorderPane prefHeight="418.0" prefWidth="584.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane fx:id="root" prefHeight="446.0" prefWidth="673.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DocManage">
     <right>
-        <VBox prefHeight="339.0" prefWidth="116.0" spacing="15.0" BorderPane.alignment="CENTER">
-            <children>
-                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="查询">
-                    <VBox.margin>
-                        <Insets left="5.0" top="30.0"/>
-                    </VBox.margin>
-                </Button>
-                <Button fx:id="btnAddDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="增加">
-                    <VBox.margin>
-                        <Insets left="5.0"/>
-                    </VBox.margin>
-                </Button>
-                <Button fx:id="btnDeleteDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="删除">
-                    <VBox.margin>
-                        <Insets left="5.0"/>
-                    </VBox.margin>
-                </Button>
-                <Button fx:id="btnConfirmDeleteDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0"
-                        text="确认删除">
-                    <VBox.margin>
-                        <Insets left="5.0"/>
-                    </VBox.margin>
-                </Button>
-                <Button fx:id="btnModifyDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="编辑">
-                    <VBox.margin>
-                        <Insets left="5.0"/>
-                    </VBox.margin>
-                </Button>
-                <Button fx:id="btnStartModifiedDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0"
-                        text="开始编辑">
-                    <VBox.margin>
-                        <Insets left="5.0"/>
-                    </VBox.margin>
-                </Button>
-            </children>
+        <VBox prefHeight="344.0" prefWidth="21.0" spacing="15.0" BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets left="10.0"/>
+                <Insets/>
             </BorderPane.margin>
         </VBox>
     </right>
     <center>
-        <TableView fx:id="tvDocs" editable="true" prefHeight="339.0" prefWidth="411.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="tvDocs" editable="true" prefHeight="335.0" prefWidth="624.0" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn prefWidth="75.0" text="C1"/>
-                <TableColumn prefWidth="75.0" text="C2"/>
+                <TableColumn fx:id="tcModifiedDoc" prefWidth="390.0"/>
             </columns>
         </TableView>
     </center>
     <left>
-        <VBox prefHeight="362.0" prefWidth="41.0" BorderPane.alignment="CENTER"/>
+        <VBox prefHeight="344.0" prefWidth="20.0" BorderPane.alignment="CENTER"/>
     </left>
     <top>
-        <HBox prefHeight="43.0" prefWidth="584.0" spacing="20.0" style="-fx-background-color: lightblue;"
+        <HBox prefHeight="35.0" prefWidth="665.0" spacing="10.0" style="-fx-background-color: lightblue;"
               BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets bottom="5.0"/>
+                <Insets/>
             </BorderPane.margin>
             <children>
-                <Label style="-fx-border-width: 2; -fx-border-color: gray;" text="选择索引名称">
-                    <font>
-                        <Font size="14.0"/>
-                    </font>
+                <Label text="请输入查询条件">
                     <HBox.margin>
-                        <Insets left="50.0" top="10.0"/>
+                        <Insets left="30.0" top="10.0"/>
                     </HBox.margin>
                 </Label>
-                <ChoiceBox fx:id="cbSelectedIndex" prefWidth="150.0">
+                <TextField fx:id="tfWord">
                     <HBox.margin>
-                        <Insets top="10.0"/>
+                        <Insets top="7.0"/>
                     </HBox.margin>
-                </ChoiceBox>
+                </TextField>
+                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="25.0" prefWidth="47.0" text="查询">
+                    <HBox.margin>
+                        <Insets left="20.0" top="6.0"/>
+                    </HBox.margin>
+                </Button>
             </children>
         </HBox>
     </top>
     <bottom>
-        <HBox prefHeight="26.0" prefWidth="584.0" BorderPane.alignment="CENTER"/>
+        <HBox prefHeight="26.0" prefWidth="584.0" spacing="25.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnAddDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="70.0" text="增加">
+                    <HBox.margin>
+                        <Insets left="50.0"/>
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="btnConfirmAddDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="70.0"
+                        text="确认添加"/>
+                <Button fx:id="btnSaveModifiedDocs" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="30.0"
+                        prefWidth="70.0" text="保存编辑">
+                    <HBox.margin>
+                        <Insets left="300.0"/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="15.0" top="10.0"/>
+            </BorderPane.margin>
+        </HBox>
     </bottom>
 </BorderPane>

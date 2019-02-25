@@ -17,6 +17,7 @@ import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -137,6 +138,28 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public boolean deleteDoc(String index, String docId) {
         return helper.delete(index, "_doc", docId);
+    }
+
+    @Override
+    public String[] getAnalyzable(String... indexNames) {
+        List<IndexMapping> mappings = indexMappingMapper.selectByIndices(Arrays.asList(indexNames));
+        return mappings.stream().filter(IndexMapping::getAnalyzable).map(IndexMapping::getFieldName).toArray(String[]::new);
+    }
+
+    @Override
+    public List<Index> getIndices() {
+        int count = indexMapper.getCount();
+        return indexMapper.selectByPage(0, count);
+    }
+
+    @Override
+    public String[] getIndexNames() {
+        return getIndices().stream().map(Index::getIndice).toArray(String[]::new);
+    }
+
+    @Override
+    public Index getIndexByName(String indice) {
+        return indexMapper.selectByPrimaryKey(indice);
     }
 
 }
