@@ -29,7 +29,9 @@ public class MainPort implements Initializable {
         mbSelectPage.getMenus().addAll(toolMenu, manageMenu);
         MenuItem toolMenuImport = new MenuItem("入库工具");
         MenuItem manageMenuIndex = new MenuItem("索引管理");
+//        MenuItem manageMenuDocs = new MenuItem("poi管理");
         toolMenu.getItems().add(toolMenuImport);
+//      manageMenu.getItems().addAll(manageMenuIndex, manageMenuDocs);
         manageMenu.getItems().addAll(manageMenuIndex);
         toolMenuImport.setOnAction(evnet -> {
             Parent root = null;
