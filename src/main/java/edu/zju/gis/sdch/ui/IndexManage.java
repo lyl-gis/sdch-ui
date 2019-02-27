@@ -22,8 +22,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
@@ -52,11 +52,15 @@ public class IndexManage implements Initializable {
     private TableColumn<MyIndex, String> tcCategory;
     @FXML
     private Button btnSaveModified;
+    @FXML
+    private BorderPane rootLayout;
+
     public static IndexManage instance = null;
     public IndexMapper mapper;
     public ElasticSearchHelper helper;
     public CommonSetting setting;
     public IndexService indexService;
+    public ArrayList<String> indexNames;//选择的索引
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -137,13 +141,7 @@ public class IndexManage implements Initializable {
             index.getIndice().set(indexList.get(i).getIndice());
             indices.add(index);
         }
-        tvIndex.setRowFactory(new Callback<TableView<MyIndex>, TableRow<MyIndex>>() {
-            @Override
-            public TableRow<MyIndex> call(TableView<MyIndex> param) {
-                return new TableRowControl();
-            }
-        });
-
+        tvIndex.setRowFactory(param -> new TableRowControl());
         btnRefresh.setOnMouseClicked(event -> {
             indices.clear();
             List<Index> indexListt = mapper.selectAll();
@@ -195,11 +193,11 @@ public class IndexManage implements Initializable {
     }
 
     class TableRowControl extends TableRow<MyIndex> {
-        public TableRowControl() {
+        TableRowControl() {
             this.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    //右键下拉选项删除选中行
+                    //右键下拉选项删除选中行或进入文档编辑页面
                     if (event.getButton().equals(MouseButton.SECONDARY)
                             && event.getClickCount() == 1
                             && TableRowControl.this.getIndex() < tvIndex.getItems().size()) {
@@ -212,7 +210,7 @@ public class IndexManage implements Initializable {
                             public void handle(ActionEvent event) {
                                 List<Integer> newDeleteItems = new ArrayList<>();
                                 for (int i = 0; i < tvIndex.getSelectionModel().getSelectedIndices().size(); i++) {
-                                    //因为tvDocs.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
+                                    //因为tvIndex.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
                                     newDeleteItems.add(tvIndex.getSelectionModel().getSelectedIndices().get(i));
                                 }
                                 Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "确认删除?");
@@ -248,17 +246,23 @@ public class IndexManage implements Initializable {
                         manageDocsItem.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
+                                indexNames = new ArrayList<>();
+                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedItems().size(); i++) {
+                                    indexNames.add(tvIndex.getSelectionModel().getSelectedItems().get(i).getIndice().getValue());
+                                }
                                 Parent root = null;
                                 try {
                                     root = FXMLLoader.load(getClass().getResource("DocManage.fxml"));
+                                    Scene scene = new Scene(root);
+                                    Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
+                                    Stage stage = new Stage();
+                                    stage.initOwner(primaryStage);
+                                    stage.setTitle(DocManage.TITLE);
+                                    stage.setScene(scene);
+                                    stage.show();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                                Scene scene = new Scene(root);
-                                Stage stage = new Stage();
-                                stage.setTitle(DocManage.TITLE);
-                                stage.setScene(scene);
-                                stage.show();
                             }
                         });
                         tvIndex.setContextMenu(contextMenu);

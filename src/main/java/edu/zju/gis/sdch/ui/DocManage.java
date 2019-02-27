@@ -22,8 +22,6 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.*;
 
-//import javafx.scene.input.MouseEvent;
-//import javafx.util.Callback;
 
 
 public class DocManage implements Initializable {
@@ -55,20 +53,15 @@ public class DocManage implements Initializable {
         btnConfirmAddDocs.setDisable(true);
         tvDocs.setEditable(true);
         tvDocs.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);//设置可以多选
-//        tvDocs.setRowFactory(new Callback<TableView<Map<String, SimpleStringProperty>>, TableRow<Map<String, SimpleStringProperty>>>() {
-//            @Override
-//            public TableRow<Map<String, SimpleStringProperty>> call(TableView<Map<String, SimpleStringProperty>> param) {
-//                return new TableRowControl();
-//            }
-//        });
         tvDocs.setRowFactory(param -> new TableRowControl());
         btnSelectDoc.setOnMouseClicked(event -> {
             if (tfWord.getText().equals("")) {
                 new Alert(Alert.AlertType.WARNING, "请填写查询条件", ButtonType.OK)
                         .showAndWait();
             } else {
-//         String[] indexNames = indexManage.indexService.getIndexNames();
-                String[] indexNames = {"sdmap"};
+//         String[] indexNames = indexManage.indexService.getIndexNames();从数据库中查询所有索引名称
+                String[] indexNames = new String[indexManage.indexNames.size()];
+                indexManage.indexNames.toArray(indexNames);
                 BoolQueryBuilder query = QueryBuilders.boolQuery();
                 String words = tfWord.getText();
                 words = QueryParser.escape(words);
@@ -269,43 +262,6 @@ public class DocManage implements Initializable {
     }
 
     class TableRowControl extends TableRow<Map<String, SimpleStringProperty>> {
-        //        public TableRowControl() {
-//            this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//                @Override
-//                public void handle(MouseEvent event) {
-//                    //右键下拉选项删除选中行
-//                    if (event.getButton().equals(MouseButton.SECONDARY)
-//                            && event.getClickCount() == 1
-//                            && TableRowControl.this.getIndex() < tvDocs.getItems().size()) {
-//                        final ContextMenu contextMenu = new ContextMenu();
-//                        MenuItem deleteItem = new MenuItem("删除");
-//                        contextMenu.getItems().addAll(deleteItem);
-//                        deleteItem.setOnAction(new EventHandler<ActionEvent>() {
-//                            @Override
-//                            public void handle(ActionEvent event) {
-//                                List<Integer> newDeleteItems = new ArrayList<>();
-//                                for (int i = 0; i < tvDocs.getSelectionModel().getSelectedIndices().size(); i++) {
-//                                    //因为tvDocs.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
-//                                    newDeleteItems.add(tvDocs.getSelectionModel().getSelectedIndices().get(i));
-//                                }
-//                                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "确认删除?");
-//                                Optional<ButtonType> result = confirmation.showAndWait();
-//                                if (result.isPresent() && result.get() == ButtonType.OK) {
-//                                    if (newDeleteItems.size() == 0) {
-//                                        new Alert(Alert.AlertType.INFORMATION, "没有要删除的内容", ButtonType.OK)
-//                                                .showAndWait();
-//                                    } else {
-//                                        List<String> idList = new ArrayList<>();
-//                                        int deleted = 0;
-//                                        for (int i = 0; i < newDeleteItems.size(); i++) {
-//                                            Map<String, SimpleStringProperty> mapDelete = tvDocs.getItems().get(newDeleteItems.get(i) - deleted);
-//                                            idList.add(mapDelete.get("lsid").get());
-//                                            tvDocs.getItems().remove(mapDelete);
-//                                            deleted++;
-//                                        }
-//                                        int resultNumber = indexManage.helper.delete("sdmap", "_doc", idList);
-//                                        new Alert(Alert.AlertType.INFORMATION, "共删除条数" + newDeleteItems.size() + "失败数" + resultNumber, ButtonType.OK)
-//                                                .showAndWait();
         TableRowControl() {
             this.setOnMouseClicked(event -> {
                 //右键下拉选项删除选中行
@@ -340,9 +296,6 @@ public class DocManage implements Initializable {
                                             .showAndWait();
                                 }
                             }
-//                        });
-//                        tvDocs.setContextMenu(contextMenu);
-//                    }
                         }
                     });
                     tvDocs.setContextMenu(contextMenu);
