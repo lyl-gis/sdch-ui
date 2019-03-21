@@ -33,6 +33,7 @@ public class IndexServiceImpl implements IndexService {
     private IndexMapper indexMapper;
     private IndexTypeMapper indexTypeMapper;
     private IndexMappingMapper indexMappingMapper;
+
     @Override
     public boolean createCategory(Category category) {
         return categoryMapper.insert(category) == 1;
@@ -87,8 +88,13 @@ public class IndexServiceImpl implements IndexService {
                                 .put("boost", mapping.getBoost()));
                     else {
                         String type = "text";
-                        if (mapping.getFieldName().equalsIgnoreCase(Contants.ADMIN_CODE))
-                            type = "keyword";
+                        switch (mapping.getFieldName()) {
+                            case Contants.ADMIN_CODE:
+                            case "clasid":
+                            case "kind":
+                                type = "keyword";
+                                break;
+                        }
                         properties.put(mapping.getFieldName(), new JSONObject().put("type", type).put("store", true));
                     }
                     break;
