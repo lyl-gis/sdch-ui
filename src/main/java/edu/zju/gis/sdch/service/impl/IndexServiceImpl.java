@@ -9,6 +9,7 @@ import edu.zju.gis.sdch.model.Index;
 import edu.zju.gis.sdch.model.IndexMapping;
 import edu.zju.gis.sdch.model.IndexType;
 import edu.zju.gis.sdch.service.IndexService;
+import edu.zju.gis.sdch.util.Contants;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import lombok.AllArgsConstructor;
 import org.elasticsearch.client.Client;
@@ -84,8 +85,12 @@ public class IndexServiceImpl implements IndexService {
                         properties.put(mapping.getFieldName(), new JSONObject().put("type", "text").put("store", true)
                                 .put("analyzer", "ik_max_word").put("search_analyzer", "ik_smart")
                                 .put("boost", mapping.getBoost()));
-                    else
-                        properties.put(mapping.getFieldName(), new JSONObject().put("type", "text").put("store", true));
+                    else {
+                        String type = "text";
+                        if (mapping.getFieldName().equalsIgnoreCase(Contants.ADMIN_CODE))
+                            type = "keyword";
+                        properties.put(mapping.getFieldName(), new JSONObject().put("type", type).put("store", true));
+                    }
                     break;
             }
         }
