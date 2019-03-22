@@ -76,6 +76,12 @@ public class MainPage implements Initializable {
                 return;
             String path = file.getPath();//选择的文件夹路径
             tfChooseFile.setText(path);
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    log.error("", ex);
+                }
             reader = new FGDBReader(path);
             String[] layerNames = reader.getLayerNames();//返回所有图层名称，将这些初始化到图层选择列表中
             cbxLayers.getItems().clear();

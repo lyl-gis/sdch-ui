@@ -20,8 +20,9 @@ public class EsTest {
 //                .setSize(20).get();
 //        System.out.println(response.getHits().getTotalHits());
 
-        long size = DeleteByQueryAction.INSTANCE.newRequestBuilder(client).source("sdmap2")
-                .filter(QueryBuilders.matchQuery("dtype", "fe_shuixi")).get().getDeleted();
+        long size = DeleteByQueryAction.INSTANCE.newRequestBuilder(client).source("sdmap")
+                .filter(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("dtype", "fe_bsq"))
+                        .mustNot(QueryBuilders.prefixQuery("lsid", "BSQ"))).get().getDeleted();
         System.out.println(size);
     }
 }
