@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="edu.zju.gis.sdch.ui.PoiTypeAdd">
+    <bottom>
+        <HBox prefHeight="41.0" prefWidth="258.0" spacing="120.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnConfirm" mnemonicParsing="false" text="确认">
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="btnCancel" mnemonicParsing="false" text="取消"/>
+            </children>
+            <BorderPane.margin>
+                <Insets left="60.0"/>
+            </BorderPane.margin>
+            <padding>
+                <Insets top="5.0"/>
+            </padding>
+        </HBox>
+    </bottom>
+    <center>
+        <GridPane prefWidth="210.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="106.0" minWidth="10.0" prefWidth="57.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="172.0" minWidth="10.0" prefWidth="165.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <TextField fx:id="tfCode" prefHeight="23.0" prefWidth="126.0" GridPane.columnIndex="1"/>
+                <Label text="编码"/>
+                <Label text="父级编码" GridPane.rowIndex="1"/>
+                <TextField fx:id="tfPcode" prefHeight="23.0" prefWidth="126.0" GridPane.columnIndex="1"
+                           GridPane.rowIndex="1"/>
+                <Label text="code4" GridPane.rowIndex="2"/>
+                <TextField fx:id="tfCode4" prefHeight="23.0" prefWidth="126.0" GridPane.columnIndex="1"
+                           GridPane.rowIndex="2"/>
+                <Label text="名称" GridPane.rowIndex="3"/>
+                <TextField fx:id="tfName" prefHeight="23.0" prefWidth="126.0" GridPane.columnIndex="1"
+                           GridPane.rowIndex="3"/>
+            </children>
+        </GridPane>
+    </center>
+    <top>
+        <HBox prefHeight="27.0" prefWidth="320.0" BorderPane.alignment="CENTER"/>
+    </top>
+    <left>
+        <VBox prefHeight="200.0" prefWidth="41.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <right>
+        <VBox prefHeight="200.0" prefWidth="42.0" BorderPane.alignment="CENTER"/>
+    </right>
+</BorderPane>

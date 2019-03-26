@@ -3,6 +3,7 @@ package edu.zju.gis.sdch.ui;
 import edu.zju.gis.sdch.Main;
 import edu.zju.gis.sdch.tool.Importer;
 import edu.zju.gis.sdch.util.GdalHelper;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -48,12 +49,10 @@ public class DataPreview implements Initializable {
     private Label lableAllNumber;
     @FXML
     private HBox hbox;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        coDataType.getItems().add("poi");
-        coDataType.getItems().add("entity");
+        coDataType.getItems().addAll("fe_zrbhq", "fe_fjmsq", "fe_whyc", "fe_xzm", "fe_gjjslgy", "fe_road", "fe_sjzrwhyc", "f_poi", "fe_zq", "fe_sjslgy", "fe_sjkfq", "fe_gjjgxq", "fe_shuixi");
         coDataType.setEditable(true);
         coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<String> dataTypes = coDataType.getItems();
@@ -142,13 +141,31 @@ public class DataPreview implements Initializable {
             lableAllNumber.setText(allNumber.toString() + "条数据");
             progressBar.progressProperty().bind(service.progressProperty());
             service.start();
-            long startTime = System.currentTimeMillis();    //获取开始时间
             service.progressProperty().addListener((observable, oldValue, newValue) -> {
-                long endTime = System.currentTimeMillis();    //获取结束时间
-
-                labelTime.setText((endTime - startTime) / 1000.0 + "s");
+//             long endTime = System.currentTimeMillis();    //获取结束时间
+//             labelTime.setText((endTime - startTime) / 1000.0 + "s");
                 labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
             });
+            long startTime = System.currentTimeMillis();    //获取开始时间
+            Thread thread = new Thread() {
+                public void run() {
+                    while (progressBar.progressProperty().get() < 1) {
+                        long endTime = System.currentTimeMillis();    //获取结束时间
+                        System.out.println(endTime);
+                        Platform.runLater(() -> {
+                            labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                        });
+                        try {
+                            //睡眠1000毫秒,即每秒更新一下时间
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            };
+            thread.start();
+
             service.stateProperty().addListener((observable, oldValue, newValue) -> {
                 switch (newValue) {
                     case READY:
@@ -168,6 +185,7 @@ public class DataPreview implements Initializable {
                         break;
                 }
             });
+
         });
     }
 

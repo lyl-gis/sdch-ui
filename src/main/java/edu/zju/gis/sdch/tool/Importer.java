@@ -148,7 +148,7 @@ public class Importer extends Task<Double> {
         CoordinateTransformation transformation = null;
         if (sr.IsProjected() == 1)
             transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
-        Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, 1000, fields, uuidField, skipEmptyGeom, transformation);
+        Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, 10, fields, uuidField, skipEmptyGeom, transformation);
         Set<String> destKeys = fieldMapping.keySet();
         long error = 0;
         long count = 0;
@@ -164,7 +164,7 @@ public class Importer extends Task<Double> {
             count += records.size();
             updateProgress(count * 1.0 / layer.GetFeatureCount(), 1);
             log.info("当前已入库失败{}条记录", error);
-            records = GdalHelper.getNextNFeatures(layer, 1000, fields, uuidField, skipEmptyGeom, transformation);
+            records = GdalHelper.getNextNFeatures(layer, 10, fields, uuidField, skipEmptyGeom, transformation);
         }
         updateProgress(1, 1);
         return (double) error;

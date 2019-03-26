@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane fx:id="rootLayout" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="edu.zju.gis.sdch.ui.AdminAreaManage">
+    <top>
+        <HBox prefHeight="55.0" prefWidth="610.0" spacing="15.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label prefHeight="15.0" prefWidth="93.0" text="请输入政区编码">
+                    <HBox.margin>
+                        <Insets left="10.0" top="5.0"/>
+                    </HBox.margin>
+                </Label>
+                <TextField fx:id="tfCode"/>
+                <Button fx:id="btnSelect" mnemonicParsing="false" text="查询">
+                    <HBox.margin>
+                        <Insets left="180.0"/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <padding>
+                <Insets left="25.0" top="20.0"/>
+            </padding>
+        </HBox>
+    </top>
+    <left>
+        <VBox prefHeight="296.0" prefWidth="22.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <center>
+        <TableView fx:id="tvAdminArea" prefHeight="296.0" prefWidth="553.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="tcCode" prefWidth="75.0" text="编码"/>
+                <TableColumn fx:id="tcPcode" prefWidth="75.0" text="父级编码"/>
+                <TableColumn fx:id="tcName" prefWidth="50.0" text="名称"/>
+                <TableColumn fx:id="tcAbbre" prefWidth="90.0" text="别名"/>
+                <TableColumn fx:id="tcFullname" text="全名"/>
+                <TableColumn fx:id="tcLon" prefWidth="52.0" text="经度"/>
+                <TableColumn fx:id="tcLat" prefWidth="42.0" text="纬度"/>
+                <TableColumn fx:id="tcWkt" prefWidth="101.0" text="WKT字符串"/>
+            </columns>
+        </TableView>
+    </center>
+    <right>
+        <VBox prefHeight="296.0" prefWidth="22.0" BorderPane.alignment="CENTER"/>
+    </right>
+    <bottom>
+        <HBox prefHeight="46.0" prefWidth="610.0" spacing="15.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnAdd" mnemonicParsing="false" text="添加政区信息"/>
+                <Button fx:id="btnSaveModify" mnemonicParsing="false" text="保存编辑"/>
+                <Button fx:id="btnRefresh" mnemonicParsing="false" text="刷新">
+                    <HBox.margin>
+                        <Insets left="320.0"/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <padding>
+                <Insets left="30.0" top="10.0"/>
+            </padding>
+        </HBox>
+    </bottom>
+</BorderPane>

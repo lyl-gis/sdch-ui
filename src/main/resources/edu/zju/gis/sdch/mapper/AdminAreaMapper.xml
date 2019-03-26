@@ -33,6 +33,11 @@
         from tb_admin_area
         where CODE = #{code,jdbcType=VARCHAR}
     </select>
+    <select id="selectAll" resultMap="ResultMapWithBLOBs">
+        select
+        *
+        from tb_admin_area
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
         delete
         from tb_admin_area

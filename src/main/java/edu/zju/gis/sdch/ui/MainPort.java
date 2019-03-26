@@ -27,8 +27,11 @@ public class MainPort implements Initializable {
         mbSelectPage.getMenus().addAll(toolMenu, manageMenu);
         MenuItem toolMenuImport = new MenuItem("入库工具");
         MenuItem manageMenuIndex = new MenuItem("索引管理");
+        MenuItem adminAreaMenuIndex = new MenuItem("政区信息管理");
+        MenuItem entityTypeMenuIndex = new MenuItem("实体类型管理");
+        MenuItem poiTypeMenuIndex = new MenuItem("POI类型管理");
         toolMenu.getItems().add(toolMenuImport);
-        manageMenu.getItems().addAll(manageMenuIndex);
+        manageMenu.getItems().addAll(manageMenuIndex, adminAreaMenuIndex, entityTypeMenuIndex, poiTypeMenuIndex);
         toolMenuImport.setOnAction(evnet -> {
             Parent root = null;
             try {
@@ -52,6 +55,54 @@ public class MainPort implements Initializable {
                 Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
                 stage.initOwner(primaryStage);
                 stage.setScene(scene);
+                stage.setTitle("索引管理");
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        adminAreaMenuIndex.setOnAction(event -> {
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("AdminAreaManage.fxml"));
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
+                stage.initOwner(primaryStage);
+                stage.setScene(scene);
+                stage.setTitle("政区信息管理");
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        entityTypeMenuIndex.setOnAction(event -> {
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("EntityTypeManage.fxml"));
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
+                stage.initOwner(primaryStage);
+                stage.setTitle("实体类型管理");
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        poiTypeMenuIndex.setOnAction(event -> {
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("PoiTypeManage.fxml"));
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
+                stage.initOwner(primaryStage);
+                stage.setScene(scene);
+                stage.setTitle("POI类型管理");
                 stage.show();
             } catch (IOException e) {
                 e.printStackTrace();
