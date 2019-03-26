@@ -110,6 +110,7 @@ public class DataPreview implements Initializable {
             CoordinateTransformation transformation = null;
             if (sr.IsProjected() == 1)
                 transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
+            layer.ResetReading();
             Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, newValue, fields, mainPage.getUuidField(), mainPage.skipEmpty(), transformation);
             tvPreview.getItems().clear();
             tvPreview.getItems().addAll(records.values());
