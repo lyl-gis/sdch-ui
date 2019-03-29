@@ -49,7 +49,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("ui/MainPage.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("ui/MainPort.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setTitle(MainPage.TITLE);
         primaryStage.setScene(scene);

@@ -3,6 +3,7 @@ package edu.zju.gis.sdch.ui;
 import edu.zju.gis.sdch.Main;
 import edu.zju.gis.sdch.tool.Importer;
 import edu.zju.gis.sdch.util.GdalHelper;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -11,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gdal.ogr.Layer;
@@ -38,11 +40,19 @@ public class DataPreview implements Initializable {
     private TableView<Map<String, Object>> tvPreview;
     @FXML
     private ChoiceBox<Integer> cbPreviewSize;
+    @FXML
+    private Label labelTime;
+    @FXML
+    private Label labelNumber;
 
+    @FXML
+    private Label lableAllNumber;
+    @FXML
+    private HBox hbox;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        coDataType.getItems().add("poi");
-        coDataType.getItems().add("entity");
+        tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        coDataType.getItems().addAll("fe_zrbhq", "fe_fjmsq", "fe_whyc", "fe_xzm", "fe_gjjslgy", "fe_road", "fe_sjzrwhyc", "f_poi", "fe_zq", "fe_sjslgy", "fe_sjkfq", "fe_gjjgxq", "fe_shuixi");
         coDataType.setEditable(true);
         coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<String> dataTypes = coDataType.getItems();
@@ -71,6 +81,7 @@ public class DataPreview implements Initializable {
             tableColumns.add(column);
             column.setCellValueFactory(param -> {
                 String value = "";
+
                 for (String srcName : fieldMapping.keySet())
                     if (targetName.equals(fieldMapping.get(srcName)))
                         value = param.getValue().get(srcName).toString();
@@ -99,6 +110,7 @@ public class DataPreview implements Initializable {
             CoordinateTransformation transformation = null;
             if (sr.IsProjected() == 1)
                 transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
+            layer.ResetReading();
             Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, newValue, fields, mainPage.getUuidField(), mainPage.skipEmpty(), transformation);
             tvPreview.getItems().clear();
             tvPreview.getItems().addAll(records.values());
@@ -106,6 +118,8 @@ public class DataPreview implements Initializable {
         cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.setValue(10);
         btnImport.setOnMouseClicked(event -> {
+            hbox.setVisible(true);
+            Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
             Service<Double> service = new Service<Double>() {
                 @Override
                 protected Task<Double> createTask() {
@@ -125,8 +139,34 @@ public class DataPreview implements Initializable {
                             fieldMapping, analyzable, skipEmptyGeom, category, dtype);
                 }
             };
+            lableAllNumber.setText(allNumber.toString() + "条数据");
             progressBar.progressProperty().bind(service.progressProperty());
             service.start();
+            service.progressProperty().addListener((observable, oldValue, newValue) -> {
+//             long endTime = System.currentTimeMillis();    //获取结束时间
+//             labelTime.setText((endTime - startTime) / 1000.0 + "s");
+                labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
+            });
+            long startTime = System.currentTimeMillis();    //获取开始时间
+            Thread thread = new Thread() {
+                public void run() {
+                    while (progressBar.progressProperty().get() < 1) {
+                        long endTime = System.currentTimeMillis();    //获取结束时间
+                        System.out.println(endTime);
+                        Platform.runLater(() -> {
+                            labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                        });
+                        try {
+                            //睡眠1000毫秒,即每秒更新一下时间
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            };
+            thread.start();
+
             service.stateProperty().addListener((observable, oldValue, newValue) -> {
                 switch (newValue) {
                     case READY:
@@ -137,16 +177,16 @@ public class DataPreview implements Initializable {
                             new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
                                     .showAndWait();
                         else {
-
-                            DataPreview.this.btnImport.getScene().getWindow().hide();
                             new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
                                     .showAndWait();
+                            DataPreview.this.btnImport.getScene().getWindow().hide();
                         }
                         break;
                     case FAILED:
                         break;
                 }
             });
+
         });
     }
 

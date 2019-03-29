@@ -23,6 +23,16 @@
         from tb_index
         where INDICE = #{indice,jdbcType=VARCHAR}
     </select>
+    <select id="getCount" resultType="int">
+        select count(*)
+        from tb_index
+    </select>
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_index
+        limit #{offset,jdbcType=INTEGER},#{size,jdbcType=INTEGER}
+    </select>
     <select id="selectAll"  resultMap="BaseResultMap">
         select
         *

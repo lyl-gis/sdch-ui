@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane prefHeight="366.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.IndexAdd">
+<BorderPane prefHeight="332.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.IndexAdd">
    <bottom>
-      <HBox prefHeight="66.0" prefWidth="740.0" spacing="100.0" BorderPane.alignment="CENTER">
+       <HBox prefHeight="66.0" prefWidth="400.0" spacing="100.0" BorderPane.alignment="CENTER">
          <children>
-              <Button fx:id="btnConfirm" mnemonicParsing="false" text="确定" />
-              <Button fx:id="btnCancel" mnemonicParsing="false" text="取消" />
+             <Button fx:id="btnConfirm" mnemonicParsing="false" prefHeight="30.0" prefWidth="60.0" text="确定"/>
+             <Button fx:id="btnCancel" mnemonicParsing="false" prefHeight="30.0" prefWidth="60.0" text="取消"/>
          </children>
          <padding>
-            <Insets left="150.0" top="20.0" />
+             <Insets left="120.0" top="20.0"/>
          </padding>
       </HBox>
    </bottom>
@@ -47,7 +47,8 @@
       <HBox prefHeight="200.0" prefWidth="51.0" BorderPane.alignment="CENTER" />
    </right>
    <top>
-      <HBox prefHeight="56.0" prefWidth="480.0" BorderPane.alignment="CENTER" />
+       <HBox prefHeight="28.0" prefWidth="480.0" style="-fx-background-color: lightblue;"
+             BorderPane.alignment="CENTER"/>
    </top>
    <left>
       <VBox prefHeight="244.0" prefWidth="85.0" BorderPane.alignment="CENTER" />

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="268.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.AdminAreaAdd">
+    <center>
+        <GridPane prefHeight="339.0" prefWidth="497.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="98.0" minWidth="10.0" prefWidth="37.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="206.0" minWidth="10.0" prefWidth="120.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="187.0" minWidth="10.0" prefWidth="116.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="206.0" minWidth="10.0" prefWidth="120.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <TextField fx:id="tfLon" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label text="经度" GridPane.rowIndex="3"/>
+                <Label text="全名" GridPane.rowIndex="2"/>
+                <TextField fx:id="tfFullname" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label text="名称" GridPane.rowIndex="1"/>
+                <TextField fx:id="tfName" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="编码"/>
+                <TextField fx:id="tfCode" prefHeight="23.0" prefWidth="155.0" GridPane.columnIndex="1"/>
+                <Label text="父级编码" GridPane.columnIndex="2">
+                    <padding>
+                        <Insets left="60.0"/>
+                    </padding>
+                </Label>
+                <TextField fx:id="tfpCode" prefHeight="23.0" prefWidth="132.0" GridPane.columnIndex="3"/>
+                <Label text="别名" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <padding>
+                        <Insets left="70.0"/>
+                    </padding>
+                </Label>
+                <TextField fx:id="tfAbb" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                <Label prefHeight="23.0" prefWidth="118.0" text="WKT字符串" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    <padding>
+                        <Insets left="40.0"/>
+                    </padding>
+                </Label>
+                <TextField fx:id="tfWKT" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                <Label text="纬度" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                    <padding>
+                        <Insets left="70.0"/>
+                    </padding>
+                </Label>
+                <TextField fx:id="tfLat" GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+            </children>
+        </GridPane>
+    </center>
+    <bottom>
+        <HBox prefHeight="44.0" prefWidth="346.0" spacing="150.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnConfirm" mnemonicParsing="false" text="确认"/>
+                <Button fx:id="btnCancel" mnemonicParsing="false" text="取消"/>
+            </children>
+            <BorderPane.margin>
+                <Insets left="100.0" top="10.0"/>
+            </BorderPane.margin>
+        </HBox>
+    </bottom>
+    <right>
+        <VBox prefHeight="184.0" prefWidth="30.0" BorderPane.alignment="CENTER"/>
+    </right>
+    <left>
+        <VBox prefHeight="184.0" prefWidth="47.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <top>
+        <HBox prefHeight="23.0" prefWidth="446.0" BorderPane.alignment="CENTER"/>
+    </top>
+</BorderPane>

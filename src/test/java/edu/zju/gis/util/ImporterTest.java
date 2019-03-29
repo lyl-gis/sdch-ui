@@ -16,7 +16,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class ImporterTest {
@@ -28,7 +30,7 @@ public class ImporterTest {
     @Before
     public void setup() throws IOException {
         ogr.RegisterAll();
-        String gdb = "F:\\Project\\山东国土测绘院\\data.gdb";
+        String gdb = "F:\\sdch_data.gdb";
         InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
         // 创建会话工厂，传入mybatis的配置文件信息
         Properties props = new Properties();
@@ -274,7 +276,22 @@ public class ImporterTest {
     }
 
     @Test
-    public void testImportRoad() {//lsid,name,clasid[,length]
+    public void testReadEs() throws ExecutionException, InterruptedException, UnknownHostException {
+        helper = new ElasticSearchHelper(Arrays.asList("192.168.137.81"), 9300, "elasticsearch");
+        Object res = helper.getAsMap("sdmap", "_doc", 0, 10);
+        System.out.println(res);
+    }
+
+
+    @Test
+    public void testImportRoad() throws IOException {
+        helper.createIfNotExist("roadtest", 1, 1);
+        JSONObject source = new JSONObject();
+        JSONObject properties = new JSONObject();
+        source.put("properties", properties);
+        properties.put("dtype", new JSONObject().put("type", "keyword").put("store", true))
+                .put("the_shape", new JSONObject().put("type", "geo_shape"));
+        helper.putMapping("roadtest", "_doc", source.toString());
         Layer layer = reader.getLayer("daolu");
         Map<String, Integer> fieldTypes = GdalHelper.getFieldTypes(layer);
         class Holder {
@@ -310,7 +327,7 @@ public class ImporterTest {
                 }
             }
         }
-        List<Map<String, Object>> maps = entityId2Entity.values().stream().map(segments -> {
+        List<Map<String, Object>> maps = entityId2Entity.values().parallelStream().map(segments -> {
             Holder first = segments.get(0);
             String lsid = first.lsid;
             String name = first.name;
@@ -343,10 +360,12 @@ public class ImporterTest {
             map.put("name", name);
             map.put("clasid", clasid);
             map.put("district", district);
-            map.put("the_shape", geometry.ExportToJson());
+            JSONObject json = new JSONObject(geometry.ExportToJson());
+            map.put("the_shape", json.toMap());
+            map.put("doc_id", lsid);
             return map;
         }).collect(Collectors.toList());
-        System.out.println(maps);
+        helper.publish("roadtest", "_doc", maps);
     }
 
 }

@@ -365,6 +365,7 @@ public final class ElasticSearchHelper implements Closeable {
 
     public boolean delete(String index, String type, String id) {
         return client.prepareDelete(index, type, id).get().getResult() == DocWriteResponse.Result.DELETED;
+
     }
 
     public int delete(String index, String type, List<String> idList) {

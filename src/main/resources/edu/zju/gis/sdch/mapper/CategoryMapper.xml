@@ -19,6 +19,18 @@
         from tb_category
         where ID = #{id,jdbcType=VARCHAR}
     </select>
+    <select id="selectByPId" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_category
+        where P_ID = #{value,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByFunc" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_category
+        where FUNC = #{value,jdbcType=VARCHAR}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
         delete
         from tb_category

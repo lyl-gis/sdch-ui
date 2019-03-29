@@ -2,6 +2,8 @@ package edu.zju.gis.sdch.mapper;
 
 import edu.zju.gis.sdch.model.AdminArea;
 
+import java.util.List;
+
 public interface AdminAreaMapper {
     int deleteByPrimaryKey(String code);
 
@@ -9,6 +11,7 @@ public interface AdminAreaMapper {
 
     int insertSelective(AdminArea record);
 
+    List<AdminArea> selectAll();
     AdminArea selectByPrimaryKey(String code);
 
     int updateByPrimaryKeySelective(AdminArea record);

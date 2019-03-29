@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane fx:id="rootLayout" prefHeight="488.0" prefWidth="406.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.PoiTypeManage">
+    <top>
+        <HBox prefHeight="34.0" prefWidth="386.0" spacing="20.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="请输入Poi类型编码">
+                    <HBox.margin>
+                        <Insets top="5.0"/>
+                    </HBox.margin>
+                </Label>
+                <TextField fx:id="tfCode" prefHeight="23.0" prefWidth="123.0"/>
+                <Button fx:id="btnSelect" mnemonicParsing="false" text="搜索">
+                    <HBox.margin>
+                        <Insets left="30.0"/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets left="20.0" top="15.0"/>
+            </BorderPane.margin>
+            <padding>
+                <Insets left="15.0"/>
+            </padding>
+        </HBox>
+    </top>
+    <bottom>
+        <HBox prefHeight="35.0" prefWidth="376.0" spacing="20.0" BorderPane.alignment="CENTER">
+            <children>
+                <Button fx:id="btnAdd" mnemonicParsing="false" text="添加Poi类型"/>
+                <Button fx:id="btnSaveModify" mnemonicParsing="false" text="保存编辑"/>
+                <Button fx:id="btnRefresh" mnemonicParsing="false" text="刷新">
+                    <HBox.margin>
+                        <Insets left="120.0"/>
+                    </HBox.margin>
+                </Button>
+            </children>
+            <BorderPane.margin>
+                <Insets left="30.0" top="10.0"/>
+            </BorderPane.margin>
+        </HBox>
+    </bottom>
+    <center>
+        <TableView fx:id="tvPoiType" prefHeight="353.0" prefWidth="354.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="tcCode" prefWidth="89.0" text="编码"/>
+                <TableColumn fx:id="tcPcode" prefWidth="85.0" text="父级编码"/>
+                <TableColumn fx:id="tcCode4" prefWidth="83.0" text="code4"/>
+                <TableColumn fx:id="tcName" prefWidth="107.0" text="名称"/>
+            </columns>
+        </TableView>
+    </center>
+    <left>
+        <VBox prefHeight="353.0" prefWidth="22.0" BorderPane.alignment="CENTER"/>
+    </left>
+    <right>
+        <VBox prefHeight="353.0" prefWidth="19.0" BorderPane.alignment="CENTER"/>
+    </right>
+</BorderPane>

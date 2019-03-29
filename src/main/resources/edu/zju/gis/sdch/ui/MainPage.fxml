@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+<BorderPane fx:id="rootLayout" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.MainPage">
     <top>
         <HBox focusTraversable="true" nodeOrientation="LEFT_TO_RIGHT" prefHeight="39.0" prefWidth="545.0" spacing="15.0"
@@ -21,23 +21,32 @@
                 <padding>
                     <Insets top="5.0"/>
                 </padding>
+                <HBox.margin>
+                    <Insets top="3.0"/>
+                </HBox.margin>
             </Label>
-            <TextField fx:id="tfChooseFile" prefHeight="30.0" prefWidth="183.0" promptText="请选择文件"/>
+            <TextField fx:id="tfChooseFile" prefHeight="30.0" prefWidth="160.0" promptText="请选择文件"/>
             <Label text="分类体系">
                 <opaqueInsets>
                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
                 </opaqueInsets>
                 <padding>
-                    <Insets top="5.0"/>
+                    <Insets left="5.0" top="5.0"/>
                 </padding>
+                <HBox.margin>
+                    <Insets top="3.0"/>
+                </HBox.margin>
             </Label>
-            <ComboBox fx:id="cbCategory" prefHeight="23.0" prefWidth="117.0" value=""/>
+            <ComboBox fx:id="cbCategory" prefHeight="30.0" prefWidth="160.0" value=""/>
             <Label text="图层">
                 <padding>
-                    <Insets top="5.0"/>
+                    <Insets left="5.0" top="5.0"/>
                 </padding>
+                <HBox.margin>
+                    <Insets top="3.0"/>
+                </HBox.margin>
             </Label>
-            <ComboBox fx:id="cbxLayers" prefHeight="30.0" prefWidth="166.0" value=""/>
+            <ComboBox fx:id="cbxLayers" prefHeight="30.0" prefWidth="160.0" value=""/>
         </HBox>
     </top>
     <bottom>
@@ -68,7 +77,7 @@
         </HBox>
     </bottom>
     <center>
-        <TableView fx:id="tableView" editable="true" prefHeight="452.0" prefWidth="593.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="tableView" editable="true" prefHeight="498.0" prefWidth="761.0" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="tcFieldName" prefWidth="100.0" text="字段名"/>
                 <TableColumn fx:id="tcTargetName" prefWidth="100.0" text="映射名"/>
@@ -81,7 +90,7 @@
         </TableView>
     </center>
     <left>
-        <VBox prefHeight="249.0" prefWidth="32.0" BorderPane.alignment="CENTER"/>
+        <VBox prefHeight="498.0" prefWidth="21.0" BorderPane.alignment="CENTER"/>
     </left>
     <right>
         <VBox prefHeight="452.0" prefWidth="31.0" BorderPane.alignment="CENTER"/>

@@ -76,6 +76,12 @@ public class MainPage implements Initializable {
                 return;
             String path = file.getPath();//选择的文件夹路径
             tfChooseFile.setText(path);
+            if (reader != null)
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    log.error("", ex);
+                }
             reader = new FGDBReader(path);
             String[] layerNames = reader.getLayerNames();//返回所有图层名称，将这些初始化到图层选择列表中
             cbxLayers.getItems().clear();
@@ -93,12 +99,17 @@ public class MainPage implements Initializable {
                     fieldRow.getTargetName().set(targetName);
                     fieldRow.getType().set(value);
                     fieldRow.getUsed().set(FieldInformation.fixedFields.contains(targetName));
-                    fieldRow.getAnalyzable().set(false);
-                    fieldRow.getBoost().set(1f);
+                    fieldRow.getAnalyzable().set(targetName.startsWith("name") || targetName.equals("address"));
+                    float boost = 1f;
+                    if (targetName.startsWith("name"))
+                        boost = 4;
+                    else if (targetName.equals("address"))
+                        boost = 2;
+                    fieldRow.getBoost().set(boost);
                     fieldRow.getDesc().set("");
                     informations.add(fieldRow);
                 });
-                informations.sort(Comparator.comparing(fieldInformation -> fieldInformation.getName().get()));
+                informations.sort(Comparator.comparing(f -> f.getName().get()));
                 cbUuidField.getItems().clear();
                 cbUuidField.getItems().addAll(fields.keySet().stream().sorted().toArray(String[]::new));
                 cbUuidField.getItems().add(0, "--自动生成--");
