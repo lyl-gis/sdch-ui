@@ -20,8 +20,7 @@
         where CODE = #{code,jdbcType=VARCHAR}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
-        select
-        *
+        select *
         from tb_poi_type
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">

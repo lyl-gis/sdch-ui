@@ -367,4 +367,5 @@ public class ImporterTest {
         }).collect(Collectors.toList());
         helper.publish("roadtest", "_doc", maps);
     }
+
 }

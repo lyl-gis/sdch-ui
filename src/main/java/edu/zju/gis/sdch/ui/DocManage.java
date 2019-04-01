@@ -29,7 +29,6 @@ import java.net.URL;
 import java.util.*;
 
 
-
 public class DocManage implements Initializable {
 
     @FXML

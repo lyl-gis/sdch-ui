@@ -20,6 +20,7 @@ public class MainPort implements Initializable {
     private MenuBar mbSelectPage;
     @FXML
     private BorderPane rootLayout;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Menu toolMenu = new Menu("工具");
