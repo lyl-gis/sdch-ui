@@ -380,6 +380,17 @@ public final class ElasticSearchHelper implements Closeable {
         return error;
     }
 
+    public long deleteDtype(String indice, String dtype) {
+        return DeleteByQueryAction.INSTANCE.newRequestBuilder(client).source(indice)
+                .filter(QueryBuilders.matchQuery("dtype", dtype)).get().getDeleted();
+    }
+
+    public long getDtypeDocCount(String indice, String dtype) {
+        SearchResponse response = client.prepareSearch(indice).setTypes("_doc")
+                .setQuery(QueryBuilders.matchQuery("dtype", dtype))
+                .setSize(20).get();
+        return response.getHits().getTotalHits();
+    }
     public String getDetail(String index, String type, String docId) {
         GetResponse getResponse = client.prepareGet(index, type, docId).get();
         return getResponse.getSourceAsString();

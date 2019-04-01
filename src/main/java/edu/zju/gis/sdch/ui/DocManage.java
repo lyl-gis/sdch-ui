@@ -6,10 +6,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -19,6 +24,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -26,6 +32,8 @@ import java.util.*;
 
 public class DocManage implements Initializable {
 
+    @FXML
+    private BorderPane rootLayout;
     @FXML
     private Button btnSelectDoc;
     @FXML
@@ -38,6 +46,8 @@ public class DocManage implements Initializable {
     public TableView<Map<String, SimpleStringProperty>> tvDocs;
     @FXML
     private TextField tfWord;
+    @FXML
+    private Button btnDeleteDtype;
 
     public IndexService indexService;
     public static final String TITLE = "文档编辑";
@@ -144,6 +154,21 @@ public class DocManage implements Initializable {
                 btnConfirmAddDocs.setDisable(false);
             }
         });
+        btnDeleteDtype.setOnMouseClicked(event -> {
+            Parent root = null;
+            try {
+                root = FXMLLoader.load(getClass().getResource("DeleteDocsDtype.fxml"));
+                Scene scene = new Scene(root);
+                Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
+                Stage stage = new Stage();
+                stage.initOwner(primaryStage);
+                stage.setTitle("按类别删除数据");
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         btnConfirmAddDocs.setOnAction(evnet -> {
             //获取要编辑行的行数
             int addValidNumber = 0;
@@ -208,7 +233,10 @@ public class DocManage implements Initializable {
                         } else
                             kvIdDoc.put(mapAdd.get("lsid").toString(), mapAdd);
                     }
-                    int erroNumber = indexManage.helper.upsert("sdmap", "_doc", kvIdDoc);
+                    int erroNumber = 0;
+                    for (int k = 0; k < indexManage.indexNames.size(); k++) {
+                        erroNumber = +indexManage.helper.upsert(indexManage.indexNames.get(k), "_doc", kvIdDoc);
+                    }
                     int resultNumber = addValidNumber - erroNumber;
                     new Alert(Alert.AlertType.INFORMATION, "成功插入" + resultNumber + "条数据", ButtonType.OK)
                             .showAndWait();
@@ -253,7 +281,11 @@ public class DocManage implements Initializable {
                     kvIdDoc.put(mapModify.get("lsid").get(), map);
                 }
             }
-            int resultNumber = indexManage.helper.updateFromMap("sdmap", "_doc", kvIdDoc);
+            int resultNumber = 0;
+            for (int k = 0; k < indexManage.indexNames.size(); k++) {
+                resultNumber += indexManage.helper.updateFromMap(indexManage.indexNames.get(k), "_doc", kvIdDoc);
+            }
+
             int modifyNumber = kvIdDoc.size();
             new Alert(Alert.AlertType.INFORMATION, "共编辑条数" + modifyNumber + "失败条数" + resultNumber, ButtonType.OK)
                     .showAndWait();
@@ -291,7 +323,10 @@ public class DocManage implements Initializable {
                                         tvDocs.getItems().remove(mapDelete);
                                         deleted++;
                                     }
-                                    int resultNumber = indexManage.helper.delete("sdmap", "_doc", idList);
+                                    int resultNumber = 0;
+                                    for (int k = 0; k < indexManage.indexNames.size(); k++) {
+                                        resultNumber = +indexManage.helper.delete(indexManage.indexNames.get(k), "_doc", idList);
+                                    }
                                     new Alert(Alert.AlertType.INFORMATION, "共删除条数" + newDeleteItems.size() + "失败数" + resultNumber, ButtonType.OK)
                                             .showAndWait();
                                 }
