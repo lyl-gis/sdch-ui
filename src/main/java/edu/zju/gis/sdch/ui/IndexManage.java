@@ -50,8 +50,7 @@ public class IndexManage implements Initializable {
     private TableColumn<MyIndex, String> tcDescription;
     @FXML
     private TableColumn<MyIndex, String> tcCategory;
-    @FXML
-    private Button btnSaveModified;
+
     @FXML
     private BorderPane rootLayout;
 
@@ -127,7 +126,7 @@ public class IndexManage implements Initializable {
         tcCategory.setCellValueFactory(cellData -> cellData.getValue().getCategory());
         tcDescription.setCellFactory(TextFieldTableCell.forTableColumn());
         tcDescription.setCellValueFactory(cellData -> cellData.getValue().getDescription());
-        tvIndex.setEditable(true);
+//        tvIndex.setEditable(true);
         //将数据库中的索引信息呈现在表格中
         ObservableList<MyIndex> indices = tvIndex.getItems();//必须放在列与数据绑定之后
         //修改为一进入页面便有数据在表格中
@@ -170,26 +169,7 @@ public class IndexManage implements Initializable {
             stage.show();
 
         });
-        btnSaveModified.setOnMouseClicked(event -> {
-            //将表格中的所有数据保存一次
-            List<Integer> modifyResult = new ArrayList<>();
-            for (int i = 0; i < tvIndex.getItems().size(); i++) {
-                Index index = new Index();
-                index.setDescription(tvIndex.getItems().get(i).getDescription().getValue());
-                index.setCategory(tvIndex.getItems().get(i).getCategory().getValue());
-                index.setReplicas(tvIndex.getItems().get(i).getReplicas().getValue());
-                index.setShards(tvIndex.getItems().get(i).getShards().getValue());
-                index.setIndice(tvIndex.getItems().get(i).getIndice().getValue());
-                int result = mapper.updateByPrimaryKey(index);
-                modifyResult.add(result);
-            }
-            if (!modifyResult.contains(0))
-                new Alert(Alert.AlertType.
-                        INFORMATION, "成功保存编辑", ButtonType.OK).showAndWait();
-            else
-                new Alert(Alert.AlertType.
-                        INFORMATION, "未能成功保存编辑", ButtonType.OK).showAndWait();
-        });
+
     }
 
     class TableRowControl extends TableRow<MyIndex> {

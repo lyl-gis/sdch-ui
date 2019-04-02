@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" prefHeight="488.0" prefWidth="406.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane fx:id="rootLayout" prefHeight="586.0" prefWidth="516.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.PoiTypeManage">
     <top>
         <HBox prefHeight="34.0" prefWidth="386.0" spacing="20.0" BorderPane.alignment="CENTER">
@@ -14,7 +14,7 @@
                     </HBox.margin>
                 </Label>
                 <TextField fx:id="tfCode" prefHeight="23.0" prefWidth="123.0"/>
-                <Button fx:id="btnSelect" mnemonicParsing="false" text="搜索">
+                <Button fx:id="btnSelect" mnemonicParsing="false" prefHeight="23.0" prefWidth="70.0" text="搜索">
                     <HBox.margin>
                         <Insets left="30.0"/>
                     </HBox.margin>
@@ -31,9 +31,9 @@
     <bottom>
         <HBox prefHeight="35.0" prefWidth="376.0" spacing="20.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="btnAdd" mnemonicParsing="false" text="添加Poi类型"/>
-                <Button fx:id="btnSaveModify" mnemonicParsing="false" text="保存编辑"/>
-                <Button fx:id="btnRefresh" mnemonicParsing="false" text="刷新">
+                <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="23.0" prefWidth="104.0" text="添加Poi类型"/>
+                <Button fx:id="btnSaveModify" mnemonicParsing="false" prefHeight="23.0" prefWidth="89.0" text="保存编辑"/>
+                <Button fx:id="btnRefresh" mnemonicParsing="false" prefHeight="23.0" prefWidth="52.0" text="刷新">
                     <HBox.margin>
                         <Insets left="120.0"/>
                     </HBox.margin>

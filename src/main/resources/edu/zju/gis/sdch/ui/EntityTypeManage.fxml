@@ -3,8 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="edu.zju.gis.sdch.ui.EntityTypeManage">
+<BorderPane fx:id="rootLayout" prefHeight="633.0" prefWidth="594.0" xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.EntityTypeManage">
     <top>
         <HBox prefHeight="41.0" prefWidth="424.0" spacing="20.0" BorderPane.alignment="CENTER">
             <children>
@@ -17,7 +17,7 @@
                     </HBox.margin>
                 </Label>
                 <TextField fx:id="tfCode" prefHeight="23.0" prefWidth="95.0"/>
-                <Button fx:id="btnSelect" mnemonicParsing="false" text="搜索">
+                <Button fx:id="btnSelect" mnemonicParsing="false" prefHeight="23.0" prefWidth="58.0" text="搜索">
                     <HBox.margin>
                         <Insets left="50.0"/>
                     </HBox.margin>
@@ -34,15 +34,15 @@
     <bottom>
         <HBox prefHeight="50.0" prefWidth="424.0" spacing="20.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="btnAdd" mnemonicParsing="false" text="添加实体类型">
+                <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="23.0" prefWidth="105.0" text="添加实体类型">
                     <HBox.margin>
                         <Insets left="10.0"/>
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnSaveModify" mnemonicParsing="false" text="保存编辑"/>
-                <Button fx:id="btnRefresh" mnemonicParsing="false" text="刷新">
+                <Button fx:id="btnSaveModify" mnemonicParsing="false" prefHeight="23.0" prefWidth="83.0" text="保存编辑"/>
+                <Button fx:id="btnRefresh" mnemonicParsing="false" prefHeight="23.0" prefWidth="59.0" text="刷新">
                     <HBox.margin>
-                        <Insets left="120.0"/>
+                        <Insets left="200.0"/>
                     </HBox.margin>
                 </Button>
             </children>

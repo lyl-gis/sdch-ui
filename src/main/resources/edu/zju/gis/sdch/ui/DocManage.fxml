@@ -34,12 +34,15 @@
                         <Insets left="30.0" top="10.0"/>
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="tfWord">
+                <TextField fx:id="tfWord" prefHeight="23.0" prefWidth="154.0">
                     <HBox.margin>
-                        <Insets top="7.0"/>
+                        <Insets left="5.0" top="7.0"/>
                     </HBox.margin>
+                    <padding>
+                        <Insets left="5.0"/>
+                    </padding>
                 </TextField>
-                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="25.0" prefWidth="47.0" text="查询">
+                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="25.0" prefWidth="55.0" text="查询">
                     <HBox.margin>
                         <Insets left="20.0" top="6.0"/>
                     </HBox.margin>
@@ -57,13 +60,13 @@
                 </Button>
                 <Button fx:id="btnConfirmAddDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="70.0"
                         text="确认添加"/>
-                <Button fx:id="btnSaveModifiedDocs" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="30.0"
-                        prefWidth="70.0" text="保存编辑">
+                <Button fx:id="btnSaveModifiedDocs" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="26.0"
+                        prefWidth="74.0" text="保存编辑">
                     <HBox.margin>
                         <Insets left="250.0"/>
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnDeleteDtype" mnemonicParsing="false" text="按类别删除"/>
+                <Button fx:id="btnDeleteDtype" mnemonicParsing="false" prefHeight="23.0" prefWidth="85.0" text="按类别删除"/>
             </children>
             <BorderPane.margin>
                 <Insets bottom="15.0" top="10.0"/>
