@@ -9,7 +9,7 @@
     <children>
         <ChoiceBox fx:id="cbDtype" layoutX="187.0" layoutY="29.0" prefWidth="150.0"/>
         <Label layoutX="22.0" layoutY="33.0" text="请选择要删除的数据类别"/>
-        <Button fx:id="btnConfirmDelete" layoutX="255.0" layoutY="86.0" mnemonicParsing="false" prefHeight="23.0"
-                prefWidth="82.0" text="确认删除"/>
+        <Button fx:id="btnConfirmDelete" layoutX="207.0" layoutY="86.0" mnemonicParsing="false" prefHeight="23.0"
+                prefWidth="130.0" text="确认删除"/>
     </children>
 </AnchorPane>

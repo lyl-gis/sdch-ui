@@ -40,7 +40,7 @@ public class MainPage implements Initializable {
     @FXML
     private TextField tfChooseFile;
     @FXML
-    private ComboBox<String> cbCategory;
+    public ComboBox<String> cbCategory;
     @FXML
     private TableView<FieldInformation> tableView;
     @FXML

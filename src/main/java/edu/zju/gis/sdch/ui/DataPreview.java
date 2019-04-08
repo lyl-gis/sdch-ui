@@ -1,8 +1,10 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.Main;
+import edu.zju.gis.sdch.mapper.IndexMapper;
 import edu.zju.gis.sdch.tool.Importer;
 import edu.zju.gis.sdch.util.GdalHelper;
+import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
@@ -33,7 +35,7 @@ public class DataPreview implements Initializable {
     @FXML
     private ProgressBar progressBar;
     @FXML
-    private TextField tfIndex;
+    private ComboBox<String> coIndex;
     @FXML
     private ComboBox<String> coDataType;
     @FXML
@@ -49,9 +51,14 @@ public class DataPreview implements Initializable {
     private Label lableAllNumber;
     @FXML
     private HBox hbox;
+    private IndexMapper mapper;
+    public static MainPage mainPage;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        mainPage = MainPage.instance;
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        mapper = MyBatisUtil.getMapper(IndexMapper.class);
+
         coDataType.getItems().addAll("fe_zrbhq", "fe_fjmsq", "fe_whyc", "fe_xzm", "fe_gjjslgy", "fe_road", "fe_sjzrwhyc", "f_poi", "fe_zq", "fe_sjslgy", "fe_sjkfq", "fe_gjjgxq", "fe_shuixi");
         coDataType.setEditable(true);
         coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -59,7 +66,23 @@ public class DataPreview implements Initializable {
             if (!dataTypes.contains(newValue))
                 dataTypes.add(newValue);
         });
-        MainPage mainPage = MainPage.instance;
+        List<String> coindex = new ArrayList<>();
+        for (int i = 0; i < mapper.selectAll().size(); i++) {
+            coindex.add(mapper.selectAll().get(i).getIndice());
+        }
+        coIndex.getItems().addAll(coindex);
+        coIndex.setEditable(true);
+        if (mainPage.cbCategory.getValue().equals("框架数据")) {
+            coIndex.setValue("sdmap");
+        }
+        if (mainPage.cbCategory.getValue().equals("专题数据")) {
+            coIndex.setValue("zhuanti");
+        }
+        coIndex.valueProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<String> dataTypes = coDataType.getItems();
+            if (!dataTypes.contains(newValue))
+                dataTypes.add(newValue);
+        });
         Layer layer = mainPage.getReader().getLayer(mainPage.getSelectedLayer());
         //1. 读取字段配置
         Map<String, Integer> fields = new HashMap<>();
@@ -123,7 +146,7 @@ public class DataPreview implements Initializable {
             Service<Double> service = new Service<Double>() {
                 @Override
                 protected Task<Double> createTask() {
-                    String index = tfIndex.getText();
+                    String index = coIndex.getValue();
                     MainPage mainPage = MainPage.instance;
                     String category = mainPage.getCategory();
                     String layerName = mainPage.getSelectedLayer();
@@ -158,7 +181,7 @@ public class DataPreview implements Initializable {
                         });
                         try {
                             //睡眠1000毫秒,即每秒更新一下时间
-                            Thread.sleep(10);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

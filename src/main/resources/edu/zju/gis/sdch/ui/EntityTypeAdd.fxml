@@ -8,8 +8,8 @@
     <bottom>
         <HBox prefHeight="46.0" prefWidth="253.0" spacing="60.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="btnConfirm" mnemonicParsing="false" prefHeight="23.0" prefWidth="55.0" text="确认"/>
-                <Button fx:id="btnCancel" mnemonicParsing="false" prefHeight="23.0" prefWidth="55.0" text="取消"/>
+                <Button fx:id="btnConfirm" mnemonicParsing="false" prefHeight="23.0" prefWidth="65.0" text="确认"/>
+                <Button fx:id="btnCancel" mnemonicParsing="false" prefHeight="23.0" prefWidth="65.0" text="取消"/>
             </children>
             <BorderPane.margin>
                 <Insets left="40.0" top="10.0"/>

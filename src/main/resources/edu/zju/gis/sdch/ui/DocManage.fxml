@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" prefHeight="446.0" prefWidth="673.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane fx:id="rootLayout" prefHeight="592.0" prefWidth="848.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DocManage">
     <right>
         <VBox prefHeight="344.0" prefWidth="21.0" spacing="15.0" BorderPane.alignment="CENTER">
@@ -23,7 +23,7 @@
         <VBox prefHeight="344.0" prefWidth="20.0" BorderPane.alignment="CENTER"/>
     </left>
     <top>
-        <HBox prefHeight="35.0" prefWidth="665.0" spacing="10.0" style="-fx-background-color: lightblue;"
+        <HBox prefHeight="35.0" prefWidth="665.0" spacing="40.0" style="-fx-background-color: lightblue;"
               BorderPane.alignment="CENTER">
             <BorderPane.margin>
                 <Insets/>
@@ -42,7 +42,7 @@
                         <Insets left="5.0"/>
                     </padding>
                 </TextField>
-                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="25.0" prefWidth="55.0" text="查询">
+                <Button fx:id="btnSelectDoc" mnemonicParsing="false" prefHeight="25.0" prefWidth="65.0" text="查询">
                     <HBox.margin>
                         <Insets left="20.0" top="6.0"/>
                     </HBox.margin>
@@ -53,20 +53,21 @@
     <bottom>
         <HBox prefHeight="26.0" prefWidth="584.0" spacing="25.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="btnAddDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="70.0" text="添加">
+                <Button fx:id="btnAddDoc" mnemonicParsing="false" prefHeight="30.0" prefWidth="65.0" text="添加">
                     <HBox.margin>
                         <Insets left="30.0"/>
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnConfirmAddDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="70.0"
+                <Button fx:id="btnConfirmAddDocs" mnemonicParsing="false" prefHeight="30.0" prefWidth="130.0"
                         text="确认添加"/>
                 <Button fx:id="btnSaveModifiedDocs" contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="26.0"
-                        prefWidth="74.0" text="保存编辑">
+                        prefWidth="130.0" text="保存编辑">
                     <HBox.margin>
                         <Insets left="250.0"/>
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnDeleteDtype" mnemonicParsing="false" prefHeight="23.0" prefWidth="85.0" text="按类别删除"/>
+                <Button fx:id="btnDeleteDtype" mnemonicParsing="false" prefHeight="23.0" prefWidth="150.0"
+                        text="按类别删除"/>
             </children>
             <BorderPane.margin>
                 <Insets bottom="15.0" top="10.0"/>

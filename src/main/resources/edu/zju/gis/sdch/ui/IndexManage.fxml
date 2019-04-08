@@ -46,14 +46,14 @@
                 <Insets left="25.0" top="15.0"/>
             </padding>
             <children>
-                <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="23.0" prefWidth="87.0" text="增加索引">
+                <Button fx:id="btnAdd" mnemonicParsing="false" prefHeight="23.0" prefWidth="130.0" text="增加索引">
                     <HBox.margin>
                         <Insets left="15.0"/>
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnRefresh" mnemonicParsing="false" prefHeight="23.0" prefWidth="62.0" text="刷新">
+                <Button fx:id="btnRefresh" mnemonicParsing="false" prefHeight="23.0" prefWidth="65.0" text="刷新">
                     <HBox.margin>
-                        <Insets left="450.0"/>
+                        <Insets left="400.0"/>
                     </HBox.margin>
                 </Button>
             </children>
