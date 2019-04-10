@@ -86,36 +86,38 @@ public class MainPage implements Initializable {
             String[] layerNames = reader.getLayerNames();//返回所有图层名称，将这些初始化到图层选择列表中
             cbxLayers.getItems().clear();
             cbxLayers.getItems().addAll(layerNames);
-            cbxLayers.valueProperty().addListener((observable, oldValue, newValue) -> {
-                Layer SelectedLayer = reader.getLayer(newValue);
-                Map<String, Integer> fields = GdalHelper.getFieldTypes(SelectedLayer);//得到一个图层中所有字段名称和类型
-                ObservableList<FieldInformation> informations = tableView.getItems();
-                informations.clear();
-                //将所选择的图层中的字段信息呈现在表中
-                fields.forEach((key, value) -> {
-                    FieldInformation fieldRow = new FieldInformation();
-                    fieldRow.getName().set(key);
-                    String targetName = key.toLowerCase();
-                    fieldRow.getTargetName().set(targetName);
-                    fieldRow.getType().set(value);
-                    fieldRow.getUsed().set(FieldInformation.fixedFields.contains(targetName));
-                    fieldRow.getAnalyzable().set(targetName.startsWith("name") || targetName.equals("address"));
-                    float boost = 1f;
-                    if (targetName.startsWith("name"))
-                        boost = 4;
-                    else if (targetName.equals("address"))
-                        boost = 2;
-                    fieldRow.getBoost().set(boost);
-                    fieldRow.getDesc().set("");
-                    informations.add(fieldRow);
-                });
-                informations.sort(Comparator.comparing(f -> f.getName().get()));
-                cbUuidField.getItems().clear();
-                cbUuidField.getItems().addAll(fields.keySet().stream().sorted().toArray(String[]::new));
-                cbUuidField.getItems().add(0, "--自动生成--");
-                cbUuidField.setValue("--自动生成--");
-                btnPreview.setDisable(false);
+        });
+        cbxLayers.valueProperty().addListener((observable, oldValue, newValue) -> {
+            ObservableList<FieldInformation> informations = tableView.getItems();
+            informations.clear();
+            if (newValue == null)
+                return;
+            Layer SelectedLayer = reader.getLayer(newValue);
+            Map<String, Integer> fields = GdalHelper.getFieldTypes(SelectedLayer);//得到一个图层中所有字段名称和类型
+            //将所选择的图层中的字段信息呈现在表中
+            fields.forEach((key, value) -> {
+                FieldInformation fieldRow = new FieldInformation();
+                fieldRow.getName().set(key);
+                String targetName = key.toLowerCase();
+                fieldRow.getTargetName().set(targetName);
+                fieldRow.getType().set(value);
+                fieldRow.getUsed().set(FieldInformation.fixedFields.contains(targetName));
+                fieldRow.getAnalyzable().set(targetName.startsWith("name") || targetName.equals("address"));
+                float boost = 1f;
+                if (targetName.startsWith("name"))
+                    boost = 4;
+                else if (targetName.equals("address"))
+                    boost = 2;
+                fieldRow.getBoost().set(boost);
+                fieldRow.getDesc().set("");
+                informations.add(fieldRow);
             });
+            informations.sort(Comparator.comparing(f -> f.getName().get()));
+            cbUuidField.getItems().clear();
+            cbUuidField.getItems().addAll(fields.keySet().stream().sorted().toArray(String[]::new));
+            cbUuidField.getItems().add(0, "--自动生成--");
+            cbUuidField.setValue("--自动生成--");
+            btnPreview.setDisable(false);
         });
         cbCategory.getItems().addAll("框架数据", "专题数据");
         tcFieldName.setCellValueFactory(cellData -> cellData.getValue().getName());
