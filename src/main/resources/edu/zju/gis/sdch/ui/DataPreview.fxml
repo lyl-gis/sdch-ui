@@ -25,18 +25,12 @@
                     <Insets top="5.0"/>
                 </padding>
             </Label>
-            <Label prefHeight="23.0" prefWidth="53.0" text="索引名称">
-                <padding>
-                    <Insets top="5.0"/>
-                </padding>
-            </Label>
-            <ComboBox fx:id="coIndex" prefHeight="23.0" prefWidth="108.0"/>
             <Label prefHeight="23.0" prefWidth="51.0" text="数据类型">
                 <padding>
                     <Insets top="5.0"/>
                 </padding>
             </Label>
-            <ComboBox fx:id="coDataType" prefHeight="30.0" prefWidth="108.0"/>
+            <ComboBox fx:id="coDataType" prefHeight="23.0" prefWidth="156.0"/>
             <Button fx:id="btnImport" mnemonicParsing="false" prefHeight="30.0" prefWidth="67.0" text="入库"/>
             <!--<ComboBox fx:id="coDataType" prefWidth="150.0" />-->
         </HBox>

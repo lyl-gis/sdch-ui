@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gdal.ogr.Layer;
@@ -34,8 +35,7 @@ public class DataPreview implements Initializable {
     private Button btnImport;
     @FXML
     private ProgressBar progressBar;
-    @FXML
-    private ComboBox<String> coIndex;
+
     @FXML
     private ComboBox<String> coDataType;
     @FXML
@@ -58,31 +58,20 @@ public class DataPreview implements Initializable {
         mainPage = MainPage.instance;
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
+        if (mainPage.cbCategory.getValue().equals("框架数据")) {
+            coDataType.getItems().addAll("fe_zrbhq", "fe_fjmsq", "fe_whyc", "fe_xzm", "fe_gjjslgy", "fe_road", "fe_sjzrwhyc", "f_poi", "fe_zq", "fe_sjslgy", "fe_sjkfq", "fe_gjjgxq", "fe_shuixi");
+        }
+        if (mainPage.cbCategory.getValue().equals("专题数据")) {
+            coDataType.getItems().addAll("专题一", "专题二", "专题三", "专题四");
+        }
 
-        coDataType.getItems().addAll("fe_zrbhq", "fe_fjmsq", "fe_whyc", "fe_xzm", "fe_gjjslgy", "fe_road", "fe_sjzrwhyc", "f_poi", "fe_zq", "fe_sjslgy", "fe_sjkfq", "fe_gjjgxq", "fe_shuixi");
         coDataType.setEditable(true);
         coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<String> dataTypes = coDataType.getItems();
             if (!dataTypes.contains(newValue))
                 dataTypes.add(newValue);
         });
-        List<String> coindex = new ArrayList<>();
-        for (int i = 0; i < mapper.selectAll().size(); i++) {
-            coindex.add(mapper.selectAll().get(i).getIndice());
-        }
-        coIndex.getItems().addAll(coindex);
-        coIndex.setEditable(true);
-        if (mainPage.cbCategory.getValue().equals("框架数据")) {
-            coIndex.setValue("sdmap");
-        }
-        if (mainPage.cbCategory.getValue().equals("专题数据")) {
-            coIndex.setValue("zhuanti");
-        }
-        coIndex.valueProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<String> dataTypes = coDataType.getItems();
-            if (!dataTypes.contains(newValue))
-                dataTypes.add(newValue);
-        });
+
         Layer layer = mainPage.getReader().getLayer(mainPage.getSelectedLayer());
         //1. 读取字段配置
         Map<String, Integer> fields = new HashMap<>();
@@ -141,76 +130,113 @@ public class DataPreview implements Initializable {
         cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.setValue(10);
         btnImport.setOnMouseClicked(event -> {
-            hbox.setVisible(true);
-            Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
-            Service<Double> service = new Service<Double>() {
-                @Override
-                protected Task<Double> createTask() {
-                    String index = coIndex.getValue();
-                    MainPage mainPage = MainPage.instance;
-                    String category = mainPage.getCategory();
-                    String layerName = mainPage.getSelectedLayer();
-                    String dtype = coDataType.getValue().trim();
-                    if ("框架数据".equals(category))
-                        category = "framework";
-                    else
-                        category = "topic";
-                    String uuidField = mainPage.getUuidField();
-                    boolean skipEmptyGeom = mainPage.skipEmpty();//检查单选框是否被选中
-                    Layer layer = mainPage.getReader().getLayer(layerName);
-                    return new Importer(Main.getHelper(), Main.getSetting(), index, dtype, layer, fields, uuidField,
-                            fieldMapping, analyzable, skipEmptyGeom, category, dtype);
-                }
-            };
-            lableAllNumber.setText(allNumber.toString() + "条数据");
-            progressBar.progressProperty().bind(service.progressProperty());
-            service.start();
-            service.progressProperty().addListener((observable, oldValue, newValue) -> {
+
+            List<String> checkMapping = new ArrayList<>();
+            for (String str : fieldMapping.keySet()) {
+                checkMapping.add(fieldMapping.get(str));
+            }
+            if (checkImporter(checkMapping)) {
+                hbox.setVisible(true);
+                Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
+                Service<Double> service = new Service<Double>() {
+                    @Override
+                    protected Task<Double> createTask() {
+                        String esIndex = "";
+                        if (mainPage.cbCategory.getValue().equals("框架数据")) {
+                            esIndex = "sdmap";
+                        }
+                        if (mainPage.cbCategory.getValue().equals("专题数据")) {
+                            esIndex = "themes";
+                        }
+                        MainPage mainPage = MainPage.instance;
+                        String category = mainPage.getCategory();
+                        String layerName = mainPage.getSelectedLayer();
+                        String dtype = coDataType.getValue().trim();
+                        if ("框架数据".equals(category))
+                            category = "framework";
+                        else
+                            category = "topic";
+                        String uuidField = mainPage.getUuidField();
+                        boolean skipEmptyGeom = mainPage.skipEmpty();//检查单选框是否被选中
+                        Layer layer = mainPage.getReader().getLayer(layerName);
+                        return new Importer(Main.getHelper(), Main.getSetting(), esIndex, dtype, layer, fields, uuidField, fieldMapping, analyzable, skipEmptyGeom, category, dtype);
+                    }
+                };
+                lableAllNumber.setText(allNumber.toString() + "条数据");
+                progressBar.progressProperty().bind(service.progressProperty());
+                service.start();
+                service.progressProperty().addListener((observable, oldValue, newValue) -> {
 //             long endTime = System.currentTimeMillis();    //获取结束时间
 //             labelTime.setText((endTime - startTime) / 1000.0 + "s");
-                labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
-            });
-            long startTime = System.currentTimeMillis();    //获取开始时间
-            Thread thread = new Thread() {
-                public void run() {
-                    while (progressBar.progressProperty().get() < 1) {
-                        long endTime = System.currentTimeMillis();    //获取结束时间
-                        System.out.println(endTime);
-                        Platform.runLater(() -> {
-                            labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
-                        });
-                        try {
-                            //睡眠1000毫秒,即每秒更新一下时间
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                    labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
+                });
+                long startTime = System.currentTimeMillis();    //获取开始时间
+                Thread thread = new Thread() {
+                    public void run() {
+                        while (progressBar.progressProperty().get() < 1) {
+                            long endTime = System.currentTimeMillis();    //获取结束时间
+                            System.out.println(endTime);
+                            Platform.runLater(() -> {
+                                labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                            });
+                            try {
+                                //睡眠1000毫秒,即每秒更新一下时间
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
-            };
-            thread.start();
-
-            service.stateProperty().addListener((observable, oldValue, newValue) -> {
-                switch (newValue) {
-                    case READY:
-                        break;
-                    case SUCCEEDED:
-                        long error = service.getValue().longValue();
-                        if (error > 0)
-                            new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
-                                    .showAndWait();
-                        else {
-                            new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
-                                    .showAndWait();
-                            DataPreview.this.btnImport.getScene().getWindow().hide();
-                        }
-                        break;
-                    case FAILED:
-                        break;
-                }
-            });
-
+                };
+                thread.start();
+                service.stateProperty().addListener((observable, oldValue, newValue) -> {
+                    switch (newValue) {
+                        case READY:
+                            break;
+                        case SUCCEEDED:
+                            long error = service.getValue().longValue();
+                            if (error > 0)
+                                new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
+                                        .showAndWait();
+                            else {
+                                new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
+                                        .showAndWait();
+                                DataPreview.this.btnImport.getScene().getWindow().hide();
+                            }
+                            break;
+                        case FAILED:
+                            break;
+                    }
+                });
+            }
         });
     }
 
+    Boolean checkImporter(List<String> checkMapping) {
+        //入库前字段检验
+        Boolean result = true;
+        if (mainPage.getSelectedLayer().equals("poi")) {
+            if (!(checkMapping.contains("lsid") && checkMapping.contains("district") && checkMapping.contains("name") && checkMapping.contains("priority") && checkMapping.contains("address") && checkMapping.contains("kind") && checkMapping.contains("rev_geo") && checkMapping.contains("tc"))) {
+                new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查，确认包含lsid（唯一标识）、district（行政代码）、name（名称）、priority, address，kind, rev_geo,tc", ButtonType.OK).showAndWait();
+                Stage stage = (Stage) btnImport.getScene().getWindow();
+                stage.close();
+                result = false;
+            }
+        } else if (mainPage.getCategory().equals("专题数据")) {
+            if (!(checkMapping.contains("lsid") && checkMapping.contains("district") && checkMapping.contains("name") && checkMapping.contains("clasid"))) {
+                new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查，确认包含lsid（唯一标识）、district（行政代码）、name（名称）和clsid", ButtonType.OK).showAndWait();
+                Stage stage = (Stage) btnImport.getScene().getWindow();
+                stage.close();
+                result = false;
+            }
+        } else {
+            if (!(checkMapping.contains("lsid") && checkMapping.contains("district") && checkMapping.contains("name"))) {
+                new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查,确认包含lsid（唯一标识）、district（行政代码）、name（名称）", ButtonType.OK).showAndWait();
+                Stage stage = (Stage) btnImport.getScene().getWindow();
+                stage.close();
+                result = false;
+            }
+        }
+        return result;
+    }
 }

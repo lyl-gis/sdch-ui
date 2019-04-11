@@ -24,10 +24,7 @@ import org.gdal.ogr.Layer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainPage implements Initializable {
     private static final Logger log = LogManager.getLogger(MainPage.class);
@@ -161,26 +158,37 @@ public class MainPage implements Initializable {
         btnPreview.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                try {
-                    if ("".equals(cbCategory.getValue())) {
-                        new Alert(Alert.AlertType.CONFIRMATION, "请选择分类体系", ButtonType.OK)
-                                .showAndWait();
-                        return;
-                    }
-                    Parent root = FXMLLoader.load(getClass().getResource("DataPreview.fxml"));
-                    Scene scene = new Scene(root);
-                    Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
-                    Stage stage = new Stage();
-                    stage.initOwner(primaryStage);
-                    stage.setTitle(DataPreview.TITLE);
-                    stage.setScene(scene);
-                    stage.show();
-                } catch (IOException e) {
-                    log.error("数据预览窗体加载失败", e);
-                    new Alert(Alert.AlertType.ERROR, "数据预览窗体加载失败：" + e.getMessage(), ButtonType.OK)
+                if ("".equals(cbCategory.getValue())) {
+                    new Alert(Alert.AlertType.CONFIRMATION, "请选择分类体系", ButtonType.OK)
                             .showAndWait();
+                    return;
                 }
-
+                String content = "";
+                if (instance.getSelectedLayer().equals("poi") && instance.getCategory().equals("框架数据")) {
+                    content = "确认字段映射名中含有lsid（唯一标识）、district（行政代码）、name（名称）、priority, address，kind,rev_geo和tc";
+                } else if (instance.getCategory().equals("专题数据")) {
+                    content = "确认字段映射名中含有lsid（唯一标识）、district（行政代码）、name（名称）、clasid";
+                } else {
+                    content = "确认字段映射名中含有lsid（唯一标识）、district（行政代码）、name（名称）";
+                }
+                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, content);
+                Optional<ButtonType> result = confirmation.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    try {
+                        Parent root = FXMLLoader.load(getClass().getResource("DataPreview.fxml"));
+                        Scene scene = new Scene(root);
+                        Stage primaryStage = (Stage) rootLayout.getScene().getWindow();
+                        Stage stage = new Stage();
+                        stage.initOwner(primaryStage);
+                        stage.setTitle(DataPreview.TITLE);
+                        stage.setScene(scene);
+                        stage.show();
+                    } catch (IOException e) {
+                        log.error("数据预览窗体加载失败", e);
+                        new Alert(Alert.AlertType.ERROR, "数据预览窗体加载失败：" + e.getMessage(), ButtonType.OK)
+                                .showAndWait();
+                    }
+                }
             }
         });
     }

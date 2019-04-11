@@ -12,6 +12,7 @@ import javafx.scene.control.ChoiceBox;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -43,6 +44,7 @@ public class DeleteDocsDtype implements Initializable {
             if (!indexType2.contains(indexType.get(i)))
                 indexType2.add(indexType.get(i));
         }
+        Collections.sort(indexType2);
         cbDtype.getItems().addAll(indexType2);
         btnConfirmDelete.setOnMouseClicked(event -> {
             String dtype = cbDtype.getValue();
@@ -60,6 +62,8 @@ public class DeleteDocsDtype implements Initializable {
                 number = +indexManage.helper.getDtypeDocCount(indexManage.indexNames.get(k), dtype);
                 result = +indexManage.helper.deleteDtype(indexManage.indexNames.get(k), dtype);
             }
+            //列表中删除该类别
+            cbDtype.getItems().remove(dtype);
             new Alert(Alert.AlertType.INFORMATION, "该类别数据共有" + number + "条，成功删除" + result + "条", ButtonType.OK)
                     .showAndWait();
         });

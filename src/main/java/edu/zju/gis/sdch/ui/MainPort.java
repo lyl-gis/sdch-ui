@@ -1,13 +1,14 @@
 package edu.zju.gis.sdch.ui;
 
+import edu.zju.gis.sdch.Main;
+import edu.zju.gis.sdch.mapper.IndexMapper;
+import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -33,6 +34,25 @@ public class MainPort implements Initializable {
         MenuItem poiTypeMenuIndex = new MenuItem("POI类型管理");
         toolMenu.getItems().add(toolMenuImport);
         manageMenu.getItems().addAll(manageMenuIndex, adminAreaMenuIndex, entityTypeMenuIndex, poiTypeMenuIndex);
+        try {
+            Main.getHelper().getClusterHealth();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "ES连接失败：" + e.getMessage(), ButtonType.OK)
+                    .showAndWait();
+            Stage stage = (Stage) mbSelectPage.getScene().getWindow();
+            stage.close();
+        }
+        ;
+        try {
+            IndexMapper mapper = MyBatisUtil.getMapper(IndexMapper.class);
+            mapper.selectAll();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "Mysql连接失败：" + e.getMessage(), ButtonType.OK)
+                    .showAndWait();
+            Stage stage = (Stage) mbSelectPage.getScene().getWindow();
+            stage.close();
+        }
+        ;
         toolMenuImport.setOnAction(evnet -> {
             Parent root = null;
             try {
