@@ -1,6 +1,7 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.model.PoiType;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -43,16 +44,27 @@ public class PoiTypeAdd implements Initializable {
             stage.close();
         });
         btnConfirm.setOnMouseClicked(event -> {
-            PoiType poiType = new PoiType();
-            poiType.setCode(tfCode.getText());
-            poiType.setCode4(tfCode4.getText());
-            poiType.setPCode(tfPcode.getText());
-            poiType.setName(tfName.getText());
-            int result = poiTypeManage.mapper.insert(poiType);
-            new Alert(Alert.AlertType.
-                    INFORMATION, "成功插入" + result + "条数据", ButtonType.OK).showAndWait();
-            Stage stage = (Stage) btnConfirm.getScene().getWindow();
-            stage.close();
+            if (tfCode4.getText().length() == 0 || tfCode4.getText().length() == 4) {
+                PoiType poiType = new PoiType();
+                poiType.setCode(tfCode.getText());
+                poiType.setCode4(tfCode4.getText());
+                poiType.setPCode(tfPcode.getText());
+                poiType.setName(tfName.getText());
+                MyPoiType myPoiType = new MyPoiType();
+                myPoiType.setCode(new SimpleStringProperty(tfCode.getText()));
+                myPoiType.setCode4(new SimpleStringProperty(tfCode4.getText()));
+                myPoiType.setPCode(new SimpleStringProperty(tfPcode.getText()));
+                myPoiType.setName(new SimpleStringProperty(tfName.getText()));
+                poiTypeManage.tvPoiType.getItems().add(myPoiType);
+                int result = poiTypeManage.mapper.insert(poiType);
+                new Alert(Alert.AlertType.
+                        INFORMATION, "成功插入" + result + "条数据", ButtonType.OK).showAndWait();
+                Stage stage = (Stage) btnConfirm.getScene().getWindow();
+                stage.close();
+            } else {
+                new Alert(Alert.AlertType.
+                        INFORMATION, "code4必须为0或4位编码", ButtonType.OK).showAndWait();
+            }
         });
     }
 }

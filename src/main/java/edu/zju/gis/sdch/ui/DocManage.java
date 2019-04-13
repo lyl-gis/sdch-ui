@@ -69,18 +69,19 @@ public class DocManage implements Initializable {
                         .showAndWait();
             } else {
 //         String[] indexNames = indexManage.indexService.getIndexNames();从数据库中查询所有索引名称
-                String[] indexNames = new String[indexManage.indexNames.size()];
-                indexManage.indexNames.toArray(indexNames);
+//                String[] indexNames = new String[indexManage.indexNames.size()];
+//                indexManage.indexNames.toArray(indexNames);
+                String indexName = indexManage.indexNames;
                 BoolQueryBuilder query = QueryBuilders.boolQuery();
                 String words = tfWord.getText();
                 words = QueryParser.escape(words);
-                String[] analysisFields = indexManage.indexService.getAnalyzable(indexNames);
+                String[] analysisFields = indexManage.indexService.getAnalyzable(indexName);
                 BoolQueryBuilder f = QueryBuilders.boolQuery();
                 f.should(QueryBuilders.multiMatchQuery(words, analysisFields).analyzer("ik_max_word"))
                         .should(QueryBuilders.matchQuery(Contants.ADDRESS, words));
                 query.must(f);
                 SearchRequestBuilder request = null;
-                request = indexManage.helper.getClient().prepareSearch().setIndices(indexNames).setQuery(query);
+                request = indexManage.helper.getClient().prepareSearch().setIndices(indexName).setQuery(query);
                 SearchResponse response = request.get();
                 SearchHits hits = response.getHits();
                 List<Map<String, Object>> result = new ArrayList<>();
@@ -91,47 +92,52 @@ public class DocManage implements Initializable {
                     item = adjustMap(item);//调整列的顺序，将lsid,name,address三列提前
                     result.add(item);
                 }
-                //将查到的数据显示在表格中
-                //result的size是一共有多少行，result中的每条记录中是个map，map中key的数量是一共有多少列
-                List<TableColumn<Map<String, SimpleStringProperty>, String>> tableColumns = new ArrayList<>();
-                Map<String, Object> map = new LinkedHashMap<>();
-                //如果直接写成Map<String, Object> map = result.get(0)，则result.get(0)的结果会改变,所以要这样赋值
-                for (String string : result.get(0).keySet())
-                    map.put(string, result.get(0).get(string));
+                if (result.size() != 0) {
+                    //将查到的数据显示在表格中
+                    //result的size是一共有多少行，result中的每条记录中是个map，map中key的数量是一共有多少列
+                    List<TableColumn<Map<String, SimpleStringProperty>, String>> tableColumns = new ArrayList<>();
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    //如果直接写成Map<String, Object> map = result.get(0)，则result.get(0)的结果会改变,所以要这样赋值
+                    for (String string : result.get(0).keySet())
+                        map.put(string, result.get(0).get(string));
 //                List<String> list = new ArrayList<>();
 //                for (String string : map.keySet())
 //                    list.add(string);
-                List<String> list = new ArrayList<>(map.keySet());
-                //得到不同类别结果中的所有字段
-                for (int i = 1; i < result.size(); i++) {
-                    Map<String, Object> map2 = result.get(i);
-                    for (String string : map2.keySet()) {
-                        if (!list.contains(string))
-                            map.put(string, map2.get(string));
+                    List<String> list = new ArrayList<>(map.keySet());
+                    //得到不同类别结果中的所有字段
+                    for (int i = 1; i < result.size(); i++) {
+                        Map<String, Object> map2 = result.get(i);
+                        for (String string : map2.keySet()) {
+                            if (!list.contains(string))
+                                map.put(string, map2.get(string));
+                        }
                     }
-                }
-                for (String key : map.keySet()) {
-                    TableColumn<Map<String, SimpleStringProperty>, String> column = new TableColumn<>(key);
-                    tableColumns.add(column);
-                    column.setCellFactory(TextFieldTableCell.forTableColumn());
-                    column.setCellValueFactory(param -> param.getValue().get(key));
-                    if (key.equals("_id"))
-                        column.setVisible(false);
-                    if (key.equals("dtype"))
-                        column.setVisible(false);
-                }
-                tvDocs.getColumns().clear();
-                tvDocs.getColumns().addAll(tableColumns);
-                tvDocs.getItems().clear();
+                    for (String key : map.keySet()) {
+                        TableColumn<Map<String, SimpleStringProperty>, String> column = new TableColumn<>(key);
+                        tableColumns.add(column);
+                        column.setCellFactory(TextFieldTableCell.forTableColumn());
+                        column.setCellValueFactory(param -> param.getValue().get(key));
+                        if (key.equals("_id"))
+                            column.setVisible(false);
+                        if (key.equals("dtype"))
+                            column.setVisible(false);
+                    }
+                    tvDocs.getColumns().clear();
+                    tvDocs.getColumns().addAll(tableColumns);
+                    tvDocs.getItems().clear();
 //                for (int i = 0; i < result.size(); i++) {
-                for (Map<String, Object> stringObjectMap : result) {
-                    Map<String, SimpleStringProperty> map2 = new HashMap<>();
+                    for (Map<String, Object> stringObjectMap : result) {
+                        Map<String, SimpleStringProperty> map2 = new HashMap<>();
 //                    for (String string : result.get(i).keySet()) {
 //                        map2.put(string, new SimpleStringProperty(result.get(i).get(string).toString()));
-                    for (String string : stringObjectMap.keySet()) {
-                        map2.put(string, new SimpleStringProperty(stringObjectMap.get(string).toString()));
+                        for (String string : stringObjectMap.keySet()) {
+                            map2.put(string, new SimpleStringProperty(stringObjectMap.get(string).toString()));
+                        }
+                        tvDocs.getItems().add(map2);
                     }
-                    tvDocs.getItems().add(map2);
+                } else {
+                    new Alert(Alert.AlertType.INFORMATION, "没有符合条件的文档", ButtonType.OK)
+                            .showAndWait();
                 }
             }
         });
@@ -232,10 +238,11 @@ public class DocManage implements Initializable {
                         } else
                             kvIdDoc.put(mapAdd.get("lsid").toString(), mapAdd);
                     }
-                    int erroNumber = 0;
-                    for (int k = 0; k < indexManage.indexNames.size(); k++) {
-                        erroNumber = +indexManage.helper.upsert(indexManage.indexNames.get(k), "_doc", kvIdDoc);
-                    }
+                    int erroNumber = indexManage.helper.upsert(indexManage.indexNames, "_doc", kvIdDoc);
+                    ;
+//                    for (int k = 0; k < indexManage.indexNames.size(); k++) {
+//                        erroNumber = +indexManage.helper.upsert(indexManage.indexNames.get(k), "_doc", kvIdDoc);
+//                    }
                     int resultNumber = addValidNumber - erroNumber;
                     new Alert(Alert.AlertType.INFORMATION, "成功插入" + resultNumber + "条数据", ButtonType.OK)
                             .showAndWait();
@@ -280,10 +287,10 @@ public class DocManage implements Initializable {
                     kvIdDoc.put(mapModify.get("lsid").get(), map);
                 }
             }
-            int resultNumber = 0;
-            for (int k = 0; k < indexManage.indexNames.size(); k++) {
-                resultNumber += indexManage.helper.updateFromMap(indexManage.indexNames.get(k), "_doc", kvIdDoc);
-            }
+            int resultNumber = indexManage.helper.upsert(indexManage.indexNames, "_doc", kvIdDoc);
+//            for (int k = 0; k < indexManage.indexNames.size(); k++) {
+//                resultNumber += indexManage.helper.updateFromMap(indexManage.indexNames.get(k), "_doc", kvIdDoc);
+//            }
 
             int modifyNumber = kvIdDoc.size();
             new Alert(Alert.AlertType.INFORMATION, "共编辑条数" + modifyNumber + "失败条数" + resultNumber, ButtonType.OK)
@@ -322,10 +329,10 @@ public class DocManage implements Initializable {
                                         tvDocs.getItems().remove(mapDelete);
                                         deleted++;
                                     }
-                                    int resultNumber = 0;
-                                    for (int k = 0; k < indexManage.indexNames.size(); k++) {
-                                        resultNumber = +indexManage.helper.delete(indexManage.indexNames.get(k), "_doc", idList);
-                                    }
+                                    int resultNumber = indexManage.helper.delete(indexManage.indexNames, "_doc", idList);
+//                                    for (int k = 0; k < indexManage.indexNames.size(); k++) {
+//                                        resultNumber = +indexManage.helper.delete(indexManage.indexNames.get(k), "_doc", idList);
+//                                    }
                                     new Alert(Alert.AlertType.INFORMATION, "共删除条数" + newDeleteItems.size() + "失败数" + resultNumber, ButtonType.OK)
                                             .showAndWait();
                                 }

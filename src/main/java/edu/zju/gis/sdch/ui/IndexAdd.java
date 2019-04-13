@@ -4,14 +4,14 @@ import edu.zju.gis.sdch.model.Index;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 public class IndexAdd implements Initializable {
     @FXML
@@ -36,11 +36,19 @@ public class IndexAdd implements Initializable {
         IndexManage indexManage = IndexManage.instance;
         cbShards.getItems().addAll(1,2,3,4,5,6,7,8);
         cbReplicas.getItems().addAll(0, 1, 2, 3, 4, 5, 6, 7, 8);
-        cbCategory.getItems().addAll("xzm","poi","road");
+        cbCategory.getItems().addAll("framework", "topic");
         btnConfirm.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //表格中显示新增加的内容
+                List<Index> indexList = IndexManage.mapper.selectAll();
+                List<String> indexNames = new ArrayList<>();
+                for (int i = 0; i < indexList.size(); i++) {
+                    indexNames.add(indexList.get(i).getIndice());
+                }
+                if (indexNames.contains(tfIndice.getText())) {
+                    new Alert(Alert.AlertType.INFORMATION, "索引名称重复，请修改", ButtonType.OK).showAndWait();
+                } else {
+                    //表格中显示新增加的内容
                 MyIndex indexNew = new MyIndex();
                 indexNew.getIndice().set(tfIndice.getText());
                 indexNew.getShards().set(cbShards.getValue());
@@ -64,6 +72,7 @@ public class IndexAdd implements Initializable {
 
                 Stage stage = (Stage) btnCancel.getScene().getWindow();
                 stage.close();
+                }
             }
         });
         btnCancel.setOnMouseClicked(new EventHandler<MouseEvent>() {

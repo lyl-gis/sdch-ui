@@ -56,8 +56,8 @@ public class MainPage implements Initializable {
     private TableColumn<FieldInformation, String> tcDescription;
     @FXML
     private ComboBox<String> cbxLayers;
-    @FXML
-    private ComboBox<String> cbUuidField;
+    //    @FXML
+//    private ComboBox<String> cbUuidField;
     @FXML
     private RadioButton rbSkipEmpty;
 
@@ -110,10 +110,10 @@ public class MainPage implements Initializable {
                 informations.add(fieldRow);
             });
             informations.sort(Comparator.comparing(f -> f.getName().get()));
-            cbUuidField.getItems().clear();
-            cbUuidField.getItems().addAll(fields.keySet().stream().sorted().toArray(String[]::new));
-            cbUuidField.getItems().add(0, "--自动生成--");
-            cbUuidField.setValue("--自动生成--");
+//            cbUuidField.getItems().clear();
+//            cbUuidField.getItems().addAll(fields.keySet().stream().sorted().toArray(String[]::new));
+//            cbUuidField.getItems().add(0, "--自动生成--");
+//            cbUuidField.setValue("--自动生成--");
             btnPreview.setDisable(false);
         });
         cbCategory.getItems().addAll("框架数据", "专题数据");
@@ -207,9 +207,9 @@ public class MainPage implements Initializable {
         return cbxLayers.getValue().trim();
     }
 
-    public String getUuidField() {
-        return cbUuidField.getValue().trim();
-    }
+//    public String getUuidField() {
+//        return cbUuidField.getValue().trim();
+//    }
 
     public boolean skipEmpty() {
         return rbSkipEmpty.isSelected();

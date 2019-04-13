@@ -1,6 +1,7 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.model.EntityType;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -43,6 +44,12 @@ public class EntityTypeAdd implements Initializable {
             entityType.setCode(tfCode.getText());
             entityType.setPCode(tfpCode.getText());
             entityType.setName(tfName.getText());
+
+            MyEntityType myEntityType = new MyEntityType();
+            myEntityType.setCode(new SimpleStringProperty(tfCode.getText()));
+            myEntityType.setPCode(new SimpleStringProperty(tfpCode.getText()));
+            myEntityType.setName(new SimpleStringProperty(tfName.getText()));
+            entityTypeManage.tvEntityType.getItems().add(myEntityType);
             int result = entityTypeManage.mapper.insert(entityType);
             new Alert(Alert.AlertType.
                     INFORMATION, "成功插入" + result + "条数据", ButtonType.OK).showAndWait();
