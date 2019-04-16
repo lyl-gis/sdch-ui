@@ -35,7 +35,7 @@ public class EntityTypeManage implements Initializable {
     private TextField tfCode;
 
     @FXML
-    private TableView<MyEntityType> tvEntityType;
+    public TableView<MyEntityType> tvEntityType;
 
     @FXML
     private TableColumn<MyEntityType, String> tcCode;
@@ -90,12 +90,17 @@ public class EntityTypeManage implements Initializable {
                 new Alert(Alert.AlertType.
                         INFORMATION, "请输入实体类型代码", ButtonType.OK).showAndWait();
             } else {
-                EntityType entityType = mapper.selectByPrimaryKey(code);
-                MyEntityType type = new MyEntityType();
-                type.getCode().set(entityType.getCode());
-                type.getPCode().set(entityType.getPCode());
-                type.getName().set(entityType.getName());
-                myEntityTypes.add(type);
+                if (mapper.selectByPrimaryKey(code) != null) {
+                    EntityType entityType = mapper.selectByPrimaryKey(code);
+                    MyEntityType type = new MyEntityType();
+                    type.getCode().set(entityType.getCode());
+                    type.getPCode().set(entityType.getPCode());
+                    type.getName().set(entityType.getName());
+                    myEntityTypes.add(type);
+                } else {
+                    new Alert(Alert.AlertType.
+                            INFORMATION, "查询不到相应内容", ButtonType.OK).showAndWait();
+                }
             }
         });
 //刷新按钮显示所有数据

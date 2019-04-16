@@ -31,9 +31,9 @@ public class DeleteDocsDtype implements Initializable {
         indexManage = IndexManage.instance;
         mapper = MyBatisUtil.getMapper(IndexTypeMapper.class);
         List<IndexType> listIndexType = new ArrayList<>();
-        for (int i = 0; i < indexManage.indexNames.size(); i++) {
-            listIndexType.addAll(mapper.selectByIndice(indexManage.indexNames.get(i)));
-        }
+
+        listIndexType.addAll(mapper.selectByIndice(indexManage.indexNames));
+
         List<String> indexType = new ArrayList<>();
         for (int j = 0; j < listIndexType.size(); j++) {
             indexType.add(listIndexType.get(j).getDtype());
@@ -58,10 +58,8 @@ public class DeleteDocsDtype implements Initializable {
                 mapper.deleteByPrimaryKey(id);
             }
             //在ES中删除该类别数据
-            for (int k = 0; k < indexManage.indexNames.size(); k++) {
-                number = +indexManage.helper.getDtypeDocCount(indexManage.indexNames.get(k), dtype);
-                result = +indexManage.helper.deleteDtype(indexManage.indexNames.get(k), dtype);
-            }
+            number = +indexManage.helper.getDtypeDocCount(indexManage.indexNames, dtype);
+            result = +indexManage.helper.deleteDtype(indexManage.indexNames, dtype);
             //列表中删除该类别
             cbDtype.getItems().remove(dtype);
             new Alert(Alert.AlertType.INFORMATION, "该类别数据共有" + number + "条，成功删除" + result + "条", ButtonType.OK)

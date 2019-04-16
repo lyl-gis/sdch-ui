@@ -1,6 +1,8 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.model.AdminArea;
+import javafx.beans.property.SimpleFloatProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -69,6 +71,16 @@ public class AdminAreaAdd implements Initializable {
             adminArea.setWkt(tfWKT.getText());
             adminArea.setLat(new BigDecimal(tfLat.getText()));
             adminArea.setLon(new BigDecimal(tfLon.getText()));
+            MyAdminArea myAdminArea = new MyAdminArea();
+            myAdminArea.setAbbreviation(new SimpleStringProperty(tfAbb.getText()));
+            myAdminArea.setCode(new SimpleStringProperty(tfCode.getText()));
+            myAdminArea.setPCode(new SimpleStringProperty(tfpCode.getText()));
+            myAdminArea.setFullName(new SimpleStringProperty(tfFullname.getText()));
+            myAdminArea.setName(new SimpleStringProperty(tfName.getText()));
+            myAdminArea.setWkt(new SimpleStringProperty(tfWKT.getText()));
+            myAdminArea.setLat(new SimpleFloatProperty(Float.parseFloat(tfLat.getText())));
+            myAdminArea.setLon(new SimpleFloatProperty(Float.parseFloat(tfLon.getText())));
+            adminAreaManage.tvAdminArea.getItems().add(myAdminArea);
             int result = adminAreaManage.mapper.insert(adminArea);
             new Alert(Alert.AlertType.
                     INFORMATION, "成功插入" + result + "条数据", ButtonType.OK).showAndWait();

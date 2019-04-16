@@ -30,7 +30,7 @@ public class AdminAreaManage implements Initializable {
     @FXML
     private BorderPane rootLayout;
     @FXML
-    private TableView<MyAdminArea> tvAdminArea;
+    public TableView<MyAdminArea> tvAdminArea;
     @FXML
     private TableColumn<MyAdminArea, String> tcCode;
 
@@ -101,7 +101,7 @@ public class AdminAreaManage implements Initializable {
 
             @Override
             public Number fromString(String string) {
-                return Integer.parseInt(string);
+                return Float.parseFloat(string);
             }
         }));
         tcLat.setCellValueFactory(cellData -> cellData.getValue().getLat());
@@ -113,7 +113,7 @@ public class AdminAreaManage implements Initializable {
 
             @Override
             public Number fromString(String string) {
-                return Integer.parseInt(string);
+                return Float.parseFloat(string);
             }
         }));
         tcLon.setCellValueFactory(cellData -> cellData.getValue().getLon());
@@ -140,17 +140,23 @@ public class AdminAreaManage implements Initializable {
                 new Alert(Alert.AlertType.
                         INFORMATION, "请输入政区代码", ButtonType.OK).showAndWait();
             } else {
-                AdminArea adminarea = mapper.selectByPrimaryKey(code);
-                MyAdminArea area = new MyAdminArea();
-                area.getCode().set(adminarea.getCode());
-                area.getPCode().set(adminarea.getPCode());
-                area.getName().set(adminarea.getName());
-                area.getAbbreviation().set(adminarea.getAbbreviation());
-                area.getFullName().set(adminarea.getFullName());
-                area.getWkt().set(adminarea.getWkt());
-                area.getLon().set(adminarea.getLon().floatValue());
-                area.getLat().set(adminarea.getLat().floatValue());
-                adminAreas.add(area);
+                if (mapper.selectByPrimaryKey(code) != null) {
+                    AdminArea adminarea = mapper.selectByPrimaryKey(code);
+                    MyAdminArea area = new MyAdminArea();
+                    area.getCode().set(adminarea.getCode());
+                    area.getPCode().set(adminarea.getPCode());
+                    area.getName().set(adminarea.getName());
+                    area.getAbbreviation().set(adminarea.getAbbreviation());
+                    area.getFullName().set(adminarea.getFullName());
+                    area.getWkt().set(adminarea.getWkt());
+                    area.getLon().set(adminarea.getLon().floatValue());
+                    area.getLat().set(adminarea.getLat().floatValue());
+                    adminAreas.add(area);
+                } else {
+                    new Alert(Alert.AlertType.
+                            INFORMATION, "查询不到相应内容", ButtonType.OK).showAndWait();
+                }
+
             }
         });
 

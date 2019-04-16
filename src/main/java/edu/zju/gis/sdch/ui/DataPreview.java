@@ -53,6 +53,7 @@ public class DataPreview implements Initializable {
     private HBox hbox;
     private IndexMapper mapper;
     public static MainPage mainPage;
+    public static String uuidField;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mainPage = MainPage.instance;
@@ -123,7 +124,7 @@ public class DataPreview implements Initializable {
             if (sr.IsProjected() == 1)
                 transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
             layer.ResetReading();
-            Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, newValue, fields, mainPage.getUuidField(), mainPage.skipEmpty(), transformation);
+            Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, newValue, fields, "--自动生成--", mainPage.skipEmpty(), transformation);
             tvPreview.getItems().clear();
             tvPreview.getItems().addAll(records.values());
         });
@@ -136,6 +137,11 @@ public class DataPreview implements Initializable {
                 checkMapping.add(fieldMapping.get(str));
             }
             if (checkImporter(checkMapping)) {
+                //强行让uuidField为lsid对应的字段
+                for (String str : fieldMapping.keySet()) {
+                    if (fieldMapping.get(str).equals("lsid"))
+                        uuidField = str;
+                }
                 hbox.setVisible(true);
                 Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
                 Service<Double> service = new Service<Double>() {
@@ -156,7 +162,9 @@ public class DataPreview implements Initializable {
                             category = "framework";
                         else
                             category = "topic";
-                        String uuidField = mainPage.getUuidField();
+
+//                        String uuidField = mainPage.getUuidField();
+
                         boolean skipEmptyGeom = mainPage.skipEmpty();//检查单选框是否被选中
                         Layer layer = mainPage.getReader().getLayer(layerName);
                         return new Importer(Main.getHelper(), Main.getSetting(), esIndex, dtype, layer, fields, uuidField, fieldMapping, analyzable, skipEmptyGeom, category, dtype);

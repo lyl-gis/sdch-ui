@@ -50,22 +50,13 @@
         </HBox>
     </top>
     <bottom>
-        <HBox prefHeight="23.0" prefWidth="566.0" spacing="15.0" BorderPane.alignment="CENTER">
+        <HBox prefHeight="23.0" prefWidth="566.0" spacing="150.0" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="10.0" left="10.0" top="10.0"/>
             </padding>
-            <Label text="唯一标识字段">
-                <padding>
-                    <Insets left="20.0" top="3.0"/>
-                </padding>
-                <opaqueInsets>
-                    <Insets top="20.0"/>
-                </opaqueInsets>
-            </Label>
-            <ComboBox fx:id="cbUuidField" prefHeight="30.0" prefWidth="181.0"/>
             <RadioButton fx:id="rbSkipEmpty" mnemonicParsing="false" text="跳过空间范围为空的纪录">
                 <padding>
-                    <Insets left="10.0" top="3.0"/>
+                    <Insets left="15.0" top="3.0"/>
                 </padding>
             </RadioButton>
             <Button fx:id="btnPreview" alignment="BASELINE_CENTER" mnemonicParsing="false" prefHeight="30.0"

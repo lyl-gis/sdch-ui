@@ -43,7 +43,7 @@ public class PoiTypeManage implements Initializable {
     private TextField tfCode;
 
     @FXML
-    private TableView<MyPoiType> tvPoiType;
+    public TableView<MyPoiType> tvPoiType;
 
     @FXML
     private TableColumn<MyPoiType, String> tcCode;
@@ -94,13 +94,18 @@ public class PoiTypeManage implements Initializable {
                 new Alert(Alert.AlertType.
                         INFORMATION, "请输入poi类型代码", ButtonType.OK).showAndWait();
             } else {
-                PoiType poiType = mapper.selectByPrimaryKey(code);
-                MyPoiType type = new MyPoiType();
-                type.getCode().set(poiType.getCode());
-                type.getCode4().set(poiType.getCode());
-                type.getPCode().set(poiType.getPCode());
-                type.getName().set(poiType.getName());
-                myPoiTypes.add(type);
+                if (mapper.selectByPrimaryKey(code) != null) {
+                    PoiType poiType = mapper.selectByPrimaryKey(code);
+                    MyPoiType type = new MyPoiType();
+                    type.getCode().set(poiType.getCode());
+                    type.getCode4().set(poiType.getCode4());
+                    type.getPCode().set(poiType.getPCode());
+                    type.getName().set(poiType.getName());
+                    myPoiTypes.add(type);
+                } else {
+                    new Alert(Alert.AlertType.
+                            INFORMATION, "查询不到相应内容", ButtonType.OK).showAndWait();
+                }
             }
         });
         btnRefresh.setOnMouseClicked(event -> {
@@ -133,13 +138,19 @@ public class PoiTypeManage implements Initializable {
             int erro = 0;
             for (int i = 0; i < tvPoiType.getItems().size(); i++) {
                 PoiType poiType = new PoiType();
-                poiType.setName(tvPoiType.getItems().get(i).getName().getValue());
-                poiType.setCode(tvPoiType.getItems().get(i).getCode().getValue());
-                poiType.setCode4(tvPoiType.getItems().get(i).getCode4().getValue());
-                poiType.setPCode(tvPoiType.getItems().get(i).getPCode().getValue());
-                int result = mapper.updateByPrimaryKey(poiType);
-                if (result != 1)
+                if (tvPoiType.getItems().get(i).getCode4().getValue().length() == 0 || tvPoiType.getItems().get(i).getCode4().getValue().length() == 4) {
+                    poiType.setName(tvPoiType.getItems().get(i).getName().getValue());
+                    poiType.setCode(tvPoiType.getItems().get(i).getCode().getValue());
+                    poiType.setCode4(tvPoiType.getItems().get(i).getCode4().getValue());
+                    poiType.setPCode(tvPoiType.getItems().get(i).getPCode().getValue());
+                    int result = mapper.updateByPrimaryKey(poiType);
+                    if (result != 1)
+                        erro++;
+                } else {
                     erro++;
+                    new Alert(Alert.AlertType.
+                            INFORMATION, "第" + (i + 1) + "条数据code4编码数不是0或1，请修改", ButtonType.OK).showAndWait();
+                }
             }
             new Alert(Alert.AlertType.
                     INFORMATION, "更新失败数目" + erro + "条", ButtonType.OK).showAndWait();

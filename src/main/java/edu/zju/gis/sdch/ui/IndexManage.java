@@ -55,12 +55,11 @@ public class IndexManage implements Initializable {
     private BorderPane rootLayout;
 
     public static IndexManage instance = null;
-    public IndexMapper mapper;
+    public static IndexMapper mapper;
     public ElasticSearchHelper helper;
     public CommonSetting setting;
     public IndexService indexService;
-    public ArrayList<String> indexNames;//选择的索引
-
+    public String indexNames;//选择的索引
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
@@ -95,7 +94,7 @@ public class IndexManage implements Initializable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        tvIndex.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);//设置表格中数据可以多选
+//        tvIndex.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);//设置表格中数据可以多选
         tcIndice.setCellFactory(TextFieldTableCell.forTableColumn());
         tcIndice.setCellValueFactory(cellData -> cellData.getValue().getIndice());
         tcShards.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
@@ -188,48 +187,55 @@ public class IndexManage implements Initializable {
                         deleteItem.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
-                                List<Integer> newDeleteItems = new ArrayList<>();
-                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedIndices().size(); i++) {
-                                    //因为tvIndex.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
-                                    newDeleteItems.add(tvIndex.getSelectionModel().getSelectedIndices().get(i));
-                                }
+//                                List<Integer> newDeleteItems = new ArrayList<>();
+//                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedIndices().size(); i++) {
+//                                    //因为tvIndex.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
+//                                    newDeleteItems.add(tvIndex.getSelectionModel().getSelectedIndices().get(i));
+//                                }
                                 Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "确认删除?");
                                 Optional<ButtonType> result = confirmation.showAndWait();
                                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                                    if (newDeleteItems.size() == 0) {
-                                        new Alert(Alert.AlertType.INFORMATION, "没有要删除的内容", ButtonType.OK)
-                                                .showAndWait();
-                                    } else {
-                                        int deleted = 0;
-                                        List<Integer> deleteResult = new ArrayList<>();
-                                        for (int i = 0; i < newDeleteItems.size(); i++) {
-                                            helper.delete(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在ES中删除
-                                            int deleteresult = mapper.deleteByPrimaryKey(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在数据库中删除
-                                            deleteResult.add(deleteresult);
-                                            tvIndex.getItems().remove(newDeleteItems.get(i).intValue() - deleted);   //在表中删除打钩的那一行
-                                            deleted++;
-                                        }
-                                        int succedDelete = 0;
-                                        int failedDelete = 0;
-                                        for (int i = 0; i < deleteResult.size(); i++) {
-                                            if (deleteResult.get(i) == 1)
-                                                succedDelete++;
-                                            else
-                                                failedDelete++;
-                                        }
-                                        new Alert(Alert.AlertType.INFORMATION, "成功删除" + succedDelete + "条数据," + failedDelete + "条数据删除失败", ButtonType.OK)
-                                                .showAndWait();
+                                    //数据库中删除
+                                    int res1 = mapper.deleteByPrimaryKey(tvIndex.getSelectionModel().getSelectedItem().getIndice().get());
+                                    //ES中删除
+                                    Boolean res2 = helper.delete(tvIndex.getSelectionModel().getSelectedItem().getIndice().get());
+                                    //表中删除
+                                    tvIndex.getItems().remove(tvIndex.getSelectionModel().getSelectedItem());
+                                    if (res1 == 1 && res2) {
+                                        new Alert(Alert.AlertType.INFORMATION, "成功删除1个索引", ButtonType.OK).showAndWait();
                                     }
                                 }
+//                                    if (newDeleteItems.size() == 0) {
+//                                        new Alert(Alert.AlertType.INFORMATION, "没有要删除的内容", ButtonType.OK)
+//                                                .showAndWait();
+//                                    } else {
+//                                        int deleted = 0;
+//                                        List<Integer> deleteResult = new ArrayList<>();
+//                                        for (int i = 0; i < newDeleteItems.size(); i++) {
+//                                            helper.delete(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在ES中删除
+//                                            int deleteresult = mapper.deleteByPrimaryKey(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在数据库中删除
+//                                            deleteResult.add(deleteresult);
+//                                            tvIndex.getItems().remove(newDeleteItems.get(i).intValue() - deleted);   //在表中删除打钩的那一行
+//                                            deleted++;
+//                                        }
+//                                        int succedDelete = 0;
+//                                        int failedDelete = 0;
+//                                        for (int i = 0; i < deleteResult.size(); i++) {
+//                                            if (deleteResult.get(i) == 1)
+//                                                succedDelete++;
+//                                            else
+//                                                failedDelete++;
+//                                        }
+//                                        new Alert(Alert.AlertType.INFORMATION, "成功删除" + succedDelete + "条数据," + failedDelete + "条数据删除失败", ButtonType.OK)
+//                                                .showAndWait();
+//                                    }
+//                                }
                             }
                         });
                         manageDocsItem.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
-                                indexNames = new ArrayList<>();
-                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedItems().size(); i++) {
-                                    indexNames.add(tvIndex.getSelectionModel().getSelectedItems().get(i).getIndice().getValue());
-                                }
+                                indexNames = tvIndex.getSelectionModel().getSelectedItem().getIndice().get();
                                 Parent root = null;
                                 try {
                                     root = FXMLLoader.load(getClass().getResource("DocManage.fxml"));
