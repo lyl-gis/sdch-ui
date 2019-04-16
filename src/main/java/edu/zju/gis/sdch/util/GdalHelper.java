@@ -115,6 +115,13 @@ public class GdalHelper {
                     geometry.FlattenTo2D();
                 if (transformation != null)
                     geometry.Transform(transformation);
+                if (!geometry.IsValid())
+                    geometry.CloseRings();
+                if (!geometry.IsValid()) {
+                    Geometry g = geometry.Buffer(0);
+                    if (g != null)
+                        geometry = g;
+                }
                 String geojson = geometry.ExportToJson();
                 JSONObject json = new JSONObject(geojson);
                 if (json.getString("type").equalsIgnoreCase("point")) {

@@ -166,8 +166,6 @@ public class DataPreview implements Initializable {
                 progressBar.progressProperty().bind(service.progressProperty());
                 service.start();
                 service.progressProperty().addListener((observable, oldValue, newValue) -> {
-//             long endTime = System.currentTimeMillis();    //获取结束时间
-//             labelTime.setText((endTime - startTime) / 1000.0 + "s");
                     labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
                 });
                 long startTime = System.currentTimeMillis();    //获取开始时间
@@ -175,9 +173,8 @@ public class DataPreview implements Initializable {
                     public void run() {
                         while (progressBar.progressProperty().get() < 1) {
                             long endTime = System.currentTimeMillis();    //获取结束时间
-                            System.out.println(endTime);
                             Platform.runLater(() -> {
-                                labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                                labelTime.setText((endTime - startTime) / 1000 + "s");//UI界面的改变一定要写到platform.runlater中
                             });
                             try {
                                 //睡眠1000毫秒,即每秒更新一下时间
