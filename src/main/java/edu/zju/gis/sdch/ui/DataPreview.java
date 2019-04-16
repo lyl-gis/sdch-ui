@@ -117,7 +117,6 @@ public class DataPreview implements Initializable {
             tableColumns.add(column);
             column.setCellValueFactory(param -> {
                 String value = "";
-
                 for (String srcName : fieldMapping.keySet())
                     if (targetName.equals(fieldMapping.get(srcName)))
                         value = param.getValue().get(srcName).toString();
@@ -140,6 +139,8 @@ public class DataPreview implements Initializable {
             }
         });
         tvPreview.getColumns().add(0, idColumn);
+
+
         cbPreviewSize.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             //3. 读取数据并填充表格
             SpatialReference sr = layer.GetSpatialRef();
@@ -153,6 +154,7 @@ public class DataPreview implements Initializable {
         });
         cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.setValue(10);
+
         btnImport.setOnMouseClicked(event -> {
 
             List<String> checkMapping = new ArrayList<>();

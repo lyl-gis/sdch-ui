@@ -48,9 +48,6 @@
                     </HBox.margin>
                 </Button>
                 <Button fx:id="btnShowWkt" mnemonicParsing="false" prefHeight="24.0" prefWidth="102.0" text="显示为wkt格式">
-                    <padding>
-                        <Insets top="6.0"/>
-                    </padding>
                     <HBox.margin>
                         <Insets top="6.0"/>
                     </HBox.margin>
