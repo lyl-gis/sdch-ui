@@ -85,6 +85,18 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/gdal.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>9.3</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gt-geojson-9.3.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

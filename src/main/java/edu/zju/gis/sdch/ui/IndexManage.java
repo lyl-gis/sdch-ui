@@ -36,8 +36,8 @@ import java.util.*;
 public class IndexManage implements Initializable {
     @FXML
     private Button btnRefresh;
-    @FXML
-    private Button btnAdd;
+    //    @FXML
+//    private Button btnAdd;
     @FXML
     public TableView<MyIndex> tvIndex;
     @FXML
@@ -154,20 +154,20 @@ public class IndexManage implements Initializable {
             }
 
         });
-        btnAdd.setOnMouseClicked(event -> {
-            Parent root = null;
-            try {
-                root = FXMLLoader.load(getClass().getResource("IndexAdd.fxml"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setTitle(IndexAdd.TITLE);
-            stage.setScene(scene);
-            stage.show();
-
-        });
+//        btnAdd.setOnMouseClicked(event -> {
+//            Parent root = null;
+//            try {
+//                root = FXMLLoader.load(getClass().getResource("IndexAdd.fxml"));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            Scene scene = new Scene(root);
+//            Stage stage = new Stage();
+//            stage.setTitle(IndexAdd.TITLE);
+//            stage.setScene(scene);
+//            stage.show();
+//
+//        });
 
     }
 

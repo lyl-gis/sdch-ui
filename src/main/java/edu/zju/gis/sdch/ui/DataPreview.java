@@ -2,6 +2,9 @@ package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.Main;
 import edu.zju.gis.sdch.mapper.IndexMapper;
+import edu.zju.gis.sdch.mapper.IndexTypeMapper;
+import edu.zju.gis.sdch.model.Index;
+import edu.zju.gis.sdch.model.IndexType;
 import edu.zju.gis.sdch.tool.Importer;
 import edu.zju.gis.sdch.util.GdalHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
@@ -54,18 +57,38 @@ public class DataPreview implements Initializable {
     private IndexMapper mapper;
     public static MainPage mainPage;
     public static String uuidField;
+    private IndexTypeMapper indexTypeMapper;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mainPage = MainPage.instance;
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
-        if (mainPage.cbCategory.getValue().equals("框架数据")) {
-            coDataType.getItems().addAll("fe_zrbhq", "fe_fjmsq", "fe_whyc", "fe_xzm", "fe_gjjslgy", "fe_road", "fe_sjzrwhyc", "f_poi", "fe_zq", "fe_sjslgy", "fe_sjkfq", "fe_gjjgxq", "fe_shuixi");
+        indexTypeMapper = MyBatisUtil.getMapper(IndexTypeMapper.class);
+        ObservableList<String> codatatype = coDataType.getItems();
+        codatatype.addAll("fe_road", "f_poi", "fe_zq");
+        List<Index> allIndex = mapper.selectAll();
+        List<String> allIndexNames = new ArrayList<>();
+        for (int i = 0; i < allIndex.size(); i++) {
+            allIndexNames.add(allIndex.get(i).getIndice());
         }
-        if (mainPage.cbCategory.getValue().equals("专题数据")) {
-            coDataType.getItems().addAll("专题一", "专题二", "专题三", "专题四");
+        if (allIndexNames.contains("sdmap") || allIndexNames.contains("themes")) {
+            String indexName = "";
+            if (mainPage.cbCategory.getValue().equals("框架数据")) {
+                indexName = "sdmap";
+            }
+            if (mainPage.cbCategory.getValue().equals("专题数据")) {
+                indexName = "themes";
+            }
+            List<IndexType> selectTypes = indexTypeMapper.selectByIndice(indexName);
+            List<String> types = new ArrayList<>();
+            for (int i = 0; i < selectTypes.size(); i++)
+                types.add(selectTypes.get(i).getDtype());
+            for (int i = 0; i < types.size(); i++) {
+                if (!codatatype.contains(types.get(i)))
+                    codatatype.add(types.get(i));
+            }
+            Collections.sort(codatatype);
         }
-
         coDataType.setEditable(true);
         coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<String> dataTypes = coDataType.getItems();

@@ -54,6 +54,7 @@ public class Main extends Application {
         primaryStage.setTitle(MainPage.TITLE);
         primaryStage.setScene(scene);
         primaryStage.show();
+        Start.frame.dispose();
     }
 
     private void setMenu(BorderPane root, Stage primaryStage) {
