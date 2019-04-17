@@ -1,7 +1,5 @@
 package edu.zju.gis.sdch.ui;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
 import edu.zju.gis.sdch.service.IndexService;
 import edu.zju.gis.sdch.util.Contants;
 import javafx.beans.property.SimpleStringProperty;
@@ -26,6 +24,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
 
 import java.io.IOException;
 import java.io.Reader;

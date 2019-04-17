@@ -1,11 +1,13 @@
 package edu.zju.gis.sdch.ui;
 
 import edu.zju.gis.sdch.Main;
+import edu.zju.gis.sdch.config.CommonSetting;
 import edu.zju.gis.sdch.mapper.IndexMapper;
 import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.model.Index;
 import edu.zju.gis.sdch.model.IndexType;
 import edu.zju.gis.sdch.tool.Importer;
+import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.GdalHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.application.Platform;
@@ -26,7 +28,10 @@ import org.gdal.osr.CoordinateTransformation;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.*;
 
 public class DataPreview implements Initializable {
@@ -49,6 +54,8 @@ public class DataPreview implements Initializable {
     private Label labelTime;
     @FXML
     private Label labelNumber;
+    @FXML
+    private RadioButton rbDeleteExisted;
 
     @FXML
     private Label lableAllNumber;
@@ -58,12 +65,40 @@ public class DataPreview implements Initializable {
     public static MainPage mainPage;
     public static String uuidField;
     private IndexTypeMapper indexTypeMapper;
+    public ElasticSearchHelper helper;
+    public CommonSetting setting;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mainPage = MainPage.instance;
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
         indexTypeMapper = MyBatisUtil.getMapper(IndexTypeMapper.class);
+        InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
+        // 创建会话工厂，传入mybatis的配置文件信息
+        Properties props = new Properties();
+        try {
+            props.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setting = new CommonSetting();
+        setting.setEsName(props.getProperty("es.name", "elasticsearch"));
+        setting.setEsHosts(Arrays.asList(props.getProperty("es.hosts").split(",")));
+        setting.setEsPort(Integer.parseInt(props.getProperty("es.port", "9300")));
+        setting.setEsShards(Integer.parseInt(props.getProperty("es.number_of_shards", "4")));
+        setting.setEsReplicas(Integer.parseInt(props.getProperty("es.number_of_replicas", "0")));
+        setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
+        try {
+            helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
         ObservableList<String> codatatype = coDataType.getItems();
         codatatype.addAll("fe_road", "f_poi", "fe_zq");
         List<Index> allIndex = mapper.selectAll();
@@ -90,6 +125,7 @@ public class DataPreview implements Initializable {
             Collections.sort(codatatype);
         }
         coDataType.setEditable(true);
+        coDataType.setValue("");
         coDataType.valueProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<String> dataTypes = coDataType.getItems();
             if (!dataTypes.contains(newValue))
@@ -156,91 +192,126 @@ public class DataPreview implements Initializable {
         cbPreviewSize.setValue(10);
 
         btnImport.setOnMouseClicked(event -> {
-
-            List<String> checkMapping = new ArrayList<>();
-            for (String str : fieldMapping.keySet()) {
-                checkMapping.add(fieldMapping.get(str));
-            }
-            if (checkImporter(checkMapping)) {
-                //强行让uuidField为lsid对应的字段
+            if (coDataType.getValue().equals("")) {
+                new Alert(Alert.AlertType.INFORMATION, "请选择dtype的值", ButtonType.OK).showAndWait();
+            } else {
+                List<String> checkMapping = new ArrayList<>();
                 for (String str : fieldMapping.keySet()) {
-                    if (fieldMapping.get(str).equals("lsid"))
-                        uuidField = str;
+                    checkMapping.add(fieldMapping.get(str));
                 }
-                hbox.setVisible(true);
-                Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
-                Service<Double> service = new Service<Double>() {
-                    @Override
-                    protected Task<Double> createTask() {
-                        String esIndex = "";
+                if (checkImporter(checkMapping)) {
+
+                    //强行让uuidField为lsid对应的字段
+                    for (String str : fieldMapping.keySet()) {
+                        if (fieldMapping.get(str).equals("lsid"))
+                            uuidField = str;
+                    }
+                    hbox.setVisible(true);
+                    Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
+                    //是否删除已经存在于ES中的该类型数据
+                    if (rbDeleteExisted.isSelected()) {
+                        String indexNames = "";
                         if (mainPage.cbCategory.getValue().equals("框架数据")) {
-                            esIndex = "sdmap";
+                            indexNames = "sdmap";
                         }
                         if (mainPage.cbCategory.getValue().equals("专题数据")) {
-                            esIndex = "themes";
+                            indexNames = "themes";
                         }
-                        MainPage mainPage = MainPage.instance;
-                        String category = mainPage.getCategory();
-                        String layerName = mainPage.getSelectedLayer();
-                        String dtype = coDataType.getValue().trim();
-                        if ("框架数据".equals(category))
-                            category = "framework";
-                        else
-                            category = "topic";
+                        List<IndexType> listIndexType = new ArrayList<>();
+                        listIndexType.addAll(indexTypeMapper.selectByIndice(indexNames));
+                        List<String> listIndexTypeNames = new ArrayList<>();
+                        for (int i = 0; i < listIndexType.size(); i++) {
+                            listIndexTypeNames.add(listIndexType.get(i).getDtype());
+                        }
+                        if (listIndexTypeNames.contains(coDataType.getValue())) {
+                            //数据库中删除
+                            String id = "";
+                            for (int m = 0; m < listIndexType.size(); m++) {
+                                if (listIndexType.get(m).getDtype().equals(coDataType.getValue()))
+                                    id = listIndexType.get(m).getId();
+                                indexTypeMapper.deleteByPrimaryKey(id);
+                            }
+                            //在ES中删除该类别数据
+                            long number = helper.getDtypeDocCount(indexNames, coDataType.getValue());
+                            long result = helper.deleteDtype(indexNames, coDataType.getValue());
+                            new Alert(Alert.AlertType.INFORMATION, "该类别数据共有" + number + "条，成功删除" + result + "条", ButtonType.OK).showAndWait();
+                        } else {
+                            new Alert(Alert.AlertType.INFORMATION, "数据库中无该类数据", ButtonType.OK).showAndWait();
+                        }
+                    }
+                    Service<Double> service = new Service<Double>() {
+                        @Override
+                        protected Task<Double> createTask() {
+                            String esIndex = "";
+                            if (mainPage.cbCategory.getValue().equals("框架数据")) {
+                                esIndex = "sdmap";
+                            }
+                            if (mainPage.cbCategory.getValue().equals("专题数据")) {
+                                esIndex = "themes";
+                            }
+                            MainPage mainPage = MainPage.instance;
+                            String category = mainPage.getCategory();
+                            String layerName = mainPage.getSelectedLayer();
+                            String dtype = coDataType.getValue().trim();
+                            if ("框架数据".equals(category))
+                                category = "framework";
+                            else
+                                category = "topic";
 
 //                        String uuidField = mainPage.getUuidField();
 
-                        boolean skipEmptyGeom = mainPage.skipEmpty();//检查单选框是否被选中
-                        Layer layer = mainPage.getReader().getLayer(layerName);
-                        return new Importer(Main.getHelper(), Main.getSetting(), esIndex, dtype, layer, fields, uuidField, fieldMapping, analyzable, skipEmptyGeom, category, dtype);
-                    }
-                };
-                lableAllNumber.setText(allNumber.toString() + "条数据");
-                progressBar.progressProperty().bind(service.progressProperty());
-                service.start();
-                service.progressProperty().addListener((observable, oldValue, newValue) -> {
+                            boolean skipEmptyGeom = mainPage.skipEmpty();//检查单选框是否被选中
+                            Layer layer = mainPage.getReader().getLayer(layerName);
+                            return new Importer(Main.getHelper(), Main.getSetting(), esIndex, dtype, layer, fields, uuidField, fieldMapping, analyzable, skipEmptyGeom, category, dtype);
+                        }
+                    };
+                    lableAllNumber.setText(allNumber.toString() + "条数据");
+                    progressBar.progressProperty().bind(service.progressProperty());
+                    service.start();
+                    service.progressProperty().addListener((observable, oldValue, newValue) -> {
 //             long endTime = System.currentTimeMillis();    //获取结束时间
 //             labelTime.setText((endTime - startTime) / 1000.0 + "s");
-                    labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
-                });
-                long startTime = System.currentTimeMillis();    //获取开始时间
-                Thread thread = new Thread() {
-                    public void run() {
-                        while (progressBar.progressProperty().get() < 1) {
-                            long endTime = System.currentTimeMillis();    //获取结束时间
-                            System.out.println(endTime);
-                            Platform.runLater(() -> {
-                                labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
-                            });
-                            try {
-                                //睡眠1000毫秒,即每秒更新一下时间
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                        labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
+                    });
+                    long startTime = System.currentTimeMillis();    //获取开始时间
+                    Thread thread = new Thread() {
+                        public void run() {
+                            while (progressBar.progressProperty().get() < 1) {
+                                long endTime = System.currentTimeMillis();    //获取结束时间
+                                System.out.println(endTime);
+                                Platform.runLater(() -> {
+                                    labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                                });
+                                try {
+                                    //睡眠1000毫秒,即每秒更新一下时间
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                    }
-                };
-                thread.start();
-                service.stateProperty().addListener((observable, oldValue, newValue) -> {
-                    switch (newValue) {
-                        case READY:
-                            break;
-                        case SUCCEEDED:
-                            long error = service.getValue().longValue();
-                            if (error > 0)
-                                new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
-                                        .showAndWait();
-                            else {
-                                new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
-                                        .showAndWait();
-                                DataPreview.this.btnImport.getScene().getWindow().hide();
-                            }
-                            break;
-                        case FAILED:
-                            break;
-                    }
-                });
+                    };
+                    thread.start();
+                    service.stateProperty().addListener((observable, oldValue, newValue) -> {
+                        switch (newValue) {
+                            case READY:
+                                break;
+                            case SUCCEEDED:
+                                long error = service.getValue().longValue();
+                                if (error > 0)
+                                    new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
+                                            .showAndWait();
+                                else {
+                                    new Alert(Alert.AlertType.INFORMATION, "数据全部成功入库", ButtonType.OK)
+                                            .showAndWait();
+                                    DataPreview.this.btnImport.getScene().getWindow().hide();
+                                }
+                                break;
+                            case FAILED:
+                                break;
+                        }
+                    });
+                }
             }
         });
     }
