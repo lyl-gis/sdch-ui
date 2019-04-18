@@ -26,8 +26,6 @@ import org.gdal.osr.CoordinateTransformation;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -69,20 +67,6 @@ public class DataPreview implements Initializable {
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
         indexTypeMapper = MyBatisUtil.getMapper(IndexTypeMapper.class);
-        InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
-        // 创建会话工厂，传入mybatis的配置文件信息
-        Properties props = new Properties();
-        try {
-            props.load(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         ObservableList<String> codatatype = coDataType.getItems();
         codatatype.addAll("fe_road", "f_poi", "fe_zq");
         List<Index> allIndex = mapper.selectAll();
@@ -183,13 +167,7 @@ public class DataPreview implements Initializable {
                 for (String str : fieldMapping.keySet()) {
                     checkMapping.add(fieldMapping.get(str));
                 }
-                if (checkImporter(checkMapping)) {
-
-                    //强行让uuidField为lsid对应的字段
-                    for (String str : fieldMapping.keySet()) {
-                        if (fieldMapping.get(str).equals("lsid"))
-                            uuidField = str;
-                    }
+                if (checkImporter2(checkMapping)) {
                     hbox.setVisible(true);
                     Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
                     //是否删除已经存在于ES中的该类型数据
@@ -197,9 +175,15 @@ public class DataPreview implements Initializable {
                         String indexNames = "";
                         if (mainPage.cbCategory.getValue().equals("框架数据")) {
                             indexNames = "sdmap";
+                            //强行让uuidField为lsid对应的字段
+                            for (String str : fieldMapping.keySet()) {
+                                if (fieldMapping.get(str).equals("lsid"))
+                                    uuidField = str;
+                            }
                         }
                         if (mainPage.cbCategory.getValue().equals("专题数据")) {
                             indexNames = "themes";
+                            uuidField = "自动生成";//专题数据的唯一id还不确定
                         }
                         List<IndexType> listIndexType = new ArrayList<>();
                         listIndexType.addAll(indexTypeMapper.selectByIndice(indexNames));
@@ -218,7 +202,7 @@ public class DataPreview implements Initializable {
                             //在ES中删除该类别数据
                             long number = Main.getHelper().getDtypeDocCount(indexNames, coDataType.getValue());
                             long result = Main.getHelper().deleteDtype(indexNames, coDataType.getValue());
-                            new Alert(Alert.AlertType.INFORMATION, "该类别数据共有" + number + "条，成功删除" + result + "条", ButtonType.OK).showAndWait();
+                            new Alert(Alert.AlertType.INFORMATION, "该类别数据在ES中已存在" + number + "条，成功删除" + result + "条", ButtonType.OK).showAndWait();
                         } else {
                             new Alert(Alert.AlertType.INFORMATION, "数据库中无该类数据", ButtonType.OK).showAndWait();
                         }
@@ -311,12 +295,13 @@ public class DataPreview implements Initializable {
                 result = false;
             }
         } else if (mainPage.getCategory().equals("专题数据")) {
-            if (!(checkMapping.contains("lsid") && checkMapping.contains("district") && checkMapping.contains("name") && checkMapping.contains("clasid"))) {
-                new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查，确认包含lsid（唯一标识）、district（行政代码）、name（名称）和clasid", ButtonType.OK).showAndWait();
-                Stage stage = (Stage) btnImport.getScene().getWindow();
-                stage.close();
-                result = false;
-            }
+            //规则暂未确定
+//            if (!(checkMapping.contains("lsid") && checkMapping.contains("district") && checkMapping.contains("name") && checkMapping.contains("clasid"))) {
+//                new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查，确认包含lsid（唯一标识）、district（行政代码）、name（名称）和clasid", ButtonType.OK).showAndWait();
+//                Stage stage = (Stage) btnImport.getScene().getWindow();
+//                stage.close();
+//                result = false;
+//            }
         } else {
             if (!(checkMapping.contains("lsid") && checkMapping.contains("district") && checkMapping.contains("name"))) {
                 new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查,确认包含lsid（唯一标识）、district（行政代码）、name（名称）", ButtonType.OK).showAndWait();
@@ -327,4 +312,19 @@ public class DataPreview implements Initializable {
         }
         return result;
     }
+
+    Boolean checkImporter2(List<String> checkMapping) {
+        //再次校验只要框架数据包含lsid,框架数据以lsid为id进行入库，专题数据还不确定，自动生成
+        Boolean result = true;
+        if (mainPage.getCategory().equals("框架数据")) {
+            if (!(checkMapping.contains("lsid"))) {
+                new Alert(Alert.AlertType.INFORMATION, "映射字段信息有误，请重新检查，确认包含lsid（唯一标识）", ButtonType.OK).showAndWait();
+                Stage stage = (Stage) btnImport.getScene().getWindow();
+                stage.close();
+                result = false;
+            }
+        }
+        return result;
+    }
+
 }

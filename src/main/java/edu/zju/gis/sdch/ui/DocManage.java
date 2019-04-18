@@ -1,7 +1,14 @@
 package edu.zju.gis.sdch.ui;
 
+import edu.zju.gis.sdch.Main;
+import edu.zju.gis.sdch.mapper.CategoryMapper;
+import edu.zju.gis.sdch.mapper.IndexMapper;
+import edu.zju.gis.sdch.mapper.IndexMappingMapper;
+import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.service.IndexService;
+import edu.zju.gis.sdch.service.impl.IndexServiceImpl;
 import edu.zju.gis.sdch.util.Contants;
+import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -62,7 +69,12 @@ public class DocManage implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
         indexManage = IndexManage.instance;
-        this.indexService = indexManage.indexService;
+//        this.indexService = indexManage.indexService;
+        indexService = new IndexServiceImpl(Main.getHelper()
+                , MyBatisUtil.getMapper(CategoryMapper.class)
+                , MyBatisUtil.getMapper(IndexMapper.class)
+                , MyBatisUtil.getMapper(IndexTypeMapper.class)
+                , MyBatisUtil.getMapper(IndexMappingMapper.class));
         btnConfirmAddDocs.setDisable(true);
         tvDocs.setEditable(true);
         tvDocs.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);//设置可以多选
@@ -79,7 +91,7 @@ public class DocManage implements Initializable {
                 BoolQueryBuilder query = QueryBuilders.boolQuery();
                 String words = tfWord.getText();
                 words = QueryParser.escape(words);
-                String[] analysisFields = indexManage.indexService.getAnalyzable(indexName);
+                String[] analysisFields = indexService.getAnalyzable(indexName);
                 BoolQueryBuilder f = QueryBuilders.boolQuery();
                 f.should(QueryBuilders.multiMatchQuery(words, analysisFields).analyzer("ik_max_word"))
                         .should(QueryBuilders.matchQuery(Contants.ADDRESS, words));
@@ -496,7 +508,7 @@ public class DocManage implements Initializable {
     }
 
     public static String wktToJson(String wkt) {
-        if (wkt == null || !wkt.isEmpty())
+        if (wkt == null || wkt.isEmpty())
             wkt = "GEOMETRYCOLLECTION EMPTY";
         Geometry geom = ogr.CreateGeometryFromWkt(wkt);
         return geom.ExportToJson();

@@ -1,13 +1,8 @@
 package edu.zju.gis.sdch.ui;
 
-import edu.zju.gis.sdch.config.CommonSetting;
-import edu.zju.gis.sdch.mapper.CategoryMapper;
+import edu.zju.gis.sdch.Main;
 import edu.zju.gis.sdch.mapper.IndexMapper;
-import edu.zju.gis.sdch.mapper.IndexMappingMapper;
-import edu.zju.gis.sdch.mapper.IndexTypeMapper;
 import edu.zju.gis.sdch.model.Index;
-import edu.zju.gis.sdch.service.IndexService;
-import edu.zju.gis.sdch.service.impl.IndexServiceImpl;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.collections.ObservableList;
@@ -27,10 +22,10 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 
 public class IndexManage implements Initializable {
@@ -57,43 +52,44 @@ public class IndexManage implements Initializable {
     public static IndexManage instance = null;
     public static IndexMapper mapper;
     public ElasticSearchHelper helper;
-    public CommonSetting setting;
-    public IndexService indexService;
+    //    public CommonSetting setting;
+//    public IndexService indexService;
     public String indexNames;//选择的索引
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         instance = this;
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
-        InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
-        // 创建会话工厂，传入mybatis的配置文件信息
-        Properties props = new Properties();
-        try {
-            props.load(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        setting = new CommonSetting();
-        setting.setEsName(props.getProperty("es.name", "elasticsearch"));
-        setting.setEsHosts(Arrays.asList(props.getProperty("es.hosts").split(",")));
-        setting.setEsPort(Integer.parseInt(props.getProperty("es.port", "9300")));
-        setting.setEsShards(Integer.parseInt(props.getProperty("es.number_of_shards", "4")));
-        setting.setEsReplicas(Integer.parseInt(props.getProperty("es.number_of_replicas", "0")));
-        setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
-        try {
-            helper = new ElasticSearchHelper(setting.getEsHosts(), setting.getEsPort(), setting.getEsName());
-            indexService = new IndexServiceImpl(helper
-                    , MyBatisUtil.getMapper(CategoryMapper.class)
-                    , MyBatisUtil.getMapper(IndexMapper.class)
-                    , MyBatisUtil.getMapper(IndexTypeMapper.class)
-                    , MyBatisUtil.getMapper(IndexMappingMapper.class));
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+//        InputStream is = Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties"));
+//        // 创建会话工厂，传入mybatis的配置文件信息
+//        Properties props = new Properties();
+//        try {
+//            props.load(is);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            is.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        setting = new CommonSetting();
+//        setting.setEsName(props.getProperty("es.name", "elasticsearch"));
+//        setting.setEsHosts(Arrays.asList(props.getProperty("es.hosts").split(",")));
+//        setting.setEsPort(Integer.parseInt(props.getProperty("es.port", "9300")));
+//        setting.setEsShards(Integer.parseInt(props.getProperty("es.number_of_shards", "4")));
+//        setting.setEsReplicas(Integer.parseInt(props.getProperty("es.number_of_replicas", "0")));
+//        setting.setEsFieldBoostDefault(Float.parseFloat(props.getProperty("es.field_boost_default", "4.0f")));
+//        try {
+        helper = Main.getHelper();
+        //indexService在docmanege页面需要
+//            indexService = new IndexServiceImpl(helper
+//                    , MyBatisUtil.getMapper(CategoryMapper.class)
+//                    , MyBatisUtil.getMapper(IndexMapper.class)
+//                    , MyBatisUtil.getMapper(IndexTypeMapper.class)
+//                    , MyBatisUtil.getMapper(IndexMappingMapper.class));
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
 //        tvIndex.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);//设置表格中数据可以多选
         tcIndice.setCellFactory(TextFieldTableCell.forTableColumn());
         tcIndice.setCellValueFactory(cellData -> cellData.getValue().getIndice());
