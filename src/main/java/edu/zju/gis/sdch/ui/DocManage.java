@@ -1,7 +1,5 @@
 package edu.zju.gis.sdch.ui;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
 import edu.zju.gis.sdch.service.IndexService;
 import edu.zju.gis.sdch.util.Contants;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,13 +22,11 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.geotools.geojson.geom.GeometryJSON;
+import org.gdal.ogr.Geometry;
+import org.gdal.ogr.ogr;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
 
@@ -492,31 +488,18 @@ public class DocManage implements Initializable {
     }
 
     public static String jsonToWkt(String geoJson) {
-        String wkt = null;
-        GeometryJSON gjson = new GeometryJSON();
-        Reader reader = new StringReader(geoJson);
-        try {
-            Geometry geometry = gjson.read(reader);
-            wkt = geometry.toText();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return wkt;
+        if (geoJson != null && !geoJson.isEmpty()) {
+            Geometry geom = ogr.CreateGeometryFromJson(geoJson);
+            return geom.ExportToWkt();
+        } else
+            return "GEOMETRYCOLLECTION EMPTY";
     }
 
     public static String wktToJson(String wkt) {
-        String json = null;
-        try {
-            WKTReader reader = new WKTReader();
-            Geometry geometry = reader.read(wkt);
-            StringWriter writer = new StringWriter();
-            GeometryJSON g = new GeometryJSON(20);
-            g.write(geometry, writer);
-            json = writer.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return json;
+        if (wkt == null || !wkt.isEmpty())
+            wkt = "GEOMETRYCOLLECTION EMPTY";
+        Geometry geom = ogr.CreateGeometryFromWkt(wkt);
+        return geom.ExportToJson();
     }
 
     public static Boolean isWkt(String string) {

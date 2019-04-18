@@ -68,39 +68,11 @@
             <version>${log4j2.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.locationtech.jts</groupId>
-            <artifactId>jts-core</artifactId>
-            <version>1.16.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.gdal</groupId>
             <artifactId>gdal</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/gdal.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson</artifactId>
-            <version>9.3</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/gt-geojson-9.3.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
-            <version>1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
         </dependency>
     </dependencies>
     <build>
@@ -112,7 +84,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>edu.zju.gis.sdch.Main</mainClass>
+                            <mainClass>edu.zju.gis.sdch.Start</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
