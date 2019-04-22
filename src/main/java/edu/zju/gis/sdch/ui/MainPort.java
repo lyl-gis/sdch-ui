@@ -35,11 +35,14 @@ public class MainPort implements Initializable {
         MenuItem poiTypeMenuIndex = new MenuItem("POI类型管理");
         toolMenu.getItems().add(toolMenuImport);
         manageMenu.getItems().addAll(manageMenuIndex, adminAreaMenuIndex, entityTypeMenuIndex, poiTypeMenuIndex);
+        String errES = "";
+        String errSQL = "";
         try {
             Main.getHelper().getClusterHealth();
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "ES连接失败：" + e.getMessage(), ButtonType.OK)
-                    .showAndWait();
+            errES = "ES连接失败!";
+//            new Alert(Alert.AlertType.ERROR, "ES连接失败：", ButtonType.OK)
+//                    .showAndWait();
             ifConnect = false;
         }
         ;
@@ -48,11 +51,16 @@ public class MainPort implements Initializable {
             IndexMapper mapper = MyBatisUtil.getMapper(IndexMapper.class);
             mapper.selectAll();
         } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Mysql连接失败：" + e.getMessage(), ButtonType.OK)
-                    .showAndWait();
+            errSQL = "Mysql连接失败!";
+//          new Alert(Alert.AlertType.ERROR, "Mysql连接失败：", ButtonType.OK)
+//                    .showAndWait();
             ifConnect = false;
         }
-        ;
+        if (!ifConnect) {
+            new Alert(Alert.AlertType.ERROR, errSQL + errES, ButtonType.OK)
+                    .showAndWait();
+        }
+
         toolMenuImport.setOnAction(evnet -> {
             Parent root = null;
             try {
