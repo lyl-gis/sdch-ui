@@ -10,7 +10,7 @@ public class Start {
         frame = new JFrame();
         Container container = frame.getContentPane();
         container.setLayout(null);
-        ImageIcon icon1 = new ImageIcon("src/main/resources/2.png");
+        ImageIcon icon1 = new ImageIcon(ClassLoader.getSystemResource("2.png"));
         JLabel jLabel = new JLabel(icon1);
         jLabel.setSize(icon1.getIconWidth(), icon1.getIconHeight());
         jLabel.setLocation(0, 0);
