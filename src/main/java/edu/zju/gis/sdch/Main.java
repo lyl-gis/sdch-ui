@@ -2,17 +2,17 @@ package edu.zju.gis.sdch;
 
 import edu.zju.gis.sdch.config.CommonSetting;
 import edu.zju.gis.sdch.ui.MainPage;
+import edu.zju.gis.sdch.ui.MainPort;
 import edu.zju.gis.sdch.util.ElasticSearchHelper;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.gdal.ogr.ogr;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -21,7 +21,28 @@ import java.util.Properties;
 public class Main extends Application {
     private static CommonSetting setting = new CommonSetting();
     private static ElasticSearchHelper helper;
+    private static JFrame frame;
+
     public static void main(String[] args) {
+        frame = new JFrame();
+        Container container = frame.getContentPane();
+        container.setLayout(null);
+        ImageIcon icon1 = new ImageIcon(ClassLoader.getSystemResource("2.png"));
+        JLabel jLabel = new JLabel(icon1);
+        jLabel.setSize(icon1.getIconWidth(), icon1.getIconHeight());
+        jLabel.setLocation(0, 0);
+        container.add(jLabel);
+        jLabel.setIcon(icon1);
+        frame.pack();
+        frame.setSize(icon1.getIconWidth(), icon1.getIconHeight());
+        int windowWidth = frame.getWidth();                    //获得窗口宽
+        int windowHeight = frame.getHeight();                  //获得窗口高
+        Toolkit kit = Toolkit.getDefaultToolkit();             //定义工具包
+        Dimension screenSize = kit.getScreenSize();            //获取屏幕的尺寸
+        int screenWidth = screenSize.width;                    //获取屏幕的宽
+        int screenHeight = screenSize.height;                  //获取屏幕的高
+        frame.setLocation(screenWidth / 2 - windowWidth / 2, screenHeight / 2 - windowHeight / 2);//设置窗口居中显示
+        frame.setVisible(true);
         ogr.RegisterAll();
         Properties props = new Properties();
         try (InputStream is = ClassLoader.getSystemResourceAsStream("config.properties")) {
@@ -53,50 +74,9 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         primaryStage.setTitle(MainPage.TITLE);
         primaryStage.setScene(scene);
-        primaryStage.show();
-        Start.frame.dispose();
-    }
-
-    private void setMenu(BorderPane root, Stage primaryStage) {
-        MenuBar menuBar = new MenuBar();
-        menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
-        root.setTop(menuBar);
-
-        // File menu - new, save, exit
-        Menu fileMenu = new Menu("File");
-        MenuItem newMenuItem = new MenuItem("New");
-        MenuItem saveMenuItem = new MenuItem("Save");
-        MenuItem exitMenuItem = new MenuItem("Exit");
-        exitMenuItem.setOnAction(actionEvent -> Platform.exit());
-        fileMenu.getItems().addAll(newMenuItem, saveMenuItem, new SeparatorMenuItem(), exitMenuItem);
-
-        Menu webMenu = new Menu("Web");
-        CheckMenuItem htmlMenuItem = new CheckMenuItem("HTML");
-        htmlMenuItem.setSelected(true);
-        webMenu.getItems().add(htmlMenuItem);
-
-        CheckMenuItem cssMenuItem = new CheckMenuItem("CSS");
-        cssMenuItem.setSelected(true);
-        webMenu.getItems().add(cssMenuItem);
-
-        Menu sqlMenu = new Menu("SQL");
-        ToggleGroup tGroup = new ToggleGroup();
-        RadioMenuItem mysqlItem = new RadioMenuItem("MySQL");
-        mysqlItem.setToggleGroup(tGroup);
-
-        RadioMenuItem oracleItem = new RadioMenuItem("Oracle");
-        oracleItem.setToggleGroup(tGroup);
-        oracleItem.setSelected(true);
-
-        sqlMenu.getItems().addAll(mysqlItem, oracleItem, new SeparatorMenuItem());
-
-        Menu tutorialManeu = new Menu("Tutorial");
-        tutorialManeu.getItems().addAll(
-                new CheckMenuItem("Java"),
-                new CheckMenuItem("JavaFX"),
-                new CheckMenuItem("Swing"));
-
-        sqlMenu.getItems().add(tutorialManeu);
-        menuBar.getMenus().addAll(fileMenu, webMenu, sqlMenu);
+        if (MainPort.ifConnect) {
+            primaryStage.show();
+        }
+        frame.dispose();
     }
 }

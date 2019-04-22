@@ -84,7 +84,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>edu.zju.gis.sdch.Start</mainClass>
+                            <mainClass>edu.zju.gis.sdch.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

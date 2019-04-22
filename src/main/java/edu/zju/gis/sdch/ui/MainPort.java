@@ -21,9 +21,10 @@ public class MainPort implements Initializable {
     private MenuBar mbSelectPage;
     @FXML
     private BorderPane rootLayout;
-
+    public static boolean ifConnect;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        ifConnect = true;
         Menu toolMenu = new Menu("工具");
         Menu manageMenu = new Menu("管理");
         mbSelectPage.getMenus().addAll(toolMenu, manageMenu);
@@ -39,18 +40,17 @@ public class MainPort implements Initializable {
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "ES连接失败：" + e.getMessage(), ButtonType.OK)
                     .showAndWait();
-            Stage stage = (Stage) mbSelectPage.getScene().getWindow();
-            stage.close();
+            ifConnect = false;
         }
         ;
+
         try {
             IndexMapper mapper = MyBatisUtil.getMapper(IndexMapper.class);
             mapper.selectAll();
         } catch (Exception e) {
             new Alert(Alert.AlertType.ERROR, "Mysql连接失败：" + e.getMessage(), ButtonType.OK)
                     .showAndWait();
-            Stage stage = (Stage) mbSelectPage.getScene().getWindow();
-            stage.close();
+            ifConnect = false;
         }
         ;
         toolMenuImport.setOnAction(evnet -> {
