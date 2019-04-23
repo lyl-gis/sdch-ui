@@ -10,6 +10,8 @@ import edu.zju.gis.sdch.util.GdalHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -60,9 +62,11 @@ public class DataPreview implements Initializable {
     public static MainPage mainPage;
     public static String uuidField;
     private IndexTypeMapper indexTypeMapper;
-
+    public static int importTag = 0;
+    public MainPort mainPort;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        mainPort = MainPort.instaceMainPort;
         mainPage = MainPage.instance;
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
@@ -158,8 +162,40 @@ public class DataPreview implements Initializable {
         });
         cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.setValue(10);
-
+        progressBar.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (oldValue.intValue() != 0) {
+                    rootLayout.setPrefWidth(newValue.doubleValue());
+                    hbox.setPrefWidth(newValue.doubleValue());
+//                    vbox.setPrefWidth(newValue.doubleValue());
+                    progressBar.setPrefWidth(newValue.doubleValue());
+                }
+            }
+        });
         btnImport.setOnMouseClicked(event -> {
+            //开始入库后不能再选择预览数量
+            cbPreviewSize.setVisible(false);
+            //入库过程中不能关闭窗口及其父窗口
+            Stage stageDataPreview = (Stage) btnImport.getScene().getWindow();
+            stageDataPreview.setOnCloseRequest(e -> {
+                e.consume();
+                new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
+            });
+            Stage stageMainPort = (Stage) mainPort.rootLayout.getScene().getWindow();
+            stageMainPort.setOnCloseRequest(e -> {
+                if (importTag != 2) {
+                    e.consume();
+                    new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
+                }
+            });
+            Stage stageMainPage = (Stage) mainPage.rootLayout.getScene().getWindow();
+            stageMainPage.setOnCloseRequest(e -> {
+                if (importTag != 2) {
+                    e.consume();
+                    new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
+                }
+            });
             if (coDataType.getValue().equals("")) {
                 new Alert(Alert.AlertType.INFORMATION, "请选择dtype的值", ButtonType.OK).showAndWait();
             } else {
@@ -192,6 +228,7 @@ public class DataPreview implements Initializable {
                             listIndexTypeNames.add(listIndexType.get(i).getDtype());
                         }
                         if (listIndexTypeNames.contains(coDataType.getValue())) {
+                            new Alert(Alert.AlertType.INFORMATION, "正在删除数据，请等待。", ButtonType.OK).showAndWait();
                             //数据库中删除
                             String id = "";
                             for (int m = 0; m < listIndexType.size(); m++) {
@@ -202,7 +239,7 @@ public class DataPreview implements Initializable {
                             //在ES中删除该类别数据
                             long number = Main.getHelper().getDtypeDocCount(indexNames, coDataType.getValue());
                             long result = Main.getHelper().deleteDtype(indexNames, coDataType.getValue());
-                            new Alert(Alert.AlertType.INFORMATION, "该类别数据在ES中已存在" + number + "条，成功删除" + result + "条", ButtonType.OK).showAndWait();
+                            new Alert(Alert.AlertType.INFORMATION, "该类别数据在ES中已存在" + number + "条，成功删除" + result + "条,现在开始入库数据", ButtonType.OK).showAndWait();
                         } else {
                             new Alert(Alert.AlertType.INFORMATION, "数据库中无该类数据", ButtonType.OK).showAndWait();
                         }
@@ -246,9 +283,15 @@ public class DataPreview implements Initializable {
                         public void run() {
                             while (progressBar.progressProperty().get() < 1) {
                                 long endTime = System.currentTimeMillis();    //获取结束时间
-                                System.out.println(endTime);
+//                                System.out.println(endTime);
                                 Platform.runLater(() -> {
-                                    labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                                    long time = (endTime - startTime) / 1000;
+//                                    labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
+                                    if (time <= 60) {
+                                        labelTime.setText(time + "s");
+                                    } else {
+                                        labelTime.setText(time / 60 + "分" + (time - time / 60 * 60) + "s");
+                                    }
                                 });
                                 try {
                                     //睡眠1000毫秒,即每秒更新一下时间
@@ -265,6 +308,7 @@ public class DataPreview implements Initializable {
                             case READY:
                                 break;
                             case SUCCEEDED:
+                                importTag = 2;
                                 long error = service.getValue().longValue();
                                 if (error > 0)
                                     new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)

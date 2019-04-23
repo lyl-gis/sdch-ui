@@ -13,6 +13,8 @@ import org.gdal.ogr.ogr;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -26,6 +28,37 @@ public class Main extends Application {
     public static void main(String[] args) {
         frame = new JFrame();
         Container container = frame.getContentPane();
+        //加载完成前点击错号，则退出
+        frame.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+            }
+        });
         container.setLayout(null);
         ImageIcon icon1 = new ImageIcon(ClassLoader.getSystemResource("2.png"));
         JLabel jLabel = new JLabel(icon1);

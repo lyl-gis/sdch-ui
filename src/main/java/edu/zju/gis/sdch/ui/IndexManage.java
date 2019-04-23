@@ -24,7 +24,6 @@ import javafx.util.StringConverter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 
@@ -177,57 +176,58 @@ public class IndexManage implements Initializable {
                             && event.getClickCount() == 1
                             && TableRowControl.this.getIndex() < tvIndex.getItems().size()) {
                         final ContextMenu contextMenu = new ContextMenu();
-                        MenuItem deleteItem = new MenuItem("删除");
+//                        MenuItem deleteItem = new MenuItem("删除");
                         MenuItem manageDocsItem = new MenuItem("编辑文档");
-                        contextMenu.getItems().addAll(deleteItem, manageDocsItem);
-                        deleteItem.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent event) {
-//                                List<Integer> newDeleteItems = new ArrayList<>();
-//                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedIndices().size(); i++) {
-//                                    //因为tvIndex.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
-//                                    newDeleteItems.add(tvIndex.getSelectionModel().getSelectedIndices().get(i));
-//                                }
-                                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "确认删除?");
-                                Optional<ButtonType> result = confirmation.showAndWait();
-                                if (result.isPresent() && result.get() == ButtonType.OK) {
-                                    //数据库中删除
-                                    int res1 = mapper.deleteByPrimaryKey(tvIndex.getSelectionModel().getSelectedItem().getIndice().get());
-                                    //ES中删除
-                                    Boolean res2 = helper.delete(tvIndex.getSelectionModel().getSelectedItem().getIndice().get());
-                                    //表中删除
-                                    tvIndex.getItems().remove(tvIndex.getSelectionModel().getSelectedItem());
-                                    if (res1 == 1 && res2) {
-                                        new Alert(Alert.AlertType.INFORMATION, "成功删除1个索引", ButtonType.OK).showAndWait();
-                                    }
-                                }
-//                                    if (newDeleteItems.size() == 0) {
-//                                        new Alert(Alert.AlertType.INFORMATION, "没有要删除的内容", ButtonType.OK)
-//                                                .showAndWait();
-//                                    } else {
-//                                        int deleted = 0;
-//                                        List<Integer> deleteResult = new ArrayList<>();
-//                                        for (int i = 0; i < newDeleteItems.size(); i++) {
-//                                            helper.delete(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在ES中删除
-//                                            int deleteresult = mapper.deleteByPrimaryKey(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在数据库中删除
-//                                            deleteResult.add(deleteresult);
-//                                            tvIndex.getItems().remove(newDeleteItems.get(i).intValue() - deleted);   //在表中删除打钩的那一行
-//                                            deleted++;
-//                                        }
-//                                        int succedDelete = 0;
-//                                        int failedDelete = 0;
-//                                        for (int i = 0; i < deleteResult.size(); i++) {
-//                                            if (deleteResult.get(i) == 1)
-//                                                succedDelete++;
-//                                            else
-//                                                failedDelete++;
-//                                        }
-//                                        new Alert(Alert.AlertType.INFORMATION, "成功删除" + succedDelete + "条数据," + failedDelete + "条数据删除失败", ButtonType.OK)
-//                                                .showAndWait();
+//                        contextMenu.getItems().addAll(deleteItem, manageDocsItem);
+                        contextMenu.getItems().addAll(manageDocsItem);
+//                        deleteItem.setOnAction(new EventHandler<ActionEvent>() {
+//                            @Override
+//                            public void handle(ActionEvent event) {
+////                                List<Integer> newDeleteItems = new ArrayList<>();
+////                                for (int i = 0; i < tvIndex.getSelectionModel().getSelectedIndices().size(); i++) {
+////                                    //因为tvIndex.getSelectionModel().getSelectedIndices().size()的值observable类型，所以这样赋值，不然删除多行时，删除第一行后之后行的行号会发生变化
+////                                    newDeleteItems.add(tvIndex.getSelectionModel().getSelectedIndices().get(i));
+////                                }
+//                                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "确认删除?");
+//                                Optional<ButtonType> result = confirmation.showAndWait();
+//                                if (result.isPresent() && result.get() == ButtonType.OK) {
+//                                    //数据库中删除
+//                                    int res1 = mapper.deleteByPrimaryKey(tvIndex.getSelectionModel().getSelectedItem().getIndice().get());
+//                                    //ES中删除
+//                                    Boolean res2 = helper.delete(tvIndex.getSelectionModel().getSelectedItem().getIndice().get());
+//                                    //表中删除
+//                                    tvIndex.getItems().remove(tvIndex.getSelectionModel().getSelectedItem());
+//                                    if (res1 == 1 && res2) {
+//                                        new Alert(Alert.AlertType.INFORMATION, "成功删除1个索引", ButtonType.OK).showAndWait();
 //                                    }
 //                                }
-                            }
-                        });
+////                                    if (newDeleteItems.size() == 0) {
+////                                        new Alert(Alert.AlertType.INFORMATION, "没有要删除的内容", ButtonType.OK)
+////                                                .showAndWait();
+////                                    } else {
+////                                        int deleted = 0;
+////                                        List<Integer> deleteResult = new ArrayList<>();
+////                                        for (int i = 0; i < newDeleteItems.size(); i++) {
+////                                            helper.delete(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在ES中删除
+////                                            int deleteresult = mapper.deleteByPrimaryKey(tvIndex.getItems().get(newDeleteItems.get(i) - deleted).getIndice().getValue());//在数据库中删除
+////                                            deleteResult.add(deleteresult);
+////                                            tvIndex.getItems().remove(newDeleteItems.get(i).intValue() - deleted);   //在表中删除打钩的那一行
+////                                            deleted++;
+////                                        }
+////                                        int succedDelete = 0;
+////                                        int failedDelete = 0;
+////                                        for (int i = 0; i < deleteResult.size(); i++) {
+////                                            if (deleteResult.get(i) == 1)
+////                                                succedDelete++;
+////                                            else
+////                                                failedDelete++;
+////                                        }
+////                                        new Alert(Alert.AlertType.INFORMATION, "成功删除" + succedDelete + "条数据," + failedDelete + "条数据删除失败", ButtonType.OK)
+////                                                .showAndWait();
+////                                    }
+////                                }
+//                            }
+//                        });
                         manageDocsItem.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {

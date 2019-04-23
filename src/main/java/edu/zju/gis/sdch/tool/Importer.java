@@ -148,7 +148,7 @@ public class Importer extends Task<Double> {
         CoordinateTransformation transformation = null;
         if (sr.IsProjected() == 1)
             transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
-        final int batchSize = 10;
+        final int batchSize = 100;
         Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, batchSize, fields, uuidField, skipEmptyGeom, transformation);
         Set<String> destKeys = fieldMapping.keySet();
         long error = 0;

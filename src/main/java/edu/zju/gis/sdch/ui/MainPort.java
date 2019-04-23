@@ -20,10 +20,12 @@ public class MainPort implements Initializable {
     @FXML
     private MenuBar mbSelectPage;
     @FXML
-    private BorderPane rootLayout;
+    public BorderPane rootLayout;
     public static boolean ifConnect;
+    public static MainPort instaceMainPort = null;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        instaceMainPort = this;
         ifConnect = true;
         Menu toolMenu = new Menu("工具");
         Menu manageMenu = new Menu("管理");

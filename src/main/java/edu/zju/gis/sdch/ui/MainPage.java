@@ -31,7 +31,7 @@ public class MainPage implements Initializable {
     public static final String TITLE = "数据入库";
     public static MainPage instance = null;
     @FXML
-    private BorderPane rootLayout;
+    public BorderPane rootLayout;
     @FXML
     private Button btnPreview;
     @FXML

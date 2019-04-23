@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" prefHeight="738.0" prefWidth="965.0" xmlns="http://javafx.com/javafx/8.0.171"
+<BorderPane fx:id="rootLayout" prefHeight="719.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DataPreview">
     <top>
         <HBox prefHeight="0.0" prefWidth="778.0" spacing="40.0" BorderPane.alignment="CENTER">
@@ -52,14 +52,14 @@
         <AnchorPane prefHeight="312.0" prefWidth="25.0" BorderPane.alignment="CENTER"/>
     </left>
     <right>
-        <AnchorPane prefHeight="284.0" prefWidth="25.0" BorderPane.alignment="CENTER"/>
+        <AnchorPane prefHeight="557.0" prefWidth="22.0" BorderPane.alignment="CENTER"/>
     </right>
     <bottom>
-        <HBox fx:id="hbox" prefHeight="61.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+        <HBox fx:id="hbox" prefHeight="73.0" prefWidth="1800.0" BorderPane.alignment="CENTER">
             <children>
-                <VBox prefHeight="73.0" prefWidth="968.0">
+                <VBox fx:id="vbox" prefHeight="73.0" prefWidth="1524.0">
                     <children>
-                        <ProgressBar fx:id="progressBar" prefHeight="48.0" prefWidth="965.0" progress="0.0">
+                        <ProgressBar fx:id="progressBar" prefHeight="48.0" prefWidth="929.0" progress="0.0">
                             <opaqueInsets>
                                 <Insets left="40.0"/>
                             </opaqueInsets>
@@ -81,7 +81,7 @@
                                     </HBox.margin>
                                 </Label>
                                 <Label fx:id="labelNumber" prefHeight="15.0" prefWidth="113.0" text="条数据"/>
-                                <Label prefHeight="15.0" prefWidth="82.0" text="当前已用时间">
+                                <Label prefHeight="15.0" prefWidth="82.0" text="已耗时">
                                     <HBox.margin>
                                         <Insets left="100.0"/>
                                     </HBox.margin>
