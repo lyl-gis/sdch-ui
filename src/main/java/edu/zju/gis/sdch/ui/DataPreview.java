@@ -10,8 +10,6 @@ import edu.zju.gis.sdch.util.GdalHelper;
 import edu.zju.gis.sdch.util.MyBatisUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -30,6 +28,7 @@ import org.gdal.osr.osr;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DataPreview implements Initializable {
     private static final Logger log = LogManager.getLogger(DataPreview.class);
@@ -40,7 +39,8 @@ public class DataPreview implements Initializable {
     private Button btnImport;
     @FXML
     private ProgressBar progressBar;
-
+    @FXML
+    private Label lbType;
     @FXML
     private ComboBox<String> coDataType;
     @FXML
@@ -48,14 +48,14 @@ public class DataPreview implements Initializable {
     @FXML
     private ChoiceBox<Integer> cbPreviewSize;
     @FXML
-    private Label labelTime;
+    private Label lbTotal;
     @FXML
-    private Label labelNumber;
+    private Label lbCount;
+    @FXML
+    private Label lbTime;
     @FXML
     private RadioButton rbDeleteExisted;
 
-    @FXML
-    private Label lableAllNumber;
     @FXML
     private HBox hbox;
     private IndexMapper mapper;
@@ -64,10 +64,14 @@ public class DataPreview implements Initializable {
     private IndexTypeMapper indexTypeMapper;
     public static int importTag = 0;
     public MainPort mainPort;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mainPort = MainPort.instaceMainPort;
         mainPage = MainPage.instance;
+        lbType.setTooltip(new Tooltip("除poi数据固定为f_poi，行政区划数据固定为fe_zq，" +
+                "道路数据固定为fe_road之外，其他可根据中文名简拼自行填写。" +
+                "前缀中f表示框架(framework)数据，e表示实体(entity)数据"));
         tvPreview.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         mapper = MyBatisUtil.getMapper(IndexMapper.class);
         indexTypeMapper = MyBatisUtil.getMapper(IndexTypeMapper.class);
@@ -162,20 +166,23 @@ public class DataPreview implements Initializable {
         });
         cbPreviewSize.getItems().addAll(10, 25, 50, 100);
         cbPreviewSize.setValue(10);
-        progressBar.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (oldValue.intValue() != 0) {
-                    rootLayout.setPrefWidth(newValue.doubleValue());
-                    hbox.setPrefWidth(newValue.doubleValue());
-//                    vbox.setPrefWidth(newValue.doubleValue());
-                    progressBar.setPrefWidth(newValue.doubleValue());
-                }
-            }
-        });
+//        progressBar.widthProperty().addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                if (oldValue.intValue() != 0) {
+//                    rootLayout.setPrefWidth(newValue.doubleValue());
+////                    hbox.setPrefWidth(newValue.doubleValue());
+////                    vbox.setPrefWidth(newValue.doubleValue());
+//                    progressBar.setPrefWidth(newValue.doubleValue());
+//                }
+//            }
+//        });
         btnImport.setOnMouseClicked(event -> {
             //开始入库后不能再选择预览数量
-            cbPreviewSize.setVisible(false);
+            cbPreviewSize.setDisable(true);
+            coDataType.setDisable(true);
+            btnImport.setDisable(true);
+            rbDeleteExisted.setDisable(true);
             //入库过程中不能关闭窗口及其父窗口
             Stage stageDataPreview = (Stage) btnImport.getScene().getWindow();
             stageDataPreview.setOnCloseRequest(e -> {
@@ -205,7 +212,7 @@ public class DataPreview implements Initializable {
                 }
                 if (checkImporter2(checkMapping)) {
                     hbox.setVisible(true);
-                    Long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
+                    long allNumber = layer.GetFeatureCount();//得到一共需要入库的条数;
                     //是否删除已经存在于ES中的该类型数据
                     if (rbDeleteExisted.isSelected()) {
                         String indexNames = "";
@@ -221,21 +228,13 @@ public class DataPreview implements Initializable {
                             indexNames = "themes";
                             uuidField = "自动生成";//专题数据的唯一id还不确定
                         }
-                        List<IndexType> listIndexType = new ArrayList<>();
-                        listIndexType.addAll(indexTypeMapper.selectByIndice(indexNames));
-                        List<String> listIndexTypeNames = new ArrayList<>();
-                        for (int i = 0; i < listIndexType.size(); i++) {
-                            listIndexTypeNames.add(listIndexType.get(i).getDtype());
-                        }
+                        List<IndexType> listIndexType = indexTypeMapper.selectByIndice(indexNames);
+                        List<String> listIndexTypeNames = listIndexType.stream().map(IndexType::getDtype).collect(Collectors.toList());
                         if (listIndexTypeNames.contains(coDataType.getValue())) {
                             new Alert(Alert.AlertType.INFORMATION, "正在删除数据，请等待。", ButtonType.OK).showAndWait();
                             //数据库中删除
-                            String id = "";
-                            for (int m = 0; m < listIndexType.size(); m++) {
-                                if (listIndexType.get(m).getDtype().equals(coDataType.getValue()))
-                                    id = listIndexType.get(m).getId();
-                                indexTypeMapper.deleteByPrimaryKey(id);
-                            }
+                            String id = listIndexType.get(listIndexTypeNames.indexOf(coDataType.getValue())).getId();
+                            indexTypeMapper.deleteByPrimaryKey(id);
                             //在ES中删除该类别数据
                             long number = Main.getHelper().getDtypeDocCount(indexNames, coDataType.getValue());
                             long result = Main.getHelper().deleteDtype(indexNames, coDataType.getValue());
@@ -270,28 +269,22 @@ public class DataPreview implements Initializable {
                             return new Importer(Main.getHelper(), Main.getSetting(), esIndex, dtype, layer, fields, uuidField, fieldMapping, analyzable, skipEmptyGeom, category, dtype);
                         }
                     };
-                    lableAllNumber.setText(allNumber.toString() + "条数据");
                     progressBar.progressProperty().bind(service.progressProperty());
                     service.start();
                     service.progressProperty().addListener((observable, oldValue, newValue) -> {
-//             long endTime = System.currentTimeMillis();    //获取结束时间
-//             labelTime.setText((endTime - startTime) / 1000.0 + "s");
-                        labelNumber.setText((int) (newValue.doubleValue() * allNumber) + "条数据");
+                        lbCount.setText((int) (newValue.doubleValue() * allNumber) + "");
                     });
                     long startTime = System.currentTimeMillis();    //获取开始时间
                     Thread thread = new Thread() {
                         public void run() {
                             while (progressBar.progressProperty().get() < 1) {
                                 long endTime = System.currentTimeMillis();    //获取结束时间
-//                                System.out.println(endTime);
                                 Platform.runLater(() -> {
-                                    long time = (endTime - startTime) / 1000;
-//                                    labelTime.setText((endTime - startTime) / 1000.0 + "s");//UI界面的改变一定要写到platform.runlater中
-                                    if (time <= 60) {
-                                        labelTime.setText(time + "s");
-                                    } else {
-                                        labelTime.setText(time / 60 + "分" + (time - time / 60 * 60) + "s");
-                                    }
+                                    long seconds = (endTime - startTime) / 1000;
+                                    if (seconds < 3600) {
+                                        lbTime.setText(String.format("%d:%02d", seconds / 60, seconds % 60));
+                                    } else
+                                        lbTime.setText(String.format("%d:%02d:%02d", seconds / 3600, seconds % 3600 / 60, seconds % 60));
                                 });
                                 try {
                                     //睡眠1000毫秒,即每秒更新一下时间
@@ -326,6 +319,7 @@ public class DataPreview implements Initializable {
                 }
             }
         });
+        lbTotal.setText(layer.GetFeatureCount() + "");
     }
 
     Boolean checkImporter(List<String> checkMapping) {
