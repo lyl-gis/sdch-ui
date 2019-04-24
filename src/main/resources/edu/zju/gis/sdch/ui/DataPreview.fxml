@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:id="rootLayout" prefHeight="719.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+<BorderPane fx:id="rootLayout" prefHeight="719.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.zju.gis.sdch.ui.DataPreview">
     <top>
         <HBox prefHeight="0.0" prefWidth="778.0" spacing="40.0" BorderPane.alignment="CENTER">
@@ -64,23 +64,23 @@
                         <Insets bottom="15.0" left="25.0" right="20.0" top="15.0"/>
                     </padding>
                 </ProgressBar>
-                <HBox prefHeight="15.0" prefWidth="718.0" spacing="40.0">
-                    <Label prefHeight="20.0" prefWidth="45.0" text="共有"/>
-                    <Label fx:id="lbTotal" prefHeight="20.0" prefWidth="20.0" text="0"/>
-                    <Label prefHeight="20.0" prefWidth="50.0" text="条数据"/>
+                <HBox prefHeight="15.0" prefWidth="718.0" spacing="20.0">
+                    <Label prefHeight="15.0" prefWidth="46.0" text="共有"/>
+                    <Label fx:id="lbTotal" prefHeight="15.0" prefWidth="97.0" text="0"/>
+                    <Label prefHeight="15.0" prefWidth="74.0" text="条数据"/>
                     <Label prefHeight="15.0" prefWidth="45.0" text="已入库">
                         <HBox.margin>
                             <Insets left="100.0"/>
                         </HBox.margin>
                     </Label>
-                    <Label fx:id="lbCount" prefHeight="20.0" prefWidth="20.0" text="0"/>
-                    <Label prefHeight="20.0" prefWidth="50.0" text="条数据"/>
+                    <Label fx:id="lbCount" prefHeight="15.0" prefWidth="111.0" text="0"/>
+                    <Label prefHeight="15.0" prefWidth="59.0" text="条数据"/>
                     <Label prefHeight="20.0" prefWidth="55.0" text="已耗时">
                         <HBox.margin>
                             <Insets left="100.0"/>
                         </HBox.margin>
                     </Label>
-                    <Label fx:id="lbTime" prefHeight="20.0" prefWidth="47.0" text="0:00"/>
+                    <Label fx:id="lbTime" prefHeight="15.0" prefWidth="56.0" text="0:00"/>
                     <VBox.margin>
                         <Insets left="30.0"/>
                     </VBox.margin>

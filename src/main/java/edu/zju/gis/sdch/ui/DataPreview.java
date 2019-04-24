@@ -184,25 +184,25 @@ public class DataPreview implements Initializable {
             btnImport.setDisable(true);
             rbDeleteExisted.setDisable(true);
             //入库过程中不能关闭窗口及其父窗口
-            Stage stageDataPreview = (Stage) btnImport.getScene().getWindow();
-            stageDataPreview.setOnCloseRequest(e -> {
-                e.consume();
-                new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
-            });
-            Stage stageMainPort = (Stage) mainPort.rootLayout.getScene().getWindow();
-            stageMainPort.setOnCloseRequest(e -> {
-                if (importTag != 2) {
-                    e.consume();
-                    new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
-                }
-            });
-            Stage stageMainPage = (Stage) mainPage.rootLayout.getScene().getWindow();
-            stageMainPage.setOnCloseRequest(e -> {
-                if (importTag != 2) {
-                    e.consume();
-                    new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
-                }
-            });
+//            Stage stageDataPreview = (Stage) btnImport.getScene().getWindow();
+//            stageDataPreview.setOnCloseRequest(e -> {
+//                e.consume();
+//                new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
+//            });
+//            Stage stageMainPort = (Stage) mainPort.rootLayout.getScene().getWindow();
+//            stageMainPort.setOnCloseRequest(e -> {
+//                if (importTag != 2) {
+//                    e.consume();
+//                    new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
+//                }
+//            });
+//            Stage stageMainPage = (Stage) mainPage.rootLayout.getScene().getWindow();
+//            stageMainPage.setOnCloseRequest(e -> {
+//                if (importTag != 2) {
+//                    e.consume();
+//                    new Alert(Alert.AlertType.INFORMATION, "正在进行入库，无法关闭窗口", ButtonType.OK).showAndWait();
+//                }
+//            });
             if (coDataType.getValue().equals("")) {
                 new Alert(Alert.AlertType.INFORMATION, "请选择dtype的值", ButtonType.OK).showAndWait();
             } else {
@@ -246,6 +246,7 @@ public class DataPreview implements Initializable {
                     Service<Double> service = new Service<Double>() {
                         @Override
                         protected Task<Double> createTask() {
+                            importTag = 1;
                             String esIndex = "";
                             if (mainPage.cbCategory.getValue().equals("框架数据")) {
                                 esIndex = "sdmap";
@@ -269,6 +270,23 @@ public class DataPreview implements Initializable {
                             return new Importer(Main.getHelper(), Main.getSetting(), esIndex, dtype, layer, fields, uuidField, fieldMapping, analyzable, skipEmptyGeom, category, dtype);
                         }
                     };
+                    //入库过程中关闭窗口则结束任务
+                    Stage stageDataPreview = (Stage) btnImport.getScene().getWindow();
+                    stageDataPreview.setOnCloseRequest(e -> {
+                        service.cancel();
+                    });
+                    Stage stageMainPort = (Stage) mainPort.rootLayout.getScene().getWindow();
+                    stageMainPort.setOnCloseRequest(e -> {
+                        if (importTag == 1) {
+                            service.cancel();
+                            System.exit(0);
+                        }
+                    });
+                    Stage stageMainPage = (Stage) mainPage.rootLayout.getScene().getWindow();
+                    stageMainPage.setOnCloseRequest(e -> {
+                        service.cancel();
+                    });
+
                     progressBar.progressProperty().bind(service.progressProperty());
                     service.start();
                     service.progressProperty().addListener((observable, oldValue, newValue) -> {
@@ -301,7 +319,7 @@ public class DataPreview implements Initializable {
                             case READY:
                                 break;
                             case SUCCEEDED:
-                                importTag = 2;
+//                                importTag = 2;
                                 long error = service.getValue().longValue();
                                 if (error > 0)
                                     new Alert(Alert.AlertType.INFORMATION, error + "条数据入库失败", ButtonType.OK)
