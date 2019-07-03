@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
  */
 public class Importer extends Task<Double> {
     private static final Logger log = LogManager.getLogger(Importer.class);
+    private static final int BATCH_SIZE = 10;
     /**
      * 索引名
      */
@@ -148,8 +149,7 @@ public class Importer extends Task<Double> {
         CoordinateTransformation transformation = null;
         if (sr.IsProjected() == 1)
             transformation = osr.CreateCoordinateTransformation(sr, sr.CloneGeogCS());
-        final int batchSize = 100;
-        Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, batchSize, fields, uuidField, skipEmptyGeom, transformation);
+        Map<String, Map<String, Object>> records = GdalHelper.getNextNFeatures(layer, BATCH_SIZE, fields, uuidField, skipEmptyGeom, transformation);
         Set<String> destKeys = fieldMapping.keySet();
         long error = 0;
         long count = 0;
@@ -165,7 +165,7 @@ public class Importer extends Task<Double> {
             count += records.size();
             updateProgress(count * 1.0 / layer.GetFeatureCount(), 1);
             log.info("当前已入库失败{}条记录", error);
-            records = GdalHelper.getNextNFeatures(layer, batchSize, fields, uuidField, skipEmptyGeom, transformation);
+            records = GdalHelper.getNextNFeatures(layer, BATCH_SIZE, fields, uuidField, skipEmptyGeom, transformation);
         }
         updateProgress(1, 1);
         return (double) error;
